@@ -35,5 +35,5 @@ The full list with links is in [`docs/upstream/README_EN_US.md`](docs/upstream/R
 ## Services and trademarks
 - "Minecraft" is a trademark of Mojang Synergies AB. Voxelium does not include or redistribute any Minecraft game files. They are downloaded from Mojang's servers to the user's device.
 - Microsoft sign-in uses the public OAuth client ID `00000000402b5328`, the same one Amethyst and PojavLauncher use.
-- The CurseForge API key is supplied at build time from the git-ignored `Config/curseforge.key` and is never committed. Voxelium's rule is that CurseForge files without a `downloadUrl` are not downloaded; the launcher links to the CurseForge website instead. **Known gap (0.1.0):** upstream code still builds a CDN link for such files (`CurseForgeFile.fixedFileUrl()`). This is being changed before CurseForge support ships.
+- The CurseForge API key is supplied at build time from the git-ignored `Config/curseforge.key` and is never committed. CurseForge files without a `downloadUrl` are never downloaded another way. The version list links to the project's files page on CurseForge's website, and a modpack that needs such files stops with a list of their CurseForge links.
 - Modrinth content is fetched from the public Modrinth API.

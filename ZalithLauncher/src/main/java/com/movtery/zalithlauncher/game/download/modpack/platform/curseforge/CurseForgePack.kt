@@ -28,6 +28,7 @@ import com.movtery.zalithlauncher.game.download.assets.platform.curseforge.model
 import com.movtery.zalithlauncher.game.download.assets.platform.mcim.mapMCIMMirrorUrls
 import com.movtery.zalithlauncher.game.download.assets.platform.mirroredCurseForgeSource
 import com.movtery.zalithlauncher.game.download.assets.platform.mirroredPlatformSearcher
+import com.movtery.zalithlauncher.game.download.modpack.install.WebsiteOnlyFileException
 import com.movtery.zalithlauncher.game.download.modpack.install.ModFile
 import com.movtery.zalithlauncher.game.download.modpack.install.ModPackInfo
 import com.movtery.zalithlauncher.game.download.modpack.install.ModPackInfoTask
@@ -78,7 +79,6 @@ class CurseForgePack(
                                     fileID = manifestFile.fileID.toString()
                                 )
                             }.data
-                            val url = version.fixedFileUrl() ?: throw IOException("Can't get the file url")
                             val fileName = version.fileName ?: throw IOException("Can't get the file name")
 
                             //获取项目
@@ -89,6 +89,11 @@ class CurseForgePack(
                                     projectID = manifestFile.projectID.toString()
                                 )
                             }.data
+                            //Voxelium: no downloadUrl means the author only allows downloads from CurseForge's website
+                            val url = version.fixedFileUrl() ?: throw WebsiteOnlyFileException(
+                                name = project.name,
+                                websiteUrl = project.links.websiteUrl?.let { "${it.trimEnd('/')}/files/${manifestFile.fileID}" }
+                            )
                             //通过项目类型指定目标下载目录
                             val folder = project.getPlatformClassesOrNull()
                                 ?.versionFolder?.folderName
@@ -103,6 +108,7 @@ class CurseForgePack(
                             )
                         }.onFailure { e ->
                             when (e) {
+                                is WebsiteOnlyFileException -> Logger.info(TAG, "Only on CurseForge's website: projectID=${manifestFile.projectID}, fileID=${manifestFile.fileID}")
                                 is FileNotFoundException -> Logger.warning(TAG, "Could not query api.curseforge.com for deleted mods: ${manifestFile.projectID}, ${manifestFile.fileID}", e)
                                 is IOException, is JsonParseException -> Logger.warning(TAG, "Unable to fetch the file name projectID=${manifestFile.projectID}, fileID=${manifestFile.fileID}", e)
                                 else -> Logger.warning(TAG, "Unable to fetch the file name projectID=${manifestFile.projectID}, fileID=${manifestFile.fileID}", e)

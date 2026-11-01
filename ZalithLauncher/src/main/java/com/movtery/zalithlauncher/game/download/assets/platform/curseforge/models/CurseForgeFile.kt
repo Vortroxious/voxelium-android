@@ -42,7 +42,6 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.JsonArray
 import java.io.FileNotFoundException
 import java.io.IOException
-import java.net.URLEncoder
 import java.time.Instant
 
 @Serializable
@@ -319,20 +318,11 @@ class CurseForgeFile(
 }
 
 /**
- * 获取修正后的文件下载链接，若下载链接为null，则根据id与文件名称计算下载链接
+ * Voxelium: the file's download link, only as CurseForge gives it. A null downloadUrl means the
+ * author doesn't allow downloads in other apps, so no CDN link is built for it: such files are
+ * only linked to on CurseForge's website.
  */
-fun CurseForgeFile.fixedFileUrl(): String? {
-    return downloadUrl
-        ?: fileName?.let { curseForgeCDNUrl(id, it) }
-}
-
-/**
- * 根据 CurseForge 的文件 ID 与文件名称拼出 CDN 下载链接
- */
-fun curseForgeCDNUrl(fileId: Int, fileName: String): String {
-    val encoded = URLEncoder.encode(fileName, "UTF-8").replace("+", "%20")
-    return "https://edge.forgecdn.net/files/${fileId / 1000}/${fileId % 1000}/$encoded"
-}
+fun CurseForgeFile.fixedFileUrl(): String? = downloadUrl
 
 /**
  * 获取Sha1值

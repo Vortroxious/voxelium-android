@@ -50,6 +50,7 @@ import com.movtery.zalithlauncher.ui.screens.content.elements.DisabledAlpha
 import com.movtery.zalithlauncher.ui.upgrade.UpgradeDialog
 import com.movtery.zalithlauncher.ui.upgrade.UpgradeFilesDialog
 import com.movtery.zalithlauncher.upgrade.GithubContentApi
+import com.movtery.zalithlauncher.upgrade.GithubReleaseSource
 import com.movtery.zalithlauncher.upgrade.RemoteData
 import com.movtery.zalithlauncher.upgrade.TooFrequentOperationException
 import com.movtery.zalithlauncher.utils.logging.Logger
@@ -83,7 +84,6 @@ sealed interface LauncherUpgradeOperation {
 private const val LATEST_VERSION = "latest_version_md.json"
 private const val LATEST_API_URL = "$URL_PROJECT_INFO/$LATEST_VERSION"
 private const val LATEST_API_CHINESE_URL = "https://repo.miawa.cn/zalith-info/v2/$LATEST_VERSION"
-private const val VOXELIUM_UPGRADE_CHECK_DISABLED = true
 
 /**
  * 用于记录启动器更新 ViewModel
@@ -191,12 +191,25 @@ class LauncherUpgradeViewModel: ViewModel() {
      * 从远端获取最新的启动器信息
      */
     private suspend fun fetchRemoteData(): RemoteData? {
-        //Voxelium: the upstream source describes Zalith Launcher 2 releases, not Voxelium ones.
-        //Disabled until the check reads Voxelium's own GitHub releases.
-        if (VOXELIUM_UPGRADE_CHECK_DISABLED) {
-            Logger.info(TAG, "Launcher upgrade check is disabled in this build.")
-            return null
+        //Voxelium: read this project's own GitHub releases; the upstream source describes
+        //Zalith Launcher 2 releases, not Voxelium ones
+        return withContext(Dispatchers.IO) {
+            runCatching {
+                withRetry(logTag = "LauncherUpgrade", maxRetries = 2) {
+                    GithubReleaseSource.fetchLatest()
+                }
+            }.getOrElse { e ->
+                Logger.warning(TAG, "Failed to check for launcher upgrade!", e)
+                null
+            }
         }
+    }
+
+    /**
+     * Upstream's source (Zalith Launcher 2 releases), unused by Voxelium
+     */
+    @Suppress("unused")
+    private suspend fun fetchUpstreamRemoteData(): RemoteData? {
         return withContext(Dispatchers.IO) {
             runCatching {
                 withRetry(logTag = "LauncherUpgrade", maxRetries = 2) {

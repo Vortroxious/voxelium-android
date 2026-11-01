@@ -38,6 +38,7 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import java.io.FileNotFoundException
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
 
 private const val TAG = "ModDownloader"
@@ -56,7 +57,10 @@ class ModDownloader(
         val resolvedFailures = AtomicInteger(0)
         val missingMods = AtomicInteger(0)
         val skippedMods = ConcurrentHashMap.newKeySet<String>()
-        val tasks = prepareAll(resolvedFailures, missingMods)
+        val websiteOnly = ConcurrentLinkedQueue<WebsiteOnlyFileException>()
+        val tasks = prepareAll(resolvedFailures, missingMods, websiteOnly)
+        //Voxelium: stop before downloading anything if some files are only on CurseForge's website
+        if (websiteOnly.isNotEmpty()) throw WebsiteOnlyModsException(websiteOnly.toList())
 
         try {
             runBatch(task, tasks, R.string.download_modpack_download_mods, missingMods, skippedMods)
@@ -113,7 +117,11 @@ class ModDownloader(
     }
 
     /** 并发解析全部模组的下载信息，解析失败的记入失败计数 */
-    private suspend fun prepareAll(resolvedFailures: AtomicInteger, missingMods: AtomicInteger): List<DownloadTask> =
+    private suspend fun prepareAll(
+        resolvedFailures: AtomicInteger,
+        missingMods: AtomicInteger,
+        websiteOnly: ConcurrentLinkedQueue<WebsiteOnlyFileException>
+    ): List<DownloadTask> =
         coroutineScope {
             val semaphore = Semaphore(maxDownloadThreads)
             mods.map { mod ->
@@ -123,6 +131,9 @@ class ModDownloader(
                             prepare(mod)
                         } catch (_: CancellationException) {
                             throw CancellationException("mod link resolving cancelled")
+                        } catch (e: WebsiteOnlyFileException) {
+                            websiteOnly.add(e)
+                            null
                         } catch (_: FileNotFoundException) {
                             //已在源端下架（404）的模组会被跳过而不是终止安装
                             missingMods.incrementAndGet()

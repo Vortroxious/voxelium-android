@@ -271,6 +271,8 @@ suspend fun Account.refreshMicrosoft(
     )
     apply {
         this.accessToken = newAcc.accessToken
+        //Voxelium: keep the new token's expiry, or every later launch treats it as expired
+        this.expiresAt = newAcc.expiresAt
         this.clientToken = newAcc.clientToken
         this.profileId = newAcc.profileId
         this.username = newAcc.username

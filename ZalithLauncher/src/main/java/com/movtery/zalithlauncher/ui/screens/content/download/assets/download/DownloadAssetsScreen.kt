@@ -36,6 +36,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -63,6 +64,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.game.download.assets.favorites.FavoriteProjectsRepository
+import com.movtery.zalithlauncher.game.download.assets.platform.curseforge.models.CurseForgeFile
+import com.movtery.zalithlauncher.game.download.assets.platform.curseforge.models.fixedFileUrl
 import com.movtery.zalithlauncher.game.download.assets.platform.Platform
 import com.movtery.zalithlauncher.game.download.assets.platform.PlatformClasses
 import com.movtery.zalithlauncher.game.download.assets.platform.PlatformProject
@@ -133,6 +136,16 @@ private class DownloadScreenViewModel(
     var versionsLoading by mutableStateOf<DownloadAssetsVersionLoading>(DownloadAssetsVersionLoading.None)
         private set
 
+    /** Voxelium: CurseForge files left out because their authors only allow downloads from CurseForge's website */
+    var websiteOnlyFiles by mutableStateOf(0)
+        private set
+
+    /** Voxelium: the project's files page on CurseForge, once the project has loaded */
+    val curseForgeFilesUrl: String?
+        get() = (projectResult as? DownloadAssetsState.Success)?.result?.first
+            ?.platformUrls(classes)?.projectUrl
+            ?.let { "$it/files" }
+
     var showOnlyMCRelease by mutableStateOf(true)
     var searchMCVersion by mutableStateOf("")
 
@@ -183,6 +196,9 @@ private class DownloadScreenViewModel(
                 onSuccess = { result ->
                     val versions: List<PlatformVersion> = result.initAll(projectId)
                     rawVersions = versions
+                    websiteOnlyFiles = result.count { version ->
+                        version is CurseForgeFile && version.fixedFileUrl() == null && versions.none { it === version }
+                    }
 
                     //版本列表先行展示，依赖项目信息改为后台缓存，不再阻塞列表加载
                     _versionsList = versions.mapWithVersions(classes)
@@ -371,6 +387,7 @@ fun DownloadAssetsScreen(
                 viewModel = viewModel,
                 installedChecker = installedChecker,
                 onReload = { viewModel.getVersions() },
+                openLink = { url -> eventViewModel.sendEvent(EventViewModel.Event.OpenLink(url)) },
                 onItemClicked = { version ->
                     val deps = version.platformDependencies().mapNotNull { dep ->
                         val key = dep.cacheKey()
@@ -423,6 +440,7 @@ private fun Versions(
     viewModel: DownloadScreenViewModel,
     installedChecker: ((PlatformVersion) -> InstalledMod?)? = null,
     onReload: () -> Unit = {},
+    openLink: (String) -> Unit = {},
     onItemClicked: (PlatformVersion) -> Unit = {}
 ) {
     when (val versions = viewModel.versionsResult) {
@@ -498,6 +516,27 @@ private fun Versions(
                             )
                         }
                     )
+                }
+
+                //Voxelium: say which files are only on CurseForge's website, and link to them
+                if (viewModel.websiteOnlyFiles > 0) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = stringResource(R.string.download_assets_curseforge_website_only, viewModel.websiteOnlyFiles),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        viewModel.curseForgeFilesUrl?.let { url ->
+                            TextButton(onClick = { openLink(url) }) {
+                                Text(text = stringResource(R.string.download_assets_open_curseforge))
+                            }
+                        }
+                    }
                 }
 
                 HorizontalDivider(
