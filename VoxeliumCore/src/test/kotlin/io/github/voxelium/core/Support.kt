@@ -21,6 +21,10 @@ object Fixture {
 
     fun bytes(name: String): ByteArray =
         requireNotNull(Fixture::class.java.getResource("/fixtures/$name.json")) { "missing fixture $name" }.readBytes()
+
+    /** A fixture file by its path under fixtures/, e.g. "content/broken.jar". */
+    fun file(path: String): File =
+        File(requireNotNull(Fixture::class.java.getResource("/fixtures/$path")) { "missing fixture $path" }.toURI())
 }
 
 /** A fresh temp directory per test; call [close] (or use `use`) to remove it. */

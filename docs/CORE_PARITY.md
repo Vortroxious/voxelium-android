@@ -31,14 +31,14 @@ ZalithLauncher2 code remains only as the engine: Java launch over JNI, renderers
 | Accounts/Keychain.swift | (app) game/account/AccountSecrets.kt | ✅ | e28b28b | Android Keystore AES-GCM; tokens and third-party passwords are encrypted in the Room `accounts` table |
 | Launch/UpdateCheck.swift | launch/UpdateCheck.kt | ✅ | e28b28b | repository is a parameter; releases also carry body, date and assets (the app offers the APK); app adapter `upgrade/GithubReleaseSource.kt` |
 | Config/SettingsStore.swift | config/SettingsStore.kt | ✅ | e28b28b | `effectiveRenderScale` not ported (iOS window code); not used by the app until the Voxelium UI (phase 7) |
-| Content/Modrinth.swift | | ⏳ 4 | | |
-| Content/CurseForge.swift | | ⏳ 4 | | |
-| Content/ContentManager.swift | | ⏳ 4 | | |
-| Content/ZipReader.swift | | ⏳ 4 | | `java.util.zip` |
+| Content/Modrinth.swift | content/Modrinth.kt | ✅ | e28b28b | not yet used by the app: connected with the Voxelium content screens (phase 7) |
+| Content/CurseForge.swift | content/CurseForge.kt | ✅ | e28b28b | as Modrinth; ZalithLauncher2's browser already follows the website-only rule meanwhile |
+| Content/ContentManager.swift | content/ContentManager.kt | ✅ | e28b28b | as Modrinth |
+| Content/ZipReader.swift | content/ZipReader.kt | ✅ | e28b28b | `java.util.zip` instead of the hand-written reader; `Closeable` |
 | Content/Modpack.swift | | ⏳ 5 | | |
 | Content/WorldManager.swift | | ⏳ 5 | | |
 | Launch/GameInstaller.swift | | ⏳ 6 | | |
-| Launch/ModLoaders.swift | | ⏳ 6 | | |
+| Launch/ModLoaders.swift | launch/ModLoader.kt (enum only) | ⏳ 6 | e28b28b | `ModLoader` ported in phase 4; installers and `isAvailable` in phase 6 |
 | Launch/ForgeInstaller.swift | | ⏳ 6 | | |
 | Launch/ForgeLaunch.swift | | ⏳ 6 | | |
 | Launch/VersionResolver.swift | | ⏳ 6 | | |
@@ -66,6 +66,9 @@ ZalithLauncher2 code remains only as the engine: Java launch over JNI, renderers
 | MicrosoftAuthTests (+ PlannerTests' offline UUID) | accounts/MicrosoftAuthTests.kt | 6 + 1 |
 | UpdateCheckTests | launch/UpdateCheckTests.kt | 5 |
 | SystemTests: SettingsTests | config/SettingsTests.kt | 3 (not `largeInterfaceSnapsToMinecraftsGUISteps`) |
+| ContentManagerTests (ContentManagerTests suite) | content/ContentManagerTests.kt | 7 (Iris, GameOptions and ShaderLaunchAdvice suites come with phase 6) |
+| ModrinthTests | content/ModrinthTests.kt | 5 |
+| CurseForgeTests | content/CurseForgeTests.kt | 7 |
 | — | download/NetworkTests.kt | 1, opt-in, real network |
 
 Swift's parameterised cases (`mavenPaths`, `rejectsTraversal`) are loops inside a single Kotlin test.
