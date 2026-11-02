@@ -48,5 +48,16 @@ class ZipReader(file: File) : Closeable {
         }
     }
 
+    /** Streams [name] to [destination] (for large entries such as world region files); false if there is no such entry. */
+    fun extract(name: String, destination: File): Boolean {
+        val entry = zip.getEntry(name) ?: return false
+        try {
+            zip.getInputStream(entry).use { input -> destination.outputStream().use { input.copyTo(it) } }
+        } catch (e: ZipException) {
+            throw ZipError.Corrupt("data of $name (${e.message})")
+        }
+        return true
+    }
+
     override fun close() = zip.close()
 }

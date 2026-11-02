@@ -136,6 +136,36 @@ class ModrinthApi(private val http: HttpClient = OkHttpJsonClient()) {
 
     suspend fun version(id: String): Version = getDecoded("$BASE/version/$id", Version.serializer(), "Modrinth version")
 
+    /**
+     * Modrinth modpacks for a loader Voxelium can run (Fabric, Quilt, Forge, NeoForge), optionally for
+     * one Minecraft version. (Swift: extension ModrinthAPI in Modpack.swift.)
+     */
+    suspend fun searchModpacks(
+        query: String, gameVersion: String? = null, sort: Sort = Sort.RELEVANCE, offset: Int = 0, limit: Int = 20
+    ): SearchPage {
+        val facets = mutableListOf(
+            listOf("project_type:modpack"),
+            listOf("categories:fabric", "categories:quilt", "categories:forge", "categories:neoforge")
+        )
+        if (gameVersion != null) facets.add(listOf("versions:$gameVersion"))
+        val url = "$BASE/search".toHttpUrl().newBuilder()
+            .addQueryParameter("query", query)
+            .addQueryParameter("facets", jsonArray(facets.map { group -> jsonArray(group.map { quoted(it) }) }))
+            .addQueryParameter("index", sort.id)
+            .addQueryParameter("offset", offset.toString())
+            .addQueryParameter("limit", limit.toString())
+            .build().toString()
+        return getDecoded(url, SearchPage.serializer(), "Modrinth search")
+    }
+
+    /** A modpack's versions for a loader Voxelium can run, newest first. */
+    suspend fun modpackVersions(project: String): List<Version> {
+        val url = "$BASE/project/$project/version".toHttpUrl().newBuilder()
+            .addQueryParameter("loaders", jsonArray(listOf("fabric", "quilt", "forge", "neoforge").map { quoted(it) }))
+            .build().toString()
+        return getDecoded(url, ListSerializer(Version.serializer()), "Modrinth versions")
+    }
+
     suspend fun project(id: String): Project = getDecoded("$BASE/project/$id", Project.serializer(), "Modrinth project")
 
     /** Which Modrinth versions these files (by SHA-1) are; unknown hashes are absent. */

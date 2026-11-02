@@ -35,8 +35,8 @@ ZalithLauncher2 code remains only as the engine: Java launch over JNI, renderers
 | Content/CurseForge.swift | content/CurseForge.kt | ✅ | e28b28b | as Modrinth; ZalithLauncher2's browser already follows the website-only rule meanwhile |
 | Content/ContentManager.swift | content/ContentManager.kt | ✅ | e28b28b | as Modrinth |
 | Content/ZipReader.swift | content/ZipReader.kt | ✅ | e28b28b | `java.util.zip` instead of the hand-written reader; `Closeable` |
-| Content/Modpack.swift | | ⏳ 5 | | |
-| Content/WorldManager.swift | | ⏳ 5 | | |
+| Content/Modpack.swift | content/Modpack.kt (+ modpack search in content/Modrinth.kt) | ✅ partly | e28b28b | index, checks, record, search; `ModpackInstaller.install` (needs GameInstaller) comes with phase 6 |
+| Content/WorldManager.swift | content/WorldManager.kt | ✅ | e28b28b | ZIP64 works (java.util.zip); entries streamed to disk; not yet used by the app (Voxelium Worlds screen, phase 7) |
 | Launch/GameInstaller.swift | | ⏳ 6 | | |
 | Launch/ModLoaders.swift | launch/ModLoader.kt (enum only) | ⏳ 6 | e28b28b | `ModLoader` ported in phase 4; installers and `isAvailable` in phase 6 |
 | Launch/ForgeInstaller.swift | | ⏳ 6 | | |
@@ -69,6 +69,8 @@ ZalithLauncher2 code remains only as the engine: Java launch over JNI, renderers
 | ContentManagerTests (ContentManagerTests suite) | content/ContentManagerTests.kt | 7 (Iris, GameOptions and ShaderLaunchAdvice suites come with phase 6) |
 | ModrinthTests | content/ModrinthTests.kt | 5 |
 | CurseForgeTests | content/CurseForgeTests.kt | 7 |
+| WorldManagerTests | content/WorldManagerTests.kt | 5 |
+| ModpackTests | content/ModpackTests.kt | 3 (+1 Android: overrides planning); `installsAVanillaPackWithOverrides` with phase 6 |
 | — | download/NetworkTests.kt | 1, opt-in, real network |
 
 Swift's parameterised cases (`mavenPaths`, `rejectsTraversal`) are loops inside a single Kotlin test.
