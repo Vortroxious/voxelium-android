@@ -201,30 +201,6 @@ suspend fun getTokenResponse(
 }
 
 /**
- * Voxelium: redeems the authorization code from the Live web sign-in ([LiveSignIn])
- */
-suspend fun redeemLiveCode(code: String, context: CoroutineContext): TokenResponse {
-    val response = withRetry {
-        submitForm<JsonObject>(
-            url = "$LIVE_AUTH_URL/oauth20_token.srf",
-            parameters = Parameters.build {
-                append("client_id", BuildKeys.OAUTH_CLIENT_ID)
-                append("code", code)
-                append("grant_type", "authorization_code")
-                append("redirect_url", LIVE_REDIRECT_URL)
-                append("scope", LIVE_SCOPE)
-            },
-            context = context
-        )
-    }
-    return TokenResponse(
-        accessToken = response["access_token"].text(),
-        refreshToken = response["refresh_token"].text(),
-        expiresIn = response["expires_in"]?.jsonPrimitive?.int ?: 0
-    )
-}
-
-/**
  * 从 OAuth 错误响应中解析 error 字段
  */
 private suspend fun ClientRequestException.errorCode(): String? {
@@ -298,9 +274,6 @@ private suspend fun refreshAccessToken(
                     append("client_id", BuildKeys.OAUTH_CLIENT_ID)
                     append("refresh_token", refreshToken)
                     append("grant_type", "refresh_token")
-                    //Voxelium: Live tokens are refreshed with the same scope and redirect they were issued for
-                    append("redirect_url", LIVE_REDIRECT_URL)
-                    append("scope", LIVE_SCOPE)
                 },
                 context = context
             )
@@ -345,15 +318,15 @@ private suspend fun authenticateXBL(accessToken: String, update: (AsyncStatus) -
         return Pair(response["Token"].text(), uhs)
     }
 
-    //Voxelium: Live (MBI_SSL) tokens go as a bare RpsTicket, as PojavLauncher / Amethyst send them;
-    //the "d=" prefix upstream sends first is for identity platform tokens, kept as the fallback
     return withRetry {
         try {
-            requestXblToken(accessToken)
+            requestXblToken("d=$accessToken")
         } catch (e: ClientRequestException) {
+            // 参考 Wiki：RpsTicket 如遇 400 Bad Request，可尝试去掉 "d=" 前缀重新请求
+            // https://zh.minecraft.wiki/w/Tutorial:%E7%BC%96%E5%86%99%E5%90%AF%E5%8A%A8%E5%99%A8#Xbox_Live%E8%BA%AB%E4%BB%BD%E9%AA%8C%E8%AF%81
             if (e.response.status.value == 400) {
-                Logger.warning(TAG, "XBL authentication rejected the bare RpsTicket, retrying with the d= prefix")
-                requestXblToken("d=$accessToken")
+                Logger.warning(TAG, "XBL authentication rejected the d= prefixed RpsTicket, retrying without the prefix")
+                requestXblToken(accessToken)
             } else throw e
         }
     }

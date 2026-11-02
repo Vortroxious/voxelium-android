@@ -94,7 +94,15 @@ object AccountsManager {
     }
 
     private suspend fun suspendReloadAccounts() {
-        val loadedAccounts = accountDao.getAllAccounts()
+        //Voxelium: secrets are encrypted in the database (AccountSecrets); rows written before
+        //that are encrypted the first time they are loaded
+        val storedAccounts = accountDao.getAllAccounts()
+        storedAccounts.filter { AccountSecrets.hasPlainSecrets(it) }.forEach { plain ->
+            runCatching { accountDao.saveAccount(AccountSecrets.sealed(plain)) }
+                .onSuccess { Logger.info(TAG, "Encrypted the stored secrets of ${plain.username}") }
+                .onFailure { e -> Logger.error(TAG, "Failed to encrypt the stored secrets of ${plain.username}", e) }
+        }
+        val loadedAccounts = storedAccounts.map { AccountSecrets.opened(it) }
         _accounts.clear()
         _accounts.addAll(loadedAccounts)
 
@@ -248,7 +256,7 @@ object AccountsManager {
      */
     suspend fun suspendSaveAccount(account: Account) {
         runCatching {
-            accountDao.saveAccount(account)
+            accountDao.saveAccount(AccountSecrets.sealed(account))
             Logger.info(TAG, "Saved account: ${account.username}")
             //同时设置当前账号
             setCurrentAccountInternal(account)

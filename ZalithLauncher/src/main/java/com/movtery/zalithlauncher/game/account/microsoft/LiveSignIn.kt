@@ -18,9 +18,9 @@
 
 package com.movtery.zalithlauncher.game.account.microsoft
 
-import android.net.Uri
-import com.movtery.zalithlauncher.BuildKeys
 import com.movtery.zalithlauncher.utils.logging.Logger
+import io.github.voxelium.core.accounts.AuthException
+import io.github.voxelium.core.accounts.MicrosoftAuth
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 
@@ -29,25 +29,11 @@ import kotlinx.coroutines.CompletableDeferred
  *
  * The client ID `00000000402b5328` is a Microsoft account (Live) client, so it only works with
  * login.live.com, not with the Microsoft identity platform's device code flow upstream uses.
- * The sign-in page runs in the in-app web screen; when login.live.com sends the browser back with
- * `?code=…` (to `ms-xal-<client id>://auth/`, or to [LIVE_REDIRECT_URL]), the web screen hands the URL
- * to [LiveSignIn.handleRedirect].
+ * The sign-in page ([MicrosoftAuth.LIVE_AUTHORIZE_URL]) runs in the in-app web screen; when
+ * login.live.com sends the browser back with `?code=…` (to `ms-xal-<client id>://auth/`, or to
+ * [MicrosoftAuth.LIVE_REDIRECT]), the web screen hands the URL to [LiveSignIn.handleRedirect], and
+ * VoxeliumCore reads the code from it.
  */
-const val LIVE_SCOPE = "service::user.auth.xboxlive.com::MBI_SSL"
-const val LIVE_REDIRECT_URL = "$LIVE_AUTH_URL/oauth20_desktop.srf"
-
-private val LIVE_CALLBACK_PREFIX: String
-    get() = "ms-xal-${BuildKeys.OAUTH_CLIENT_ID}:"
-
-val LIVE_AUTHORIZE_URL: String
-    get() = Uri.parse("$LIVE_AUTH_URL/oauth20_authorize.srf").buildUpon()
-        .appendQueryParameter("client_id", BuildKeys.OAUTH_CLIENT_ID)
-        .appendQueryParameter("response_type", "code")
-        .appendQueryParameter("scope", LIVE_SCOPE)
-        .appendQueryParameter("redirect_url", LIVE_REDIRECT_URL)
-        .build()
-        .toString()
-
 object LiveSignIn {
     private const val TAG = "LiveSignIn"
 
@@ -70,27 +56,23 @@ object LiveSignIn {
      */
     fun handleRedirect(url: String?): Boolean {
         if (url == null) return false
-        if (!url.startsWith(LIVE_CALLBACK_PREFIX) && !url.startsWith(LIVE_REDIRECT_URL)) return false
+        if (!url.startsWith("${MicrosoftAuth.LIVE_CALLBACK_SCHEME}:") && !url.startsWith(MicrosoftAuth.LIVE_REDIRECT)) return false
         val deferred = pending ?: return false
-        val uri = Uri.parse(url)
-        val code = uri.getQueryParameter("code")
-        when {
-            !code.isNullOrEmpty() -> {
+        MicrosoftAuth.liveCode(url).fold(
+            onSuccess = { code ->
                 Logger.info(TAG, "Authorization code received")
                 deferred.complete(code)
+            },
+            onFailure = { e ->
+                if (e is AuthException.Declined) {
+                    Logger.info(TAG, "The user declined the sign-in")
+                    deferred.cancel(CancellationException("Sign-in declined"))
+                } else {
+                    Logger.warning(TAG, "Sign-in page returned an error: ${e.message}")
+                    deferred.completeExceptionally(e)
+                }
             }
-            uri.getQueryParameter("error")?.startsWith("access_denied") == true -> {
-                Logger.info(TAG, "The user declined the sign-in")
-                deferred.cancel(CancellationException("Sign-in declined"))
-            }
-            else -> {
-                val reason = uri.getQueryParameter("error_description")
-                    ?: uri.getQueryParameter("error")
-                    ?: "no code"
-                Logger.warning(TAG, "Sign-in page returned an error: $reason")
-                deferred.completeExceptionally(Exception(reason))
-            }
-        }
+        )
         return true
     }
 }

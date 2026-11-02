@@ -31,14 +31,11 @@ import com.movtery.zalithlauncher.game.account.auth_server.ResponseException
 import com.movtery.zalithlauncher.game.account.auth_server.data.AuthServer
 import com.movtery.zalithlauncher.game.account.auth_server.getAuthServeInfo
 import com.movtery.zalithlauncher.game.account.microsoft.AsyncStatus
-import com.movtery.zalithlauncher.game.account.microsoft.AuthType
 import com.movtery.zalithlauncher.game.account.microsoft.MinecraftProfileException
 import com.movtery.zalithlauncher.game.account.microsoft.NotPurchasedMinecraftException
 import com.movtery.zalithlauncher.game.account.microsoft.XboxLoginException
-import com.movtery.zalithlauncher.game.account.microsoft.LIVE_AUTHORIZE_URL
 import com.movtery.zalithlauncher.game.account.microsoft.LiveSignIn
-import com.movtery.zalithlauncher.game.account.microsoft.microsoftAuthAsync
-import com.movtery.zalithlauncher.game.account.microsoft.redeemLiveCode
+import com.movtery.zalithlauncher.game.account.microsoft.VoxeliumMicrosoftAuth
 import com.movtery.zalithlauncher.game.account.microsoft.toLocal
 import com.movtery.zalithlauncher.path.DOWNLOAD_OKHTTP_CLIENT
 import com.movtery.zalithlauncher.path.URL_USER_AGENT
@@ -49,12 +46,15 @@ import com.movtery.zalithlauncher.utils.copyText
 import com.movtery.zalithlauncher.utils.logging.Logger
 import com.movtery.zalithlauncher.utils.network.toLocal
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
+import io.github.voxelium.core.accounts.AuthException
+import io.github.voxelium.core.accounts.MicrosoftAuth
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.ResponseException as KtorResponseException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withContext
 import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONObject
@@ -123,7 +123,7 @@ fun microsoftLogin(
             task.updateMessage(androidText(R.string.account_microsoft_live_sign_in))
             val codeDeferred = LiveSignIn.begin()
             val code = try {
-                toWeb(LIVE_AUTHORIZE_URL)
+                toWeb(MicrosoftAuth.LIVE_AUTHORIZE_URL)
                 //give the web screen time to open before treating "not in the web screen" as leaving it
                 delay(1500)
                 while (!codeDeferred.isCompleted) {
@@ -144,13 +144,8 @@ fun microsoftLogin(
             }
             backToMain()
             task.updateProgress(-1f)
-            task.updateMessage(androidText(R.string.account_microsoft_getting_access_token))
-            val tokenResponse = redeemLiveCode(code, coroutineContext)
             val account = microsoftAuth(
-                AuthType.Access,
-                tokenResponse.refreshToken,
-                tokenResponse.accessToken,
-                coroutineContext = coroutineContext,
+                tokens = { auth -> auth.redeemLiveCode(code) },
                 updateProgress = task::updateProgress,
                 updateMessage = task::updateMessage,
             )
@@ -167,6 +162,7 @@ fun microsoftLogin(
             }
             when (th) {
                 is HttpRequestTimeoutException -> androidText(R.string.account_logging_time_out)
+                is AuthException -> androidText(th.message ?: th::class.simpleName.orEmpty())
                 is NotPurchasedMinecraftException -> toLocal()
                 is MinecraftProfileException -> th.toLocal()
                 is XboxLoginException -> th.toLocal()
@@ -196,15 +192,16 @@ fun microsoftLogin(
     TaskSystem.submitTask(task)
 }
 
+/**
+ * Voxelium: the sign-in chain runs in VoxeliumCore ([VoxeliumMicrosoftAuth]); [tokens] gets the
+ * Microsoft tokens (a redeemed sign-in code, or a refresh).
+ */
 private suspend fun microsoftAuth(
-    authType: AuthType,
-    refreshToken: String,
-    accessToken: String = "NULL",
-    coroutineContext: CoroutineContext,
+    tokens: suspend (MicrosoftAuth) -> MicrosoftAuth.MicrosoftTokens,
     updateProgress: (Float) -> Unit,
     updateMessage: (AndroidStringText?) -> Unit,
 ): Account {
-    return microsoftAuthAsync(authType, refreshToken, accessToken, coroutineContext) { asyncStatus ->
+    return VoxeliumMicrosoftAuth.signIn(tokens) { asyncStatus ->
         when (asyncStatus) {
             AsyncStatus.GETTING_ACCESS_TOKEN -> {
                 updateProgress(0.25f)
@@ -261,14 +258,14 @@ suspend fun Account.refreshMicrosoft(
     task: Task,
     coroutineContext: CoroutineContext = Dispatchers.IO
 ) {
-    val newAcc = microsoftAuth(
-        AuthType.Refresh,
-        refreshToken,
-        accessToken,
-        coroutineContext = coroutineContext,
-        updateProgress = task::updateProgress,
-        updateMessage = task::updateMessage,
-    )
+    val savedRefreshToken = refreshToken
+    val newAcc = withContext(coroutineContext) {
+        microsoftAuth(
+            tokens = { auth -> auth.refresh(savedRefreshToken) },
+            updateProgress = task::updateProgress,
+            updateMessage = task::updateMessage,
+        )
+    }
     apply {
         this.accessToken = newAcc.accessToken
         //Voxelium: keep the new token's expiry, or every later launch treats it as expired
@@ -310,6 +307,7 @@ fun Throwable.isReloginRequired(): Boolean {
 }
 
 fun accountErrorText(th: Throwable): AndroidStringText = when (th) {
+    is AuthException -> androidText(th.message ?: th::class.simpleName.orEmpty())
     is NotPurchasedMinecraftException -> toLocal()
     is MinecraftProfileException -> th.toLocal()
     is XboxLoginException -> th.toLocal()
