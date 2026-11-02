@@ -35,20 +35,20 @@ ZalithLauncher2 code remains only as the engine: Java launch over JNI, renderers
 | Content/CurseForge.swift | content/CurseForge.kt | ✅ | e28b28b | as Modrinth; ZalithLauncher2's browser already follows the website-only rule meanwhile |
 | Content/ContentManager.swift | content/ContentManager.kt | ✅ | e28b28b | as Modrinth |
 | Content/ZipReader.swift | content/ZipReader.kt | ✅ | e28b28b | `java.util.zip` instead of the hand-written reader; `Closeable` |
-| Content/Modpack.swift | content/Modpack.kt (+ modpack search in content/Modrinth.kt) | ✅ partly | e28b28b | index, checks, record, search; `ModpackInstaller.install` (needs GameInstaller) comes with phase 6 |
+| Content/Modpack.swift | content/Modpack.kt (+ modpack search in content/Modrinth.kt) | ✅ | e28b28b | |
 | Content/WorldManager.swift | content/WorldManager.kt | ✅ | e28b28b | ZIP64 works (java.util.zip); entries streamed to disk; not yet used by the app (Voxelium Worlds screen, phase 7) |
-| Launch/GameInstaller.swift | | ⏳ 6 | | |
-| Launch/ModLoaders.swift | launch/ModLoader.kt (enum only) | ⏳ 6 | e28b28b | `ModLoader` ported in phase 4; installers and `isAvailable` in phase 6 |
-| Launch/ForgeInstaller.swift | | ⏳ 6 | | |
-| Launch/ForgeLaunch.swift | | ⏳ 6 | | |
-| Launch/VersionResolver.swift | | ⏳ 6 | | |
-| Launch/GameFilePlanner.swift | | ⏳ 6 | | |
-| Launch/GameRuntime.swift | | ⏳ 6 | | |
-| Launch/LaunchPlanner.swift | launch/LaunchIdentity.kt (LaunchIdentity only) | ⏳ 6 | e28b28b | `LaunchIdentity` ported in phase 2 for accounts |
-| Launch/VersionDeleter.swift | | ⏳ 6 | | |
-| Launch/GameRenderer.swift | | ⏳ 6 | | maps onto ZalithLauncher2's renderers |
-| Content/GameOptions.swift | | ⏳ 6 | | |
-| Content/IrisSettings.swift | | ⏳ 6 | | |
+| Launch/GameInstaller.swift | launch/GameInstaller.kt | ✅ | e28b28b | |
+| Launch/ModLoaders.swift | launch/ModLoader.kt | ✅ | e28b28b | ModLoader, LoaderVersion, ModLoaderMeta, ModLoaderInstaller |
+| Launch/ForgeInstaller.swift | launch/ForgeMeta.kt, launch/ForgeInstaller.kt | ✅ | e28b28b | `relocatePlan` not ported (iOS data folder moves on reinstall; Android's doesn't). Android runs the processor plan at install time (decided 2026-11-02) |
+| Launch/ForgeLaunch.swift | launch/ForgeLaunch.kt | ✅ | e28b28b | iOS boot-jar names not ported |
+| Launch/VersionResolver.swift | launch/VersionResolver.kt | ✅ | e28b28b | |
+| Launch/GameFilePlanner.swift | launch/GameFilePlanner.kt | ✅ | e28b28b | |
+| Launch/GameRuntime.swift | launch/GameRuntime.kt | ✅ | e28b28b | the Android app bundles LWJGL 3.3.3 and 3.4.1 |
+| Launch/LaunchPlanner.swift | launch/LaunchPlanner.kt, launch/LaunchIdentity.kt | ✅ | e28b28b | launcher name/version are parameters |
+| Launch/VersionDeleter.swift | launch/VersionDeleter.kt | ✅ | e28b28b | |
+| Launch/GameRenderer.swift | launch/GameRuntime.kt (RendererChoice only) | ✅ partly | e28b28b | `GameRenderer` (MobileGlues/ANGLE, KosmicKrisp) is iOS-only; Android keeps ZalithLauncher2's renderers |
+| Content/GameOptions.swift | content/GameOptions.kt | ✅ | e28b28b | GameOptions, ShaderLaunchAdvice |
+| Content/IrisSettings.swift | content/IrisSettings.kt | ✅ | e28b28b | |
 | Runtime/RuntimeCatalog.swift | | ➖ | | ZalithLauncher2's `RuntimesManager` (bundled JREs, `.so`) is kept |
 | Runtime/MachO.swift | | ➖ | | iOS only |
 | Controls/ControlLayout.swift | | ➖ | | ZalithLauncher2's controls and editor are kept |
@@ -66,11 +66,17 @@ ZalithLauncher2 code remains only as the engine: Java launch over JNI, renderers
 | MicrosoftAuthTests (+ PlannerTests' offline UUID) | accounts/MicrosoftAuthTests.kt | 6 + 1 |
 | UpdateCheckTests | launch/UpdateCheckTests.kt | 5 |
 | SystemTests: SettingsTests | config/SettingsTests.kt | 3 (not `largeInterfaceSnapsToMinecraftsGUISteps`) |
-| ContentManagerTests (ContentManagerTests suite) | content/ContentManagerTests.kt | 7 (Iris, GameOptions and ShaderLaunchAdvice suites come with phase 6) |
+| ContentManagerTests (ContentManagerTests suite) | content/ContentManagerTests.kt | 7 |
 | ModrinthTests | content/ModrinthTests.kt | 5 |
 | CurseForgeTests | content/CurseForgeTests.kt | 7 |
 | WorldManagerTests | content/WorldManagerTests.kt | 5 |
-| ModpackTests | content/ModpackTests.kt | 3 (+1 Android: overrides planning); `installsAVanillaPackWithOverrides` with phase 6 |
+| ModpackTests | content/ModpackTests.kt | 4 (+1 Android: overrides planning) |
 | — | download/NetworkTests.kt | 1, opt-in, real network |
 
 Swift's parameterised cases (`mavenPaths`, `rejectsTraversal`) are loops inside a single Kotlin test.
+| PlannerTests, IdentityTests | launch/PlannerTests.kt | 11 + 2 |
+| GameRuntimeTests | launch/GameRuntimeTests.kt | 6 |
+| InstallerTests, VersionDeleterTests | launch/InstallerTests.kt | 2 + 1 |
+| ModLoaderTests | launch/ModLoaderTests.kt | 5 |
+| ForgeTests | launch/ModLoaderTests.kt (ForgeMetaTests), launch/ForgeTests.kt | 4 + 3 (+1 Android: installer refuses unoffered versions); not `planFollowsTheDataFolderAfterAReinstall` (iOS-only) |
+| SystemTests (GameOptions), ContentManagerTests (Iris, GraphicsBackend, ShaderLaunchAdvice) | content/GameOptionsTests.kt | 2 + 2 + 1 + 1 |

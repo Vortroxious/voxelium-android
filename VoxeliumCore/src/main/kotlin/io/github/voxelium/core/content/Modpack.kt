@@ -3,15 +3,26 @@
  * Copyright (C) 2026 Voxelium contributors
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
- * Ported from VoxeliumCore/Content/Modpack.swift (zalithios e28b28b): the index, the checks and the
- * record. ModpackInstaller.install (which needs GameInstaller) comes with phase 6.
+ * Ported from VoxeliumCore/Content/Modpack.swift (zalithios e28b28b).
  */
 
 package io.github.voxelium.core.content
 
 import io.github.voxelium.core.download.DownloadItem
+import io.github.voxelium.core.download.DownloadProgress
+import io.github.voxelium.core.download.DownloadReport
+import io.github.voxelium.core.launch.GameInstaller
 import io.github.voxelium.core.launch.ModLoader
+import io.github.voxelium.core.launch.ModLoaderException
+import io.github.voxelium.core.launch.ModLoaderMeta
+import io.github.voxelium.core.launch.VersionResolver
 import io.github.voxelium.core.paths.AppPaths
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.io.File
@@ -121,7 +132,84 @@ data class InstalledModpack(
  * loader profile (or Minecraft itself), so the pack gets its own game folder like any modded version,
  * with the pack's files and overrides in it.
  */
-class ModpackInstaller(val paths: AppPaths) {
+class ModpackInstaller(val game: GameInstaller, var meta: ModLoaderMeta = ModLoaderMeta()) {
+    val paths: AppPaths get() = game.paths
+
+    enum class Stage { MINECRAFT, LOADER, MODPACK_FILES, OVERRIDES }
+
+    data class Result(val id: String, val report: DownloadReport)
+
+    /**
+     * Installs the pack as version [id] (default: name + version). Minecraft and the loader are
+     * installed first when missing. Returns the version id and the download report of the pack's own
+     * files; nothing is marked installed unless every file downloaded and verified.
+     */
+    suspend fun install(
+        mrpack: java.io.File, id: String? = null, source: Pair<String, String>? = null,
+        progress: ((Stage, DownloadProgress) -> Unit)? = null
+    ): Result {
+        val (index, zip) = read(mrpack)
+        zip.use {
+            val versionId = id ?: versionId(index)
+            if (game.isInstalled(versionId)) throw ModpackException.AlreadyInstalled(versionId)
+            val minecraft = index.minecraft!!
+            val instance = paths.instanceDir(versionId)
+
+            // Check everything before downloading or writing anything.
+            val downloads = plannedDownloads(index, instance)
+            val overrides = plannedOverrides(zip, instance)
+
+            // 1. Minecraft and the loader.
+            val loader = index.loader
+            val parentId = if (loader != null) {
+                val result = game.installLoader(loader.loader, minecraft, loader.version, meta) { _, p -> progress?.invoke(Stage.LOADER, p) }
+                if (!result.report.succeeded) return Result(versionId, result.report)
+                result.id
+            } else {
+                if (!game.isInstalled(minecraft)) {
+                    val entry = game.fetchManifest().entry(minecraft)
+                        ?: throw ModLoaderException.BadProfile("unknown Minecraft version $minecraft")
+                    val report = game.install(game.fetchVersion(entry)) { _, p -> progress?.invoke(Stage.MINECRAFT, p) }
+                    if (!report.succeeded) return Result(versionId, report)
+                }
+                minecraft
+            }
+
+            // 2. The pack's version JSON, building on the loader profile.
+            val parent = VersionResolver(paths).resolve(parentId).info
+            instance.mkdirs()
+            val json = buildJsonObject {
+                put("id", versionId)
+                put("inheritsFrom", parentId)
+                put("libraries", JsonArray(emptyList()))
+                put("mainClass", parent.mainClass)
+                put("releaseTime", Instant.now().truncatedTo(ChronoUnit.SECONDS).toString())
+                put("type", "release")
+            }
+            paths.versionJson(versionId).writeText(PRETTY.encodeToString(kotlinx.serialization.json.JsonObject.serializer(), json))
+
+            // 3. The pack's files (mods, resource packs, shaders), verified.
+            val report = game.downloader.run(downloads, concurrency = 6) { progress?.invoke(Stage.MODPACK_FILES, it) }
+            if (!report.succeeded) return Result(versionId, report)
+
+            // 4. Overrides (configs, options, bundled packs).
+            overrides.forEachIndexed { n, (entry, dest) ->
+                dest.parentFile?.mkdirs()
+                zip.extract(entry, dest)
+                progress?.invoke(Stage.OVERRIDES, DownloadProgress(n + 1, overrides.size, 0))
+            }
+
+            // 5. Remember where it came from, then mark the version installed.
+            val record = InstalledModpack(
+                name = index.name, versionNumber = index.versionId, minecraft = minecraft,
+                loader = loader?.loader?.displayName, projectID = source?.first, versionID = source?.second
+            )
+            File(instance, InstalledModpack.FILE_NAME).writeText(RECORD_JSON.encodeToString(InstalledModpack.serializer(), record))
+            val final = game.install(VersionResolver(paths).resolve(versionId).info)
+            return Result(versionId, final)
+        }
+    }
+
     /**
      * Checks every file before anything is written: paths must stay inside the instance, downloads
      * must come from allowed hosts. Returns the download items.
@@ -163,6 +251,7 @@ class ModpackInstaller(val paths: AppPaths) {
         val ALLOWED_HOSTS = setOf("cdn.modrinth.com", "github.com", "raw.githubusercontent.com", "gitlab.com")
 
         private val RECORD_JSON = Json { ignoreUnknownKeys = true; explicitNulls = false }
+        private val PRETTY = Json { prettyPrint = true }
 
         private fun host(url: String): String? = runCatching { URI(url).host }.getOrNull()
 

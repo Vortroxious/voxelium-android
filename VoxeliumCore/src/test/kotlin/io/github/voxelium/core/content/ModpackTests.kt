@@ -11,6 +11,7 @@ package io.github.voxelium.core.content
 
 import io.github.voxelium.core.Fixture
 import io.github.voxelium.core.TempDir
+import io.github.voxelium.core.launch.GameInstaller
 import io.github.voxelium.core.launch.ModLoader
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -42,7 +43,7 @@ class ModpackTests {
     @Test
     fun refusesUnsafePathsAndHosts() {
         TempDir().use { tmp ->
-            val installer = ModpackInstaller(tmp.paths)
+            val installer = ModpackInstaller(GameInstaller(tmp.paths))
             val instance = tmp.paths.instanceDir("Pack 1")
             fun index(path: String, url: String, client: String = "required") = ModpackIndex(
                 formatVersion = 1, game = "minecraft", versionId = "1", name = "Pack", summary = null,
@@ -106,6 +107,66 @@ class ModpackTests {
         }
     }
 
+    @Test
+    fun installsAVanillaPackWithOverrides() = kotlinx.coroutines.runBlocking {
+        TempDir().use { tmp ->
+            // Minecraft 1.21.11 is already installed: a minimal version whose only file (an empty
+            // asset index) is present and valid, so nothing needs downloading.
+            val assetIndex = """{"objects":{}}""".toByteArray()
+            val indexFile = tmp.paths.assetIndex("29")
+            indexFile.parentFile.mkdirs()
+            indexFile.writeBytes(assetIndex)
+            val base = tmp.paths.versionJson("1.21.11")
+            base.parentFile.mkdirs()
+            base.writeText(
+                """{"id":"1.21.11","type":"release","mainClass":"net.minecraft.client.main.Main","libraries":[],"assets":"29",
+                   "assetIndex":{"id":"29","sha1":"${io.github.voxelium.core.download.FileHash.sha1(assetIndex)}","size":${assetIndex.size},"totalSize":0,
+                                 "url":"https://piston-meta.mojang.com/v1/packages/x/29.json"}}"""
+            )
+            val transport = io.github.voxelium.core.MockTransport()
+            val game = GameInstaller(
+                tmp.paths,
+                io.github.voxelium.core.download.DownloadManager(
+                    transport = transport,
+                    retry = io.github.voxelium.core.download.RetryPolicy(maxAttempts = 1, baseDelay = kotlin.time.Duration.ZERO),
+                    log = io.github.voxelium.core.logging.Logger(), sleep = {}
+                )
+            )
+            game.completionMarker("1.21.11").writeBytes(ByteArray(0))
+            transport.enqueue("https://cdn.modrinth.com/data/TEST/versions/1/test-pack.zip", io.github.voxelium.core.MockTransport.Response.Ok("pack bytes".toByteArray()))
+
+            val installer = ModpackInstaller(game)
+            val (id, report) = installer.install(fixture("test-vanilla.mrpack"), source = "PROJ" to "VER")
+            assertTrue(report.succeeded)
+            assertEquals("Test Pack- Vanilla+ 1.0.0", id)
+            assertTrue(game.isInstalled(id))
+
+            // Its own version, building on Minecraft, with its own game folder.
+            val resolved = io.github.voxelium.core.launch.VersionResolver(tmp.paths).resolve(id)
+            assertTrue(resolved.isModded)
+            assertEquals("1.21.11", resolved.baseVersionId)
+            assertEquals("net.minecraft.client.main.Main", resolved.info.mainClass)
+            val instance = tmp.paths.instanceDir(id)
+            assertEquals("pack bytes", java.io.File(instance, "resourcepacks/test-pack.zip").readText())
+            assertTrue(!java.io.File(instance, "mods/server-only.jar").exists())
+            assertEquals(1, transport.requests.size) // the server-only file was not downloaded
+            assertEquals("from overrides", java.io.File(instance, "config/test.txt").readText())
+            assertEquals("lang:id_id\n", java.io.File(instance, "options.txt").readText()) // client-overrides win
+            assertEquals(
+                InstalledModpack("Test Pack: Vanilla+", "1.0.0", "1.21.11", null, "PROJ", "VER"),
+                ModpackInstaller.installedModpack(instance)
+            )
+
+            // Installing the same pack again is refused rather than overwriting the instance.
+            try {
+                installer.install(fixture("test-vanilla.mrpack"))
+                fail("expected AlreadyInstalled")
+            } catch (e: ModpackException) {
+                assertEquals(ModpackException.AlreadyInstalled(id), e)
+            }
+        }
+    }
+
     /** From the vanilla pack fixture: overrides then client-overrides (which win), all inside the instance. */
     @Test
     fun plansOverridesInsideTheInstance() {
@@ -113,7 +174,7 @@ class ModpackTests {
             val (index, zip) = ModpackInstaller.read(fixture("test-vanilla.mrpack"))
             zip.use {
                 val instance = tmp.paths.instanceDir(ModpackInstaller.versionId(index))
-                val overrides = ModpackInstaller(tmp.paths).plannedOverrides(zip, instance)
+                val overrides = ModpackInstaller(GameInstaller(tmp.paths)).plannedOverrides(zip, instance)
                 assertTrue(overrides.isNotEmpty())
                 assertTrue(overrides.all { (_, dest) -> dest.path.startsWith(instance.path + java.io.File.separator) })
                 assertEquals("client-overrides/options.txt", overrides.last { it.second.name == "options.txt" }.first)
