@@ -54,6 +54,7 @@ import com.movtery.zalithlauncher.upgrade.GithubReleaseSource
 import com.movtery.zalithlauncher.upgrade.RemoteData
 import com.movtery.zalithlauncher.upgrade.TooFrequentOperationException
 import com.movtery.zalithlauncher.utils.logging.Logger
+import io.github.voxelium.core.launch.UpdateCheck
 import com.movtery.zalithlauncher.utils.network.safeBodyAsJson
 import com.movtery.zalithlauncher.utils.network.withRetry
 import com.movtery.zalithlauncher.utils.string.decodeBase64
@@ -253,22 +254,23 @@ class LauncherUpgradeViewModel: ViewModel() {
         onUpgrade: suspend (RemoteData) -> Unit,
         onIsLatest: suspend () -> Unit = {}
     ) {
-        val currentVersionCode = BuildConfig.VERSION_CODE
-        if (currentVersionCode < data.code) {
+        //Voxelium: versions are compared as VoxeliumCore's UpdateCheck does (2.10 > 2.9), as on iOS
+        val currentVersion = BuildConfig.VERSION_NAME.removeSuffix("-debug")
+        if (data.version.isNotEmpty() && UpdateCheck.isNewer(data.version, currentVersion)) {
             //启动器为旧版本
             when {
                 ignoreDismissedVersions && lastIgnored == data.code -> {
                     //忽略这次更新
-                    Logger.info(TAG, "Launcher update detected: $currentVersionCode -> ${data.code}, but ignored by user")
+                    Logger.info(TAG, "Launcher update detected: $currentVersion -> ${data.version}, but ignored by user")
                 }
                 else -> {
                     //弹出更新弹窗
-                    Logger.info(TAG, "Launcher update detected: $currentVersionCode -> ${data.code}, dialog shown to user")
+                    Logger.info(TAG, "Launcher update detected: $currentVersion -> ${data.version}, dialog shown to user")
                     onUpgrade(data)
                 }
             }
         } else {
-            Logger.info(TAG, "Launcher is running the latest version: $currentVersionCode")
+            Logger.info(TAG, "Launcher is running the latest version: $currentVersion" + (if (data.version.isEmpty()) " (no release published yet)" else " (latest release ${data.version})"))
             onIsLatest()
         }
     }

@@ -91,6 +91,9 @@ class ZLApplication : Application(), SingletonImageLoader.Factory {
             loadAllSettings(this)
 
             Logger.initialize(this)
+            //Voxelium: VoxeliumCore's requests (GitHub, Modrinth, CurseForge, loaders) identify the launcher
+            io.github.voxelium.core.accounts.HttpHeaders.userAgent =
+                "Voxelium/${BuildConfig.VERSION_NAME} (Android Minecraft launcher; github.com/Vortroxious/Voxelium-android)"
 
             initializeData()
             PathManager.DIR_FILES_PRIVATE = getDir("files", MODE_PRIVATE)

@@ -19,44 +19,36 @@
 package com.movtery.zalithlauncher.upgrade
 
 import com.movtery.zalithlauncher.BuildKeys
-import com.movtery.zalithlauncher.path.GLOBAL_CLIENT
-import com.movtery.zalithlauncher.utils.network.safeBodyAsJson
-import io.ktor.client.plugins.ClientRequestException
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.http.HttpHeaders
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import io.github.voxelium.core.accounts.OkHttpJsonClient
+import io.github.voxelium.core.launch.UpdateCheck
 
 /**
- * Voxelium: launcher update checks read the latest published GitHub release of this project
- * ([BuildKeys.URL_HOME]). Drafts and pre-releases are never offered.
+ * Voxelium: launcher update checks use VoxeliumCore's [UpdateCheck] (as Voxelium for iOS does) on
+ * the latest published GitHub release of this project ([BuildKeys.URL_HOME]). Drafts and
+ * pre-releases are never offered. The release becomes upstream's [RemoteData] for its update dialog.
  *
- * Release tags are `vX.Y.Z` (or `X.Y.Z`); the matching version code is `X*10000 + Y*100 + Z`,
- * the scheme `launcher_version_code` in gradle.properties follows.
+ * Release tags are `vX.Y.Z`; versions are compared by number (2.10 > 2.9). [RemoteData.code] is
+ * `X*10000 + Y*100 + Z`, the scheme `launcher_version_code` in gradle.properties follows; it only
+ * identifies a release the user chose to ignore.
  */
 object GithubReleaseSource {
-    private val apiUrl: String
-        get() = BuildKeys.URL_HOME.trimEnd('/')
-            .replace("https://github.com/", "https://api.github.com/repos/") + "/releases/latest"
+    private val repository: String
+        get() = BuildKeys.URL_HOME.trimEnd('/').removePrefix("https://github.com/")
 
     /**
-     * @return the latest release as [RemoteData]; a project without any release yet gives
-     * code 0, which is never newer than the running launcher
+     * @return the latest release as [RemoteData]; a project without any release yet gives an empty
+     * version, which is never newer than the running launcher
      */
     suspend fun fetchLatest(): RemoteData {
         val release = try {
-            GLOBAL_CLIENT.get(apiUrl) {
-                header(HttpHeaders.Accept, "application/vnd.github+json")
-            }.safeBodyAsJson<GithubRelease>()
-        } catch (e: ClientRequestException) {
-            if (e.response.status.value == 404) return noRelease()
+            UpdateCheck(OkHttpJsonClient(), repository).latest()
+        } catch (e: UpdateCheck.CheckException.Http) {
+            if (e.status == 404) return noRelease()
             throw e
         }
         return RemoteData(
-            code = versionCodeOf(release.tagName)
-                ?: throw IllegalStateException("Release tag is not vX.Y.Z: ${release.tagName}"),
-            version = release.tagName.removePrefix("v"),
+            code = versionCodeOf(release.tagName) ?: 0,
+            version = release.version,
             createdAt = release.publishedAt ?: "",
             files = release.assets
                 .filter { it.name.endsWith(".apk", ignoreCase = true) }
@@ -100,19 +92,4 @@ object GithubReleaseSource {
         defaultBody = RemoteData.RemoteBody(language = "en", markdown = ""),
         bodies = emptyList()
     )
-
-    @Serializable
-    private data class GithubRelease(
-        @SerialName("tag_name") val tagName: String,
-        @SerialName("published_at") val publishedAt: String? = null,
-        @SerialName("body") val body: String? = null,
-        @SerialName("assets") val assets: List<Asset> = emptyList()
-    ) {
-        @Serializable
-        data class Asset(
-            @SerialName("name") val name: String,
-            @SerialName("browser_download_url") val browserDownloadUrl: String,
-            @SerialName("size") val size: Long = 0L
-        )
-    }
 }

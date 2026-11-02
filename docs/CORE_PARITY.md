@@ -26,11 +26,11 @@ ZalithLauncher2 code remains only as the engine: Java launch over JNI, renderers
 | Download/FileHash.swift | download/FileHash.kt | ✅ | e28b28b | `MessageDigest` instead of CryptoKit |
 | Download/DownloadManager.swift | download/DownloadManager.kt, download/OkHttpTransport.kt | ✅ | e28b28b | OkHttp instead of URLSession |
 | Logging/Log.swift | logging/Logger.kt | ✅ | e28b28b | `sink` instead of os_log; the app routes it to android.util.Log |
-| Accounts/MicrosoftAuth.swift | accounts/MicrosoftAuth.kt, accounts/HttpClient.kt | ✅ | e28b28b | adds an optional `onStep` progress callback; the app adapter is `game/account/microsoft/VoxeliumMicrosoftAuth.kt` |
+| Accounts/MicrosoftAuth.swift (+ `HTTPHeaders`/`get` from ModLoaders.swift) | accounts/MicrosoftAuth.kt, accounts/HttpClient.kt | ✅ | e28b28b | adds an optional `onStep` progress callback; the app adapter is `game/account/microsoft/VoxeliumMicrosoftAuth.kt` |
 | Accounts/OfflineIdentity.swift | accounts/OfflineIdentity.kt | ✅ | e28b28b | ZalithLauncher2 still creates offline accounts; the core gives the same UUIDs |
 | Accounts/Keychain.swift | (app) game/account/AccountSecrets.kt | ✅ | e28b28b | Android Keystore AES-GCM; tokens and third-party passwords are encrypted in the Room `accounts` table |
-| Launch/UpdateCheck.swift | | ⏳ 3 | | replaces `upgrade/GithubReleaseSource.kt` |
-| Config/SettingsStore.swift | | ⏳ 3 | | |
+| Launch/UpdateCheck.swift | launch/UpdateCheck.kt | ✅ | e28b28b | repository is a parameter; releases also carry body, date and assets (the app offers the APK); app adapter `upgrade/GithubReleaseSource.kt` |
+| Config/SettingsStore.swift | config/SettingsStore.kt | ✅ | e28b28b | `effectiveRenderScale` not ported (iOS window code); not used by the app until the Voxelium UI (phase 7) |
 | Content/Modrinth.swift | | ⏳ 4 | | |
 | Content/CurseForge.swift | | ⏳ 4 | | |
 | Content/ContentManager.swift | | ⏳ 4 | | |
@@ -64,6 +64,8 @@ ZalithLauncher2 code remains only as the engine: Java launch over JNI, renderers
 | DownloadTests | download/DownloadTests.kt | 12 |
 | SystemTests: PathTests, LoggerTests | paths/PathTests.kt (PathTests, LoggerTests) | 3 + 1 (+1 Android: custom `gameDir`) |
 | MicrosoftAuthTests (+ PlannerTests' offline UUID) | accounts/MicrosoftAuthTests.kt | 6 + 1 |
+| UpdateCheckTests | launch/UpdateCheckTests.kt | 5 |
+| SystemTests: SettingsTests | config/SettingsTests.kt | 3 (not `largeInterfaceSnapsToMinecraftsGUISteps`) |
 | — | download/NetworkTests.kt | 1, opt-in, real network |
 
 Swift's parameterised cases (`mavenPaths`, `rejectsTraversal`) are loops inside a single Kotlin test.

@@ -71,6 +71,19 @@ suspend fun HttpClient.json(url: String, body: JsonObject): JsonResponse =
 suspend fun HttpClient.get(url: String, bearer: String): JsonResponse =
     send(HttpRequest(url, "GET", mapOf("Authorization" to "Bearer $bearer", "Accept" to "application/json")))
 
+/** A plain GET with Voxelium's User-Agent ([HttpHeaders.userAgent]). */
+suspend fun HttpClient.get(url: String): JsonResponse =
+    send(HttpRequest(url, "GET", mapOf("Accept" to "application/json", "User-Agent" to HttpHeaders.userAgent)))
+
+object HttpHeaders {
+    /**
+     * The User-Agent that Fabric, Quilt, Modrinth, CurseForge and GitHub ask clients to send.
+     * The app sets it at start with its version.
+     */
+    @Volatile
+    var userAgent: String = "Voxelium (Android Minecraft launcher; github.com/Vortroxious/Voxelium-android)"
+}
+
 /** Percent-encodes everything except ASCII letters, digits and `-._~`. */
 internal fun formEncode(value: String): String = buildString {
     for (b in value.toByteArray(Charsets.UTF_8)) {
