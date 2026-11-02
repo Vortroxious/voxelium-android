@@ -26,6 +26,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "ZalithLauncher"
 include(":ZalithLauncher")
+include(":VoxeliumCore")
 include(":LWJGL")
 include(":LWJGL:patches")
 project(":LWJGL:patches").projectDir = file("LWJGL/patches")

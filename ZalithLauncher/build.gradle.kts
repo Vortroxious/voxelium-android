@@ -258,6 +258,7 @@ dependencies {
     implementation(libs.editor.language.textmate)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     //Project
+    implementation(project(":VoxeliumCore"))
     implementation(project(":LayerController"))
     implementation(project(":ColorPicker"))
     implementation(project(":CardGrid"))
