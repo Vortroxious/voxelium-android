@@ -33,7 +33,7 @@ LWJGL/*/build/
 .vscode/
 
 # Voxelium: secrets and signing material never go in the repo
-Config/
+/Config/
 *.jks
 *.keystore
 keystore.properties
