@@ -130,6 +130,13 @@ private fun getGameManifest(
             }
 
             inheritsManifest.arguments.game = totalArgList
+
+            // Voxelium: append the child's JVM arguments too (Forge/NeoForge's module path and
+            // --add-opens). ZalithLauncher2 merges its own installs into one JSON, but VoxeliumCore
+            // installs keep inheritsFrom. Kept in order and not de-duplicated, as they come in pairs.
+            gameManifest0.arguments.jvm?.let { childJvm ->
+                inheritsManifest.arguments.jvm = ArrayList(inheritsManifest.arguments.jvm ?: emptyList()).apply { addAll(childJvm) }
+            }
         }
 
         gameManifest0 = inheritsManifest

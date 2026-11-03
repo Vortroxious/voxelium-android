@@ -267,7 +267,10 @@ class LaunchArgs(
             }
             when {
                 argument.startsWith("-DignoreList=") -> {
-                    "$argument,${version.getVersionName()}.jar"
+                    // Voxelium: a version with inheritsFrom (VoxeliumCore installs) puts its parent's
+                    // client jar on the classpath, which Forge/NeoForge must ignore as well.
+                    val own = "${version.getVersionName()}.jar"
+                    if (clientJar.name == own) "$argument,$own" else "$argument,$own,${clientJar.name}"
                 }
                 argument.contains("-Dio.netty.native.workdir") ||
                 argument.contains("-Djna.tmpdir") ||

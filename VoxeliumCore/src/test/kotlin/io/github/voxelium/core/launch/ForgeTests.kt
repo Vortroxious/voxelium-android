@@ -202,3 +202,48 @@ class ForgeTests {
         }
     }
 }
+
+class ProcessorPlanTests {
+    @Test
+    fun readsThePlanForgeInstallerWrites() {
+        val plan = ProcessorPlan.parse(
+            "processor installertools DOWNLOAD_MOJMAPS\njar /l/tools.jar\ncp /l/a.jar\ncp /l/b.jar\n" +
+                "arg --task\narg DOWNLOAD_MOJMAPS\narg --version\narg 1.21.1\narg --side\narg client\narg --output\narg /out/client.txt\n" +
+                "out /out/client.txt -\nend\n" +
+                "processor binarypatcher\njar /l/patcher.jar\narg --clean\narg /x y/z.jar\nout /out/patched.jar 0123456789abcdef0123456789abcdef01234567\nend\n"
+        )
+        assertEquals(2, plan.size)
+        assertEquals("DOWNLOAD_MOJMAPS", plan[0].task)
+        assertEquals("1.21.1", plan[0].arg("--version"))
+        assertEquals("/out/client.txt", plan[0].arg("--output"))
+        assertEquals(listOf("/l/a.jar", "/l/b.jar"), plan[0].classpath)
+        assertEquals(mapOf("/out/client.txt" to null), plan[0].outputs)
+        assertEquals("/x y/z.jar", plan[1].arg("--clean")) // a path with a space stays one argument
+        assertEquals(mapOf("/out/patched.jar" to "0123456789abcdef0123456789abcdef01234567"), plan[1].outputs)
+        assertEquals(null, plan[1].task)
+        try {
+            ProcessorPlan.parse("jar /x.jar\n")
+            fail("a line outside a processor was accepted")
+        } catch (_: IllegalArgumentException) {
+        }
+    }
+
+    @Test
+    fun outputsAreCheckedBySha1() {
+        TempDir().use { tmp ->
+            val out = File(tmp.dir, "out.jar").apply { writeText("patched") }
+            val good = ProcessorPlan.Processor("p", "j", emptyList(), emptyList(), mapOf(out.path to FileHash.sha1(out)))
+            val bad = good.copy(outputs = mapOf(out.path to "0".repeat(40)))
+            val missing = good.copy(outputs = mapOf(File(tmp.dir, "nope").path to null))
+            assertTrue(ProcessorPlan.outputsValid(good))
+            assertFalse(ProcessorPlan.outputsValid(bad))
+            assertFalse(ProcessorPlan.outputsValid(missing))
+        }
+    }
+
+    @Test
+    fun versionJsonCarriesClientMappings() {
+        val v = io.github.voxelium.core.manifest.VersionInfo.decode(Fixture.text("1.20.1"))
+        assertTrue(v.downloads?.clientMappings?.url?.startsWith("https://") == true)
+    }
+}

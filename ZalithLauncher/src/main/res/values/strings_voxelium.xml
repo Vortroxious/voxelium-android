@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Voxelium: strings for the screens built on VoxeliumCore (English only for now). -->
+<resources>
+    <string name="voxelium_versions">Versions</string>
+    <string name="voxelium_versions_title">Minecraft Versions</string>
+    <string name="voxelium_installing">Installing %s</string>
+    <string name="voxelium_installed">Installed</string>
+    <string name="voxelium_versions_section">Versions</string>
+    <string name="voxelium_show_snapshots">Show snapshots</string>
+    <string name="voxelium_refresh">Refresh</string>
+    <string name="voxelium_loading_versions">Loading the version list…</string>
+    <string name="voxelium_versions_failed">Couldn\'t load the version list. Check your internet connection and refresh.</string>
+    <string name="voxelium_play">Play</string>
+    <string name="voxelium_install">Install</string>
+    <string name="voxelium_install_with_loader">Install with a mod loader…</string>
+    <string name="voxelium_repair">Verify / repair files</string>
+    <string name="voxelium_delete">Delete version…</string>
+    <string name="voxelium_vanilla">Vanilla</string>
+    <string name="voxelium_stage_game_files">Game files</string>
+    <string name="voxelium_stage_assets">Assets</string>
+    <string name="voxelium_progress">%1$s: %2$d/%3$d</string>
+    <string name="voxelium_progress_failed">%1$s: %2$d/%3$d · %4$d failed</string>
+    <string name="voxelium_preparing">Preparing…</string>
+    <string name="voxelium_setting_up">Setting up %s (a minute or two)…</string>
+    <string name="voxelium_all_verified">All %d files verified</string>
+    <string name="voxelium_some_failed">%d files failed. See the launcher log.</string>
+
+    <string name="voxelium_install_title">Install %s</string>
+    <string name="voxelium_mod_loader">Mod loader</string>
+    <string name="voxelium_loader_for_newer">For Minecraft %s and newer</string>
+    <string name="voxelium_blurb_vanilla">No mods</string>
+    <string name="voxelium_blurb_fabric">Lightweight mod loader; most performance mods (Sodium, Lithium…)</string>
+    <string name="voxelium_blurb_quilt">Fabric-compatible loader; runs most Fabric mods</string>
+    <string name="voxelium_blurb_forge">The classic mod loader; most big modpacks for 1.20.1</string>
+    <string name="voxelium_blurb_neoforge">Forge\'s successor for 1.20.2 and newer (Create, many tech mods)</string>
+    <string name="voxelium_forge_note">Installing also sets up %s, which takes a minute or two.</string>
+    <string name="voxelium_loader_version">%s version</string>
+    <string name="voxelium_loading_builds">Loading %s builds…</string>
+    <string name="voxelium_try_again">Try again</string>
+    <string name="voxelium_build_beta">%s (beta)</string>
+    <string name="voxelium_build_recommended">%s · recommended</string>
+    <string name="voxelium_show_all_builds">Show all %d builds</string>
+    <string name="voxelium_install_vanilla">Install %s</string>
+    <string name="voxelium_install_loader">Install %1$s for %2$s</string>
+
+    <string name="voxelium_delete_title">Delete %s?</string>
+    <string name="voxelium_delete_shared">Removes %s. Its worlds and settings are in the shared game folder and stay.</string>
+    <string name="voxelium_delete_own_folder">This also deletes %s, mods, resource packs and settings in its game folder. This can\'t be undone.</string>
+    <string name="voxelium_delete_its_worlds">its worlds</string>
+    <plurals name="voxelium_delete_world_count">
+        <item quantity="one">its %d world</item>
+        <item quantity="other">its %d worlds</item>
+    </plurals>
+    <string name="voxelium_not_deleted">Not deleted</string>
+    <string name="voxelium_needed_by">%1$s is needed by %2$s. Delete those first.</string>
+</resources>

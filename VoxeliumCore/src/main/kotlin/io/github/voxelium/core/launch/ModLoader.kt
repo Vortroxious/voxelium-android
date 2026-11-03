@@ -85,7 +85,11 @@ sealed class ModLoaderException(message: String) : Exception(message) {
  *   Quilt:  https://meta.quiltmc.org/v3/versions/loader/<mc>[/<loader>/profile/json]
  */
 class ModLoaderMeta(val http: HttpClient = OkHttpJsonClient()) {
-    /** Loader builds for [minecraft], newest first as the meta server lists them. */
+    /**
+     * Loader builds for [minecraft], newest first. Android addition: sorted here, because Quilt's
+     * meta server does not list them in order (for 1.21.1 it starts with 0.20.0-beta.9, then 0.24.0,
+     * while 0.30.2 is near the end), so "the first stable build" was an old one.
+     */
     suspend fun versions(loader: ModLoader, minecraft: String): List<LoaderVersion> {
         if (loader.usesForgeInstaller) return ForgeMeta(http).versions(loader, minecraft)
         val r = http.get("${base(loader)}/${escape(minecraft)}")
@@ -100,7 +104,7 @@ class ModLoaderMeta(val http: HttpClient = OkHttpJsonClient()) {
             LoaderVersion(v, stable)
         }
         if (builds.isEmpty()) throw ModLoaderException.NoBuilds(loader, minecraft)
-        return builds
+        return builds.sortedWith { a, b -> compareVersions(b.version, a.version) }
     }
 
     /** The raw profile JSON for one build. */
@@ -123,6 +127,35 @@ class ModLoaderMeta(val http: HttpClient = OkHttpJsonClient()) {
                 val c = b.toInt() and 0xff
                 val ch = c.toChar()
                 if (c < 0x80 && (ch.isLetterOrDigit() || ch in "-._~+")) append(ch) else append("%%%02X".format(c))
+            }
+        }
+
+        /**
+         * Orders loader versions like `0.30.2`, `0.30.0-beta.8`: numbers part by part, and a
+         * pre-release (`-beta.8`, `-rc.1`) before its release. Parts that aren't numbers compare as text.
+         */
+        fun compareVersions(a: String, b: String): Int {
+            fun split(v: String) = v.split('-', limit = 2).let { it[0] to it.getOrNull(1) }
+            fun parts(cmpA: List<String>, cmpB: List<String>): Int {
+                for (i in 0 until maxOf(cmpA.size, cmpB.size)) {
+                    val x = cmpA.getOrNull(i) ?: return -1
+                    val y = cmpB.getOrNull(i) ?: return 1
+                    val xn = x.toLongOrNull()
+                    val yn = y.toLongOrNull()
+                    val c = if (xn != null && yn != null) xn.compareTo(yn) else x.compareTo(y)
+                    if (c != 0) return c
+                }
+                return 0
+            }
+            val (releaseA, preA) = split(a)
+            val (releaseB, preB) = split(b)
+            val c = parts(releaseA.split('.'), releaseB.split('.'))
+            if (c != 0) return c
+            return when {
+                preA == null && preB == null -> 0
+                preA == null -> 1
+                preB == null -> -1
+                else -> parts(preA.split('.'), preB.split('.'))
             }
         }
 

@@ -20,7 +20,7 @@ ZalithLauncher2 code remains only as the engine: Java launch over JNI, renderers
 | Paths/AppPaths.swift | paths/AppPaths.kt | ✅ | e28b28b | `gameDir` can be passed in (Android uses its existing `.minecraft`); no `controlsDir` |
 | Paths/AppPathsMigration.swift | | ➖ | | iOS 0.1.0 data move only |
 | Manifest/VersionManifest.swift | manifest/VersionManifest.kt, manifest/MojangJson.kt | ✅ | e28b28b | |
-| Manifest/VersionInfo.swift | manifest/VersionInfo.kt | ✅ | e28b28b | URLs kept as strings |
+| Manifest/VersionInfo.swift | manifest/VersionInfo.kt | ✅ | e28b28b | URLs kept as strings; Android addition: `Downloads.clientMappings` (for DOWNLOAD_MOJMAPS) |
 | Manifest/Rules.swift | manifest/Rules.kt | ✅ | e28b28b | `RulePlatform.iOSDefault` → `RulePlatform.DEFAULT` (linux/aarch64) |
 | Manifest/AssetIndex.swift | manifest/AssetIndex.kt | ✅ | e28b28b | |
 | Download/FileHash.swift | download/FileHash.kt | ✅ | e28b28b | `MessageDigest` instead of CryptoKit |
@@ -38,8 +38,8 @@ ZalithLauncher2 code remains only as the engine: Java launch over JNI, renderers
 | Content/Modpack.swift | content/Modpack.kt (+ modpack search in content/Modrinth.kt) | ✅ | e28b28b | |
 | Content/WorldManager.swift | content/WorldManager.kt | ✅ | e28b28b | ZIP64 works (java.util.zip); entries streamed to disk; not yet used by the app (Voxelium Worlds screen, phase 7) |
 | Launch/GameInstaller.swift | launch/GameInstaller.kt | ✅ | e28b28b | |
-| Launch/ModLoaders.swift | launch/ModLoader.kt | ✅ | e28b28b | ModLoader, LoaderVersion, ModLoaderMeta, ModLoaderInstaller |
-| Launch/ForgeInstaller.swift | launch/ForgeMeta.kt, launch/ForgeInstaller.kt | ✅ | e28b28b | `relocatePlan` not ported (iOS data folder moves on reinstall; Android's doesn't). Android runs the processor plan at install time (decided 2026-11-02) |
+| Launch/ModLoaders.swift | launch/ModLoader.kt | ✅ | e28b28b | ModLoader, LoaderVersion, ModLoaderMeta, ModLoaderInstaller; Android fix: builds sorted newest first (`compareVersions`), see below |
+| Launch/ForgeInstaller.swift | launch/ForgeMeta.kt, launch/ForgeInstaller.kt | ✅ | e28b28b | `relocatePlan` not ported (iOS data folder moves on reinstall; Android's doesn't). Android runs the processor plan at install time (decided 2026-11-02): plan reader launch/ProcessorPlan.kt (from JavaRuntime/voxelium-boot Boot.java), runner in the app (`game/voxelium/ForgeProcessorRunner.kt`) |
 | Launch/ForgeLaunch.swift | launch/ForgeLaunch.kt | ✅ | e28b28b | iOS boot-jar names not ported |
 | Launch/VersionResolver.swift | launch/VersionResolver.kt | ✅ | e28b28b | |
 | Launch/GameFilePlanner.swift | launch/GameFilePlanner.kt | ✅ | e28b28b | |
@@ -77,6 +77,10 @@ Swift's parameterised cases (`mavenPaths`, `rejectsTraversal`) are loops inside 
 | PlannerTests, IdentityTests | launch/PlannerTests.kt | 11 + 2 |
 | GameRuntimeTests | launch/GameRuntimeTests.kt | 6 |
 | InstallerTests, VersionDeleterTests | launch/InstallerTests.kt | 2 + 1 |
-| ModLoaderTests | launch/ModLoaderTests.kt | 5 |
-| ForgeTests | launch/ModLoaderTests.kt (ForgeMetaTests), launch/ForgeTests.kt | 4 + 3 (+1 Android: installer refuses unoffered versions); not `planFollowsTheDataFolderAfterAReinstall` (iOS-only) |
+| ModLoaderTests | launch/ModLoaderTests.kt | 5 (+1 Android: builds sorted newest first) |
+| ForgeTests | launch/ModLoaderTests.kt (ForgeMetaTests), launch/ForgeTests.kt | 4 + 3 (+1 Android: installer refuses unoffered versions; +3 Android: ProcessorPlanTests); not `planFollowsTheDataFolderAfterAReinstall` (iOS-only) |
 | SystemTests (GameOptions), ContentManagerTests (Iris, GraphicsBackend, ShaderLaunchAdvice) | content/GameOptionsTests.kt | 2 + 2 + 1 + 1 |
+
+## Android changes to port back to iOS
+
+- **Loader builds sorted newest first** (`ModLoaderMeta.versions`, `compareVersions`; found 2026-11-03). Quilt's meta server doesn't list builds in order: for 1.21.1 it starts with `0.20.0-beta.9`, then `0.24.0`, while `0.30.2` is near the end. "The first stable build" was therefore an old one. The iOS core has the same assumption. Test: `loaderBuildsAreSortedNewestFirst`.

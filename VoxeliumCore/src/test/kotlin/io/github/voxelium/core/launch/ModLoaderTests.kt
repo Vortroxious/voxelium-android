@@ -134,6 +134,23 @@ class ModLoaderTests {
         assertTrue(http.requests.first().headers["User-Agent"]?.startsWith("Voxelium/") == true)
     }
 
+    /** Android addition: Quilt's meta lists 1.21.1 builds out of order (checked 2026-11-03). */
+    @Test
+    fun loaderBuildsAreSortedNewestFirst() = runBlocking {
+        val http = MockHttp()
+        val unordered = listOf("0.20.0-beta.9", "0.24.0", "0.20.2-beta.1", "0.30.0-beta.8", "0.30.2", "0.30.0", "0.30.10", "0.31.0-beta.10", "0.31.0-beta.2")
+        http.on(
+            "https://meta.quiltmc.org/v3/versions/loader/1.21.1", 200,
+            unordered.joinToString(",", "[", "]") { """{"loader":{"version":"$it"}}""" }
+        )
+        val q = ModLoaderMeta(http).versions(ModLoader.QUILT, "1.21.1")
+        assertEquals(
+            listOf("0.31.0-beta.10", "0.31.0-beta.2", "0.30.10", "0.30.2", "0.30.0", "0.30.0-beta.8", "0.24.0", "0.20.2-beta.1", "0.20.0-beta.9"),
+            q.map { it.version }
+        )
+        assertEquals("0.30.10", ModLoaderMeta.recommended(q)?.version)
+    }
+
     @Test
     fun fillsInMissingChecksumsFromMaven() = runBlocking {
         TempDir().use { tmp ->

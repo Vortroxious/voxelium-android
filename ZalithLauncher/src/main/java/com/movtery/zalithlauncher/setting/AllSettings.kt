@@ -125,6 +125,11 @@ object AllSettings : SettingsRegistry() {
     val versionIsolation = boolSetting("versionIsolation", true)
 
     /**
+     * Voxelium: show snapshots in the Versions screen
+     */
+    val voxeliumShowSnapshots = boolSetting("voxeliumShowSnapshots", false)
+
+    /**
      * 不检查游戏完整性
      */
     val skipGameIntegrityCheck = boolSetting("skipGameIntegrityCheck", false)

@@ -110,7 +110,12 @@ data class VersionInfo(
     data class JavaVersion(val component: String, val majorVersion: Int)
 
     @Serializable
-    data class Downloads(val client: RemoteFile? = null, val server: RemoteFile? = null)
+    data class Downloads(
+        val client: RemoteFile? = null,
+        val server: RemoteFile? = null,
+        /** Android addition: Mojang's mappings, which the app downloads for Forge/NeoForge's DOWNLOAD_MOJMAPS step. */
+        @kotlinx.serialization.SerialName("client_mappings") val clientMappings: RemoteFile? = null
+    )
 
     @Serializable
     data class Arguments(val game: List<Argument>? = null, val jvm: List<Argument>? = null)
