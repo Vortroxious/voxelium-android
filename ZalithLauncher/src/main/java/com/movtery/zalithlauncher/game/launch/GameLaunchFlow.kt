@@ -18,6 +18,7 @@
 
 package com.movtery.zalithlauncher.game.launch
 
+import com.movtery.zalithlauncher.game.voxelium.CoreLaunch
 import android.content.Context
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.coroutine.Task
@@ -196,7 +197,16 @@ class GameLaunchFlow(scope: CoroutineScope) {
                 }
             }
 
-            if (!version.skipGameIntegrityCheck()) {
+            if (CoreLaunch.isCoreInstall(version)) {
+                // Voxelium: the core checks the files of the whole inheritsFrom chain
+                addTask(
+                    icon = R.drawable.ic_assignment_filled,
+                    title = androidText(R.string.minecraft_download_stat_verify_task),
+                    dispatcher = Dispatchers.IO
+                ) { task ->
+                    CoreLaunch.verify(version, task)
+                }
+            } else if (!version.skipGameIntegrityCheck()) {
                 //校验并修复游戏文件
                 addTask(
                     icon = R.drawable.ic_assignment_filled,

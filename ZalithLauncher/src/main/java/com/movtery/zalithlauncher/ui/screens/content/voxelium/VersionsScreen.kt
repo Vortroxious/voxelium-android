@@ -99,6 +99,7 @@ fun VoxeliumVersionsScreen(
         var installTarget by remember { mutableStateOf<Pair<VersionManifest.Entry, ModLoader>?>(null) }
         var deleteTarget by remember { mutableStateOf<VoxeliumGame.InstalledVersion?>(null) }
         var message by remember { mutableStateOf<Pair<String, String>?>(null) }
+        var showModpacks by remember { mutableStateOf(false) }
 
         LaunchedEffect(Unit) {
             VoxeliumGame.refreshInstalled()
@@ -138,7 +139,12 @@ fun VoxeliumVersionsScreen(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(stringResource(R.string.voxelium_show_snapshots), modifier = Modifier.weight(1f))
+                        Button(onClick = { showModpacks = true }) {
+                            Text(stringResource(R.string.voxelium_modpacks_button))
+                        }
+                        Spacer(Modifier.weight(1f))
+                        Text(stringResource(R.string.voxelium_show_snapshots))
+                        Spacer(Modifier.width(12.dp))
                         DefaultSwitch(
                             checked = showSnapshots,
                             onCheckedChange = { AllSettings.voxeliumShowSnapshots.save(it) }
@@ -180,6 +186,13 @@ fun VoxeliumVersionsScreen(
                     }
                 }
             }
+        }
+
+        if (showModpacks) {
+            ModpacksDialog(onDismiss = {
+                showModpacks = false
+                VoxeliumGame.resetModpack()
+            })
         }
 
         installTarget?.let { (entry, loader) ->

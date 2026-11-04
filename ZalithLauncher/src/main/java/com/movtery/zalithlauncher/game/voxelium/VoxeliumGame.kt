@@ -27,11 +27,14 @@ import com.movtery.zalithlauncher.game.version.installed.VersionsManager
 import com.movtery.zalithlauncher.path.PathManager
 import com.movtery.zalithlauncher.ui.androidText
 import com.movtery.zalithlauncher.utils.logging.Logger
+import io.github.voxelium.core.content.ModpackException
+import io.github.voxelium.core.content.ModpackInstaller
+import io.github.voxelium.core.content.ModrinthApi
 import io.github.voxelium.core.content.WorldManager
+import io.github.voxelium.core.download.DownloadItem
 import io.github.voxelium.core.download.DownloadManager
 import io.github.voxelium.core.download.DownloadProgress
 import io.github.voxelium.core.download.DownloadReport
-import io.github.voxelium.core.launch.ForgeInstaller
 import io.github.voxelium.core.launch.GameInstaller
 import io.github.voxelium.core.launch.LoaderVersion
 import io.github.voxelium.core.launch.ModLoader
@@ -64,7 +67,7 @@ object VoxeliumGame {
     /** The core's view of ZalithLauncher2's current `.minecraft`; Voxelium's own files go next to it. */
     fun paths(): AppPaths = AppPaths(root = PathManager.DIR_GAME, gameDir = File(getGameHome()))
 
-    private val downloader by lazy { DownloadManager() }
+    internal val downloader by lazy { DownloadManager() }
     private val meta by lazy { ModLoaderMeta() }
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -95,8 +98,16 @@ object VoxeliumGame {
         val loader: String?,
         val releaseTime: Instant?
     ) {
-        val title: String get() = if (isModded) "${loader ?: "Modded"} $base" else id
-        val subtitle: String get() = if (isModded) id else "Vanilla"
+        /**
+         * Loader installs are named like "fabric-loader-0.19.5-1.21.11", "neoforge-21.1.264" or
+         * "1.20.1-forge-47.4.10"; anything else modded is a modpack named after itself.
+         */
+        val isModpack: Boolean
+            get() = isModded && !id.startsWith("fabric-loader-") && !id.startsWith("quilt-loader-") &&
+                !id.startsWith("neoforge-") && !id.contains("-forge-")
+        private val loaderLine: String get() = "${loader ?: "Modded"} $base"
+        val title: String get() = if (isModpack) id else if (isModded) loaderLine else id
+        val subtitle: String get() = if (isModpack) "Modpack · $loaderLine" else if (isModded) id else "Vanilla"
     }
 
     private val _manifest = MutableStateFlow<ManifestState>(ManifestState.Loading)
@@ -207,29 +218,123 @@ object VoxeliumGame {
         TaskSystem.submitTask(task)
     }
 
-    /** Runs the Forge/NeoForge processor plan of [id] if it has one that hasn't finished. */
+    /** Runs the Forge/NeoForge processor plans in [id]'s chain that haven't finished. */
     private suspend fun setUpForge(id: String, paths: AppPaths, task: Task?) {
-        val plan = ForgeInstaller.processorPlan(id, paths) ?: return
-        if (ForgeInstaller.processorsDone(plan)) return
-        val name = loaderName(VersionResolver(paths).resolve(id)) ?: "the mod loader"
-        setState(VersionResolver(paths).resolve(id).baseVersionId, InstallState.SettingUp(name))
-        setState(id, InstallState.SettingUp(name))
-        ForgeProcessorRunner.run(plan, paths, downloader, name, task)
+        CoreLaunch.finishForgeSetUp(paths, id, task) { name ->
+            setState(VersionResolver(paths).resolve(id).baseVersionId, InstallState.SettingUp(name))
+            setState(id, InstallState.SettingUp(name))
+        }
     }
 
-    /** True when [id] still needs its Forge/NeoForge set-up before it can start. */
-    fun needsSetUp(id: String): Boolean {
-        val plan = ForgeInstaller.processorPlan(id, paths()) ?: return false
-        return !ForgeInstaller.processorsDone(plan)
+    // Modpacks (mirrors the iOS app's ModpackBrowseView and LauncherModel.installModpack)
+
+    sealed interface ModpackState {
+        data object Idle : ModpackState
+        data class Working(val stage: ModpackInstaller.Stage?, val done: Int, val total: Int) : ModpackState
+        data class SettingUp(val loader: String) : ModpackState
+        data class Finished(val id: String, val mods: Int) : ModpackState
+        data class Failed(val message: String) : ModpackState
     }
 
-    /** Sets up Forge/NeoForge (if needed), then hands the version to ZalithLauncher2's launcher. */
-    fun play(id: String, launch: (Version) -> Unit, onError: (String) -> Unit) {
-        if (needsSetUp(id)) {
-            repair(id)
-            onError("Setting up the mod loader first. Press Play again when it is done.")
+    private val modrinth by lazy { ModrinthApi() }
+    private const val MODPACK_TASK = "voxelium-modpack"
+
+    private val _modpack = MutableStateFlow<ModpackState>(ModpackState.Idle)
+    val modpack = _modpack.asStateFlow()
+
+    fun resetModpack() {
+        if (!TaskSystem.containsTask(MODPACK_TASK)) _modpack.update { ModpackState.Idle }
+    }
+
+    suspend fun searchModpacks(query: String, offset: Int): ModrinthApi.SearchPage =
+        withContext(Dispatchers.IO) { modrinth.searchModpacks(query, offset = offset) }
+
+    suspend fun modpackVersions(project: String): List<ModrinthApi.Version> =
+        withContext(Dispatchers.IO) { modrinth.modpackVersions(project) }
+
+    /** Downloads [version]'s .mrpack (checked by SHA-1), then installs it as its own version. */
+    fun installModpack(version: ModrinthApi.Version) {
+        val file = version.primaryFile ?: return
+        runModpackTask(version.name) { task ->
+            _modpack.update { ModpackState.Working(null, 0, 1) }
+            val dest = File(File(PathManager.DIR_CACHE, "modpacks"), file.filename.replace('/', '_'))
+            dest.parentFile?.mkdirs()
+            downloader.ensure(DownloadItem(file.url, dest, file.hashes.sha1, file.size))
+            installPackFile(dest, version.projectId to version.id, task)
+            dest.delete()
+        }
+    }
+
+    /** Installs a .mrpack file the user picked. */
+    fun installModpackFile(file: File, name: String) {
+        runModpackTask(name) { task ->
+            installPackFile(file, null, task)
+            file.delete()
+        }
+    }
+
+    private fun runModpackTask(title: String, body: suspend (Task) -> Unit) {
+        if (TaskSystem.containsTask(MODPACK_TASK)) return
+        _modpack.update { ModpackState.Working(null, 0, 1) }
+        TaskSystem.submitTask(
+            Task.runTask(
+                id = MODPACK_TASK,
+                dispatcher = Dispatchers.IO,
+                task = { task ->
+                    task.updateMessage(androidText(R.string.voxelium_installing, title))
+                    body(task)
+                },
+                onError = { e ->
+                    Logger.error(TAG, "Installing modpack $title failed", e)
+                    _modpack.update {
+                        ModpackState.Failed(if (e is ModpackException) e.message ?: e.toString() else "The modpack could not be installed: ${e.message ?: e}")
+                    }
+                },
+                onFinally = {
+                    refreshInstalled()
+                    VersionsManager.refresh(TAG)
+                }
+            )
+        )
+    }
+
+    /**
+     * The pack's usual version id (name + version), or "<id> (<loader>)" when that id is already
+     * installed with another loader: packs like Simply Optimized Reloaded give their Quilt and
+     * NeoForge files the same name and version. The same pack again is still refused by the core.
+     */
+    private fun packVersionId(file: File, game: GameInstaller): String {
+        val index = ModpackInstaller.read(file).let { (index, zip) -> zip.close(); index }
+        val id = ModpackInstaller.versionId(index)
+        if (!game.isInstalled(id)) return id
+        val installedLoader = ModpackInstaller.installedModpack(game.paths.instanceDir(id))?.loader
+        val loader = index.loader?.loader?.displayName ?: return id
+        return if (installedLoader == loader) id else "$id ($loader)"
+    }
+
+    private suspend fun installPackFile(file: File, source: Pair<String, String>?, task: Task) {
+        val game = installer()
+        val (id, report) = ModpackInstaller(game, meta).install(file, id = packVersionId(file, game), source = source) { stage, p ->
+            _modpack.update { ModpackState.Working(stage, p.completed, p.total) }
+            task.updateProgress(if (p.total > 0) p.completed.toFloat() / p.total else -1f)
+        }
+        report.failures.entries.take(20).forEach { (item, e) -> Logger.warning(TAG, "$id: ${item.destination.name}: ${e.message}") }
+        if (!report.succeeded) {
+            _modpack.update { ModpackState.Failed("${report.failures.size} files could not be downloaded. Install again to retry; finished files are kept.") }
             return
         }
+        // The core leaves Forge/NeoForge's set-up to the first launch (iOS); Android does it now.
+        CoreLaunch.finishForgeSetUp(game.paths, id, task) { name -> _modpack.update { ModpackState.SettingUp(name) } }
+        val mods = runCatching { ModpackInstaller.read(file).let { (index, zip) -> zip.close(); index.clientModCount } }.getOrDefault(0)
+        Logger.info(TAG, "Installed modpack $id ($mods mods, ${report.outcomes.size} game files)")
+        _modpack.update { ModpackState.Finished(id, mods) }
+    }
+
+    /**
+     * Hands the version to ZalithLauncher2's launcher. Its launch flow verifies the files and
+     * finishes an incomplete Forge/NeoForge set-up through [CoreLaunch].
+     */
+    fun play(id: String, launch: (Version) -> Unit, onError: (String) -> Unit) {
         val version = VersionsManager.loadVersion(getGameHome(), id)
         if (version == null || !version.isValid()) {
             onError("$id can't be read by the launcher.")

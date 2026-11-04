@@ -18,6 +18,7 @@
 
 package com.movtery.zalithlauncher.game.launch
 
+import com.movtery.zalithlauncher.game.voxelium.CoreLaunch
 import android.app.Activity
 import android.os.Build
 import android.os.Parcelable
@@ -106,7 +107,7 @@ class GameLauncher(
         }
 
         val manifest = GSON.fromJson(File(version.getVersionPath(), "${version.getVersionName()}.json").readText(), GameManifest::class.java)
-        val clientJar = manifest.inheritsFrom?.let { inheritsFrom ->
+        val clientJar = if (CoreLaunch.isCoreInstall(version)) CoreLaunch.clientJar(version) else manifest.inheritsFrom?.let { inheritsFrom ->
             //FIXME: 依赖的是一个原版ID的版本，但这个版本可能是用户自行安装的，只是版本名称与ID一致，不保证客户端真的是对应版本
             version.getInheritedClientJar(inheritsFrom)
         } ?: version.getClientJar()

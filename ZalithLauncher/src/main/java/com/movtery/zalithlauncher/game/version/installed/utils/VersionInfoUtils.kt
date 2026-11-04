@@ -18,6 +18,7 @@
 
 package com.movtery.zalithlauncher.game.version.installed.utils
 
+import com.movtery.zalithlauncher.game.voxelium.CoreLaunch
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
@@ -72,7 +73,15 @@ private val LOADER_DETECTORS = listOf<(String) -> String?>(
  */
 fun parseJsonToVersionInfo(jsonFile: File): VersionInfo? {
     return runCatching {
-        val jsonObject = JsonParser.parseString(jsonFile.readText()).asJsonObject
+        // Voxelium: read versions VoxeliumCore installed merged, so a modpack shows its Minecraft
+        // version and loader rather than its parent's id.
+        val versionDir = jsonFile.parentFile
+        val text = if (versionDir != null && CoreLaunch.isCoreInstall(versionDir)) {
+            runCatching { CoreLaunch.mergedJson(versionDir.parentFile!!.parentFile!!, versionDir.name) }
+                .onFailure { Logger.warning(TAG, "Couldn't merge ${versionDir.name}", it) }
+                .getOrElse { jsonFile.readText() }
+        } else jsonFile.readText()
+        val jsonObject = JsonParser.parseString(text).asJsonObject
         val quickPlay = runCatching {
             ensureQuickPlay(jsonObject)
         }.getOrElse { e ->

@@ -18,6 +18,7 @@
 
 package com.movtery.zalithlauncher.game.version.installed
 
+import com.movtery.zalithlauncher.game.voxelium.CoreLaunch
 import com.movtery.zalithlauncher.game.version.download.processLibraries
 import com.movtery.zalithlauncher.game.versioninfo.models.GameManifest
 import com.movtery.zalithlauncher.game.versioninfo.models.GameManifest.Library
@@ -52,6 +53,15 @@ class VersionInfoParser(private val version: Version) {
      * 构建并返回最终合并后的 [GameManifest]
      */
     fun build(): GameManifest {
+        // Voxelium: versions VoxeliumCore installed are merged by the core (any depth of
+        // inheritsFrom, e.g. a modpack on its loader on Minecraft).
+        if (inherit == true && CoreLaunch.isCoreInstall(version)) {
+            return getGameManifest(
+                gameManifest = GSON.fromJson(CoreLaunch.mergedJson(version), GameManifest::class.java),
+                inheritsManifest = null
+            )
+        }
+
         val manifest = gameManifest ?: GSON.fromJson(
             File(version.getVersionPath(), "${version.getVersionName()}.json").readText(),
             GameManifest::class.java

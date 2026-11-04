@@ -53,4 +53,28 @@
     </plurals>
     <string name="voxelium_not_deleted">Not deleted</string>
     <string name="voxelium_needed_by">%1$s is needed by %2$s. Delete those first.</string>
+
+    <string name="voxelium_modpacks">Modpacks</string>
+    <string name="voxelium_modpacks_button">Modpacks…</string>
+    <string name="voxelium_back">Back</string>
+    <string name="voxelium_close">Close</string>
+    <string name="voxelium_ok">OK</string>
+    <string name="voxelium_search">Search</string>
+    <string name="voxelium_search_modpacks">Search Modrinth modpacks</string>
+    <string name="voxelium_import_mrpack">Import .mrpack</string>
+    <string name="voxelium_modpack_import_failed">Couldn\'t read that file.</string>
+    <string name="voxelium_modpack_note">Modpacks bring many mods at once and need a lot of memory: smaller packs and render distance 8–10 work best on phones.</string>
+    <string name="voxelium_downloads">%d downloads</string>
+    <string name="voxelium_load_more">Load more</string>
+    <string name="voxelium_modpack_version">Version</string>
+    <string name="voxelium_modpack_no_versions">No version of this modpack for a loader Voxelium runs.</string>
+    <string name="voxelium_install_modpack">Install %s</string>
+    <string name="voxelium_modpack_downloading">Downloading the modpack…</string>
+    <string name="voxelium_modpack_stage_minecraft">Installing Minecraft</string>
+    <string name="voxelium_modpack_stage_loader">Installing the mod loader</string>
+    <string name="voxelium_modpack_stage_mods">Downloading mods</string>
+    <string name="voxelium_modpack_stage_overrides">Copying settings</string>
+    <string name="voxelium_modpack_count">%1$d of %2$d</string>
+    <string name="voxelium_modpack_background">You can close this; the install continues in the background.</string>
+    <string name="voxelium_modpack_installed">Installed as %s. Find it under Installed on the Versions page.</string>
 </resources>
