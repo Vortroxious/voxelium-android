@@ -76,6 +76,8 @@ import com.movtery.zalithlauncher.ui.screens.main.crashlogs.LogShareMenu
 import com.movtery.zalithlauncher.ui.screens.main.crashlogs.LogShareMenuOperation
 import com.movtery.zalithlauncher.ui.screens.main.crashlogs.ShareLinkOperation
 import com.movtery.zalithlauncher.ui.theme.ZalithLauncherTheme
+import com.movtery.zalithlauncher.setting.enums.isLauncherInDarkTheme
+import com.movtery.zalithlauncher.ui.voxelium.theme.VoxeliumTheme
 import com.movtery.zalithlauncher.ui.theme.festivals.FestivalEffects
 import com.movtery.zalithlauncher.ui.theme.festivals.FestivalTapObserver
 import com.movtery.zalithlauncher.ui.theme.showThemed
@@ -315,6 +317,8 @@ class MainActivity : BaseAppCompatActivity() {
                 backgroundViewModel = backgroundViewModel,
                 festivals = festivals
             ) {
+            //Voxelium: its own colours, shapes and type over the whole launcher
+            VoxeliumTheme(dark = isLauncherInDarkTheme()) {
                 ObserveFullScreenSetting(AllSettings.launcherFullScreen.state)
 
                 val guides = rememberAppGuides(eventViewModel)
@@ -322,11 +326,6 @@ class MainActivity : BaseAppCompatActivity() {
                     guides.mainScreen,
                     nextTip = { NextTipLabel(it) }
                 ) {
-                    Background(
-                        modifier = Modifier.fillMaxSize(),
-                        viewModel = backgroundViewModel
-                    )
-
                     MainScreen(
                         screenBackStackModel = screenBackStackModel,
                         eventViewModel = eventViewModel,
@@ -337,11 +336,6 @@ class MainActivity : BaseAppCompatActivity() {
                         }
                     )
 
-                    //节日彩蛋效果层
-                    FestivalEffects(
-                        modifier = Modifier.fillMaxSize(),
-                        festivals = festivals
-                    )
 
                     //启动游戏操作流程
                     LaunchGameOperation(
@@ -523,6 +517,7 @@ class MainActivity : BaseAppCompatActivity() {
                         vulkanCheckerViewModel.resumeCont()
                     }
                 )
+            }
             }
         }
     }

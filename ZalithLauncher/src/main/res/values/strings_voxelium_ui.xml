@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Voxelium: strings for the new interface (U1: shell, Play, Install, version detail). English only for now. -->
+<resources>
+    <string name="voxelium_ui_play">Play</string>
+    <string name="voxelium_ui_install">Install</string>
+    <string name="voxelium_ui_accounts">Accounts</string>
+    <string name="voxelium_ui_controls">Controls</string>
+    <string name="voxelium_ui_settings">Settings</string>
+    <string name="voxelium_ui_tasks">Tasks</string>
+    <string name="voxelium_ui_more">More</string>
+    <string name="voxelium_ui_more_download">Download packs and worlds</string>
+    <string name="voxelium_ui_more_multiplayer">Multiplayer (Terracotta)</string>
+    <string name="voxelium_ui_more_files">Files</string>
+    <string name="voxelium_ui_more_classic_home">ZalithLauncher home</string>
+
+    <string name="voxelium_ui_badge_vanilla">VANILLA</string>
+    <string name="voxelium_ui_badge_modpack">MODPACK</string>
+
+    <string name="voxelium_ui_last_played">Last played</string>
+    <string name="voxelium_ui_installed_count">Installed · %d</string>
+    <string name="voxelium_ui_add_install">+ Install</string>
+    <string name="voxelium_ui_play_version">Play %s</string>
+    <string name="voxelium_ui_open_version">Mods, worlds and settings</string>
+    <plurals name="voxelium_ui_mods_count">
+        <item quantity="one">%d mod</item>
+        <item quantity="other">%d mods</item>
+    </plurals>
+    <plurals name="voxelium_ui_worlds_count">
+        <item quantity="one">%d world</item>
+        <item quantity="other">%d worlds</item>
+    </plurals>
+    <string name="voxelium_ui_from_zalith">From ZalithLauncher</string>
+    <string name="voxelium_ui_nothing_installed">Nothing installed yet</string>
+    <string name="voxelium_ui_nothing_installed_hint">Pick a Minecraft version and a mod loader to get started.</string>
+    <string name="voxelium_ui_go_install">Install Minecraft</string>
+    <string name="voxelium_ui_notice">%s is an Unofficial Modified Version of Zalith Launcher 2. Please report problems to Voxelium, not to the Zalith Launcher team. Not affiliated with Mojang or Microsoft.</string>
+    <string name="voxelium_ui_test_build">Test build: may be unstable.</string>
+    <string name="voxelium_ui_no_account">Add an account</string>
+
+    <string name="voxelium_ui_releases">Releases</string>
+    <string name="voxelium_ui_snapshots">Snapshots</string>
+    <string name="voxelium_ui_minecraft_version">Minecraft %s</string>
+    <string name="voxelium_ui_release">Release</string>
+    <string name="voxelium_ui_snapshot">Snapshot</string>
+    <string name="voxelium_ui_short_vanilla">No mods</string>
+    <string name="voxelium_ui_short_fabric">Most mods</string>
+    <string name="voxelium_ui_short_quilt">Runs Fabric mods</string>
+    <string name="voxelium_ui_short_forge">Classic</string>
+    <string name="voxelium_ui_short_neoforge">Create, tech</string>
+    <string name="voxelium_ui_not_offered">From %s</string>
+    <string name="voxelium_ui_modded_note">Modded versions get their own game folder, so mods, settings and worlds don\'t mix with vanilla.</string>
+    <string name="voxelium_ui_pick_version">Pick a version on the left.</string>
+    <string name="voxelium_ui_installed_note">Installed. Installing again checks and repairs its files.</string>
+
+    <string name="voxelium_ui_tab_worlds">Worlds</string>
+    <string name="voxelium_ui_tab_settings">Settings</string>
+    <string name="voxelium_ui_add_kind">+ Add %s</string>
+    <string name="voxelium_ui_version_settings_title">This version</string>
+    <string name="voxelium_ui_version_settings_more">Memory, renderer, Java and arguments</string>
+    <string name="voxelium_ui_version_settings_open">Open version settings</string>
+    <string name="voxelium_ui_repair_hint">Checks every file and downloads what is missing or damaged.</string>
+    <string name="voxelium_ui_delete_hint">Removes this version and its game folder.</string>
+    <string name="voxelium_ui_not_found">This version is no longer installed.</string>
+
+    <string name="voxelium_ui_controls_soon">The layout editor comes with the new in-game controls.</string>
+    <string name="voxelium_ui_controls_soon_hint">It will use the same layout file as Voxelium for iOS.</string>
+</resources>

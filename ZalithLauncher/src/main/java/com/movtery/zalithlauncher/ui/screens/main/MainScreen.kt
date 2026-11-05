@@ -18,6 +18,9 @@
 
 package com.movtery.zalithlauncher.ui.screens.main
 
+import com.movtery.zalithlauncher.ui.voxelium.shell.MoreItem
+import com.movtery.zalithlauncher.ui.voxelium.shell.VoxeliumPlace
+import com.movtery.zalithlauncher.ui.voxelium.shell.VoxeliumRail
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
@@ -98,7 +101,10 @@ import com.movtery.zalithlauncher.ui.screens.content.LicenseScreen
 import com.movtery.zalithlauncher.ui.screens.content.LogViewScreen
 import com.movtery.zalithlauncher.ui.screens.content.FirstLoginMenu
 import com.movtery.zalithlauncher.ui.screens.content.MultiplayerScreen
-import com.movtery.zalithlauncher.ui.screens.content.voxelium.VoxeliumVersionsScreen
+import com.movtery.zalithlauncher.ui.voxelium.controls.VoxeliumControlsScreen
+import com.movtery.zalithlauncher.ui.voxelium.install.VoxeliumInstallScreen
+import com.movtery.zalithlauncher.ui.voxelium.play.VoxeliumPlayScreen
+import com.movtery.zalithlauncher.ui.voxelium.version.VoxeliumVersionScreen
 import com.movtery.zalithlauncher.ui.screens.content.SettingsScreen
 import com.movtery.zalithlauncher.ui.screens.content.VersionExportScreen
 import com.movtery.zalithlauncher.ui.screens.content.VersionSettingsScreen
@@ -161,66 +167,63 @@ fun MainScreen(
     //Voxelium: the Versions screen is the home screen
     val inLauncherScreen = mainScreenKey == null || mainScreenKey is NormalNavKey.Voxelium
 
-    val isBackgroundValid = LocalBackgroundViewModel.current?.isValid == true
-    val launcherBackgroundOpacity = AllSettings.launcherBackgroundOpacity.state.toFloat() / 100f
-
-    val backgroundColor = if (isBackgroundValid) {
-        backgroundColor().copy(alpha = launcherBackgroundOpacity)
-    } else backgroundColor()
-
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = backgroundColor,
-        contentColor = onBackgroundColor()
+        color = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            TopBar(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp),
-                mainScreenKey = mainScreenKey,
-                inLauncherScreen = inLauncherScreen,
-                taskRunning = tasks.isEmpty(),
-                isTasksExpanded = isTaskMenuExpanded,
-                contentColor = onBackgroundColor(),
-                onScreenBack = {
-                    screenBackStackModel.mainScreen.backStack.removeFirstOrNull()
+        //Voxelium: the rail on the left replaces Zalith Launcher 2's top bar
+        Row(modifier = Modifier.fillMaxSize()) {
+            VoxeliumRail(
+                selected = when (mainScreenKey) {
+                    null, is NormalNavKey.Voxelium, is NormalNavKey.VoxeliumVersion -> VoxeliumPlace.PLAY
+                    is NormalNavKey.VoxeliumInstall -> VoxeliumPlace.INSTALL
+                    is NormalNavKey.AccountManager -> VoxeliumPlace.ACCOUNTS
+                    is NormalNavKey.VoxeliumControls -> VoxeliumPlace.CONTROLS
+                    is NestedNavKey.Settings -> VoxeliumPlace.SETTINGS
+                    else -> null
                 },
-                toMainScreen = toMainScreen,
-                toSettingsScreen = {
-                    screenBackStackModel.mainScreen.removeAndNavigateTo(
-                        removes = screenBackStackModel.clearBeforeNavKeys,
-                        screenKey = screenBackStackModel.settingsScreen
-                    )
-                },
-                toDownloadScreen = {
-                    screenBackStackModel.navigateToDownload()
-                },
-                toMultiplayerScreen = {
-                    screenBackStackModel.mainScreen.removeAndNavigateTo(
-                        removes = screenBackStackModel.clearBeforeNavKeys,
-                        screenKey = NormalNavKey.Multiplayer
-                    )
-                },
-                toVoxeliumScreen = toMainScreen,
-                openFileManager = {
-                    eventViewModel.sendEvent(
-                        EventViewModel.Event.OpenFileManager(
-                            rootPath = PathManager.DIR_FILES_EXTERNAL.absolutePath
+                taskCount = tasks.size,
+                onSelect = { place ->
+                    when (place) {
+                        VoxeliumPlace.PLAY -> toMainScreen()
+                        VoxeliumPlace.INSTALL -> screenBackStackModel.mainScreen.removeAndNavigateTo(
+                            removes = screenBackStackModel.clearBeforeNavKeys,
+                            screenKey = NormalNavKey.VoxeliumInstall
                         )
-                    )
+                        VoxeliumPlace.ACCOUNTS -> screenBackStackModel.mainScreen.removeAndNavigateTo(
+                            removes = screenBackStackModel.clearBeforeNavKeys,
+                            screenKey = NormalNavKey.AccountManager(FirstLoginMenu.NONE)
+                        )
+                        VoxeliumPlace.CONTROLS -> screenBackStackModel.mainScreen.removeAndNavigateTo(
+                            removes = screenBackStackModel.clearBeforeNavKeys,
+                            screenKey = NormalNavKey.VoxeliumControls
+                        )
+                        VoxeliumPlace.SETTINGS -> screenBackStackModel.mainScreen.removeAndNavigateTo(
+                            removes = screenBackStackModel.clearBeforeNavKeys,
+                            screenKey = screenBackStackModel.settingsScreen
+                        )
+                    }
                 },
-                changeExpandedState = {
-                    changeTasksExpandedState()
-                },
+                onTasks = { changeTasksExpandedState() },
+                onMore = { item ->
+                    when (item) {
+                        MoreItem.DOWNLOAD -> screenBackStackModel.navigateToDownload()
+                        MoreItem.MULTIPLAYER -> screenBackStackModel.mainScreen.removeAndNavigateTo(
+                            removes = screenBackStackModel.clearBeforeNavKeys,
+                            screenKey = NormalNavKey.Multiplayer
+                        )
+                        MoreItem.FILES -> eventViewModel.sendEvent(
+                            EventViewModel.Event.OpenFileManager(rootPath = PathManager.DIR_FILES_EXTERNAL.absolutePath)
+                        )
+                        MoreItem.CLASSIC_HOME -> screenBackStackModel.mainScreen.navigateTo(screenKey = NormalNavKey.LauncherMain)
+                    }
+                }
             )
 
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxHeight()
                     .weight(1f)
             ) {
                 NavigationUI(
@@ -667,19 +670,43 @@ private fun NavigationUI(
                     )
                 }
                 entry<NormalNavKey.Voxelium> {
-                    VoxeliumVersionsScreen(
+                    VoxeliumPlayScreen(
                         backScreenViewModel = screenBackStackModel,
                         eventViewModel = eventViewModel,
                         onAccounts = {
-                            screenBackStackModel.mainScreen.navigateTo(
+                            screenBackStackModel.mainScreen.removeAndNavigateTo(
+                                removes = screenBackStackModel.clearBeforeNavKeys,
                                 screenKey = NormalNavKey.AccountManager(FirstLoginMenu.NONE)
                             )
                         },
-                        onClassicHome = {
-                            screenBackStackModel.mainScreen.navigateTo(screenKey = NormalNavKey.LauncherMain)
+                        onInstall = {
+                            screenBackStackModel.mainScreen.removeAndNavigateTo(
+                                removes = screenBackStackModel.clearBeforeNavKeys,
+                                screenKey = NormalNavKey.VoxeliumInstall
+                            )
                         },
+                        onOpenVersion = { id ->
+                            screenBackStackModel.mainScreen.removeAndNavigateTo(
+                                removes = screenBackStackModel.clearBeforeNavKeys,
+                                screenKey = NormalNavKey.VoxeliumVersion(id)
+                            )
+                        }
+                    )
+                }
+                entry<NormalNavKey.VoxeliumInstall> {
+                    VoxeliumInstallScreen(backScreenViewModel = screenBackStackModel)
+                }
+                entry<NormalNavKey.VoxeliumVersion> { key ->
+                    VoxeliumVersionScreen(
+                        key = key,
+                        backScreenViewModel = screenBackStackModel,
+                        eventViewModel = eventViewModel,
+                        onBack = toMainScreen,
                         onVersionSettings = navigateToVersions
                     )
+                }
+                entry<NormalNavKey.VoxeliumControls> {
+                    VoxeliumControlsScreen(backScreenViewModel = screenBackStackModel)
                 }
                 entry<NormalNavKey.LogView> { key ->
                     LogViewScreen(

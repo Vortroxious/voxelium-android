@@ -72,15 +72,15 @@ import kotlinx.coroutines.withContext
 enum class ContentSource { MODRINTH, CURSEFORGE }
 
 /**
- * Voxelium: a version's mods, resource packs and shader packs (switch on/off, remove, Modrinth
- * updates, add from Modrinth, CurseForge or a file). Mirrors the iOS app's ContentLibraryView.
+ * Voxelium: one kind of a version's content (mods, resource packs or shader packs) as a tab of the
+ * version page: switch on/off, remove, Modrinth updates, add from Modrinth, CurseForge or a file.
+ * Mirrors the iOS app's ContentLibraryView.
  */
 @Composable
-fun ContentLibraryDialog(content: VoxeliumContent, onDismiss: () -> Unit) {
+fun ContentLibraryPane(content: VoxeliumContent, kind: ContentKind, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    var kind by remember { mutableStateOf(content.kinds.first()) }
     var items by remember { mutableStateOf<List<ContentItem>>(emptyList()) }
     var reload by remember { mutableIntStateOf(0) }
     var message by remember { mutableStateOf<String?>(null) }
@@ -135,25 +135,18 @@ fun ContentLibraryDialog(content: VoxeliumContent, onDismiss: () -> Unit) {
         }
     }
 
-    VoxeliumSheet(
-        title = content.version.title,
-        onClose = onDismiss,
-        actions = {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(
+                stringResource(R.string.voxelium_content_count, kindTitle(kind), items.count { it.isEnabled }, items.size),
+                style = MaterialTheme.typography.labelLarge,
+                modifier = Modifier.weight(1f)
+            )
             OutlinedButton(onClick = { browsing = ContentSource.MODRINTH }) { Text(stringResource(R.string.voxelium_browse_modrinth)) }
-            Spacer(Modifier.width(8.dp))
             if (content.curseForgeAvailable) {
                 OutlinedButton(onClick = { browsing = ContentSource.CURSEFORGE }) { Text(stringResource(R.string.voxelium_browse_curseforge)) }
-                Spacer(Modifier.width(8.dp))
             }
             OutlinedButton(onClick = { importer.launch(arrayOf("*/*")) }) { Text(stringResource(R.string.voxelium_import_file)) }
-        }
-    ) {
-        if (content.kinds.size > 1) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                for (k in content.kinds) {
-                    FilterChip(selected = kind == k, onClick = { kind = k }, label = { Text(kindTitle(k)) })
-                }
-            }
         }
 
         if (kind == ContentKind.SHADER_PACKS) {
@@ -189,10 +182,6 @@ fun ContentLibraryDialog(content: VoxeliumContent, onDismiss: () -> Unit) {
 
         message?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
 
-        Text(
-            stringResource(R.string.voxelium_content_count, kindTitle(kind), items.count { it.isEnabled }, items.size),
-            style = MaterialTheme.typography.labelLarge
-        )
         if (items.isEmpty()) {
             Text(
                 stringResource(R.string.voxelium_content_empty, kindTitle(kind).lowercase(), kind.fileExtension),

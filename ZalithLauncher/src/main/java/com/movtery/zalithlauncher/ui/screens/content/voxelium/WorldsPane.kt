@@ -21,6 +21,7 @@ package com.movtery.zalithlauncher.ui.screens.content.voxelium
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -70,7 +71,7 @@ import java.time.format.FormatStyle
  * WorldsView. Worlds are copied only while Minecraft is closed (the launcher is in front then).
  */
 @Composable
-fun WorldsDialog(content: VoxeliumContent, onDismiss: () -> Unit) {
+fun WorldsPane(content: VoxeliumContent, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var worlds by remember { mutableStateOf<List<WorldItem>?>(null) }
@@ -100,16 +101,17 @@ fun WorldsDialog(content: VoxeliumContent, onDismiss: () -> Unit) {
         }
     }
 
-    VoxeliumSheet(
-        title = stringResource(R.string.voxelium_worlds_title, content.version.title),
-        onClose = onDismiss,
-        closeEnabled = !busy,
-        actions = {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                stringResource(R.string.voxelium_world_count, worlds?.size ?: 0),
+                style = MaterialTheme.typography.labelLarge,
+                modifier = Modifier.weight(1f)
+            )
             OutlinedButton(enabled = !busy, onClick = { importer.launch(arrayOf("application/zip", "application/octet-stream", "*/*")) }) {
                 Text(stringResource(R.string.voxelium_import_world))
             }
         }
-    ) {
         if (busy) Row(verticalAlignment = Alignment.CenterVertically) {
             CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
             Spacer(Modifier.width(8.dp))
@@ -122,7 +124,6 @@ fun WorldsDialog(content: VoxeliumContent, onDismiss: () -> Unit) {
             list == null -> CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
             list.isEmpty() -> Text(stringResource(R.string.voxelium_no_worlds), color = MaterialTheme.colorScheme.onSurfaceVariant)
             else -> {
-                Text(stringResource(R.string.voxelium_world_count, list.size), style = MaterialTheme.typography.labelLarge)
                 LazyColumn(modifier = Modifier.weight(1f)) {
                     items(list, key = { it.id }) { world ->
                         Row(modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {

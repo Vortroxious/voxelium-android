@@ -59,9 +59,21 @@ sealed interface NormalNavKey : TitledNavKey {
     ) : NormalNavKey {
         @Contextual override val title: AndroidStringText = androidText(R.string.page_title_select_files)
     }
-    /** Voxelium: the Versions screen (installs through VoxeliumCore) */
+    /** Voxelium: Play, the home screen (installed versions) */
     @Serializable data object Voxelium: NormalNavKey {
-        @Contextual override val title: AndroidStringText = androidText(R.string.voxelium_versions_title)
+        @Contextual override val title: AndroidStringText = androidText(R.string.voxelium_ui_play)
+    }
+    /** Voxelium: Install (Minecraft versions, loaders, modpacks) */
+    @Serializable data object VoxeliumInstall: NormalNavKey {
+        @Contextual override val title: AndroidStringText = androidText(R.string.voxelium_ui_install)
+    }
+    /** Voxelium: one installed version (mods, packs, shaders, worlds, settings) */
+    @Serializable data class VoxeliumVersion(val id: String): NormalNavKey {
+        @Contextual override val title: AndroidStringText = androidText(id)
+    }
+    /** Voxelium: the touch controls editor */
+    @Serializable data object VoxeliumControls: NormalNavKey {
+        @Contextual override val title: AndroidStringText = androidText(R.string.voxelium_ui_controls)
     }
     /** 多人联机屏幕 */
     @Serializable data object Multiplayer: NormalNavKey {
