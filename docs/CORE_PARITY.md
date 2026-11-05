@@ -17,7 +17,7 @@ ZalithLauncher2 code remains only as the engine: Java launch over JNI, renderers
 
 | Swift (`Sources/VoxeliumCore/…`) | Kotlin (`io.github.voxelium.core…`) | Status | iOS commit | Notes |
 |---|---|---|---|---|
-| Paths/AppPaths.swift | paths/AppPaths.kt | ✅ | e28b28b | `gameDir` can be passed in (Android uses its existing `.minecraft`); no `controlsDir` |
+| Paths/AppPaths.swift | paths/AppPaths.kt | ✅ | e28b28b | `gameDir` can be passed in (Android uses its existing `.minecraft`); `controlsDir` is `root/controls` as on iOS |
 | Paths/AppPathsMigration.swift | | ➖ | | iOS 0.1.0 data move only |
 | Manifest/VersionManifest.swift | manifest/VersionManifest.kt, manifest/MojangJson.kt | ✅ | e28b28b | |
 | Manifest/VersionInfo.swift | manifest/VersionInfo.kt | ✅ | e28b28b | URLs kept as strings; Android addition: `Downloads.clientMappings` (for DOWNLOAD_MOJMAPS) |
@@ -51,7 +51,7 @@ ZalithLauncher2 code remains only as the engine: Java launch over JNI, renderers
 | Content/IrisSettings.swift | content/IrisSettings.kt | ✅ | e28b28b | |
 | Runtime/RuntimeCatalog.swift | | ➖ | | ZalithLauncher2's `RuntimesManager` (bundled JREs, `.so`) is kept |
 | Runtime/MachO.swift | | ➖ | | iOS only |
-| Controls/ControlLayout.swift | | ➖ | | ZalithLauncher2's controls and editor are kept |
+| Controls/ControlLayout.swift | controls/ControlLayout.kt | ✅ | e28b28b | sizes are dp where iOS uses points. `layout.json` is written in the same bytes as Swift's `JSONEncoder` (`.prettyPrinted, .sortedKeys`: upper-case UUIDs, `\/`, Swift number form) by `SwiftJson`, so a file moves between the apps unchanged. `ControlSpecial.KEYBOARD.title` says "Show keyboard" (iOS: "Show iOS keyboard"). Used by the in-game overlay `ui/voxelium/game/TouchControls.kt` (from `App/Voxelium/Native/VXTouchControls.m`, d602cd1) |
 | Launch/JITReadiness.swift | | ➖ | | iOS only (Android needs no JIT workaround) |
 | Launch/NetworkRoute.swift | | ➖ | | iOS only |
 | Launch/StikDebugJIT.swift | | ➖ | | iOS only |
@@ -78,6 +78,7 @@ Swift's parameterised cases (`mavenPaths`, `rejectsTraversal`) are loops inside 
 | GameRuntimeTests | launch/GameRuntimeTests.kt | 6 |
 | InstallerTests, VersionDeleterTests | launch/InstallerTests.kt | 2 + 1 |
 | ModLoaderTests | launch/ModLoaderTests.kt | 5 (+1 Android: builds sorted newest first) |
+| ControlLayoutTests | controls/ControlLayoutTests.kt | 9 (+4 Android: same bytes as Swift for the default and an iOS file, unknown `special`/nulls, Swift number form; fixtures in `fixtures/controls`, written by the Swift encoder) |
 | ForgeTests | launch/ModLoaderTests.kt (ForgeMetaTests), launch/ForgeTests.kt | 4 + 3 (+1 Android: installer refuses unoffered versions; +3 Android: ProcessorPlanTests); not `planFollowsTheDataFolderAfterAReinstall` (iOS-only) |
 | SystemTests (GameOptions), ContentManagerTests (Iris, GraphicsBackend, ShaderLaunchAdvice) | content/GameOptionsTests.kt | 2 + 2 + 1 + 1 |
 

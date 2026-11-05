@@ -25,7 +25,7 @@ sealed class PathException(message: String) : Exception(message) {
  * paths from Mojang can be used unchanged:
  *   gameDir/{versions,libraries,assets/{indexes,objects},saves,resourcepacks,…}
  *   gameDir/versions/<id>/   (also the game folder of a modded version or modpack)
- *   root/runtimes/<name>/, root/logs/, root/config/
+ *   root/runtimes/<name>/, root/logs/, root/config/, root/controls/
  *
  * On iOS [gameDir] is `root/minecraft`. On Android the app passes its existing
  * `.minecraft` folder, so versions installed before the core was used keep working.
@@ -42,6 +42,8 @@ class AppPaths(root: File, gameDir: File? = null) {
     val runtimesDir: File get() = File(root, "runtimes")
     val logsDir: File get() = File(root, "logs")
     val configDir: File get() = File(root, "config")
+    /** The on-screen control layout (controls/layout.json), shared in format with the iOS app. */
+    val controlsDir: File get() = File(root, "controls")
 
     fun versionDir(id: String): File = resolve(id, versionsDir)
 

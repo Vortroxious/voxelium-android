@@ -1,0 +1,317 @@
+{
+  "buttons" : [
+    {
+      "height" : 69.6,
+      "id" : "00000000-0000-4000-8000-000000000001",
+      "inDrawer" : false,
+      "keys" : [
+        32
+      ],
+      "mouse" : -1,
+      "name" : "Jump",
+      "showInGame" : true,
+      "showInMenu" : false,
+      "special" : "none",
+      "toggle" : false,
+      "width" : 69.6,
+      "x" : 0.8741068384120171,
+      "y" : 0.4778217679069768
+    },
+    {
+      "height" : 69.6,
+      "id" : "00000000-0000-4000-8000-000000000002",
+      "inDrawer" : false,
+      "keys" : [
+        340
+      ],
+      "mouse" : -1,
+      "name" : "Shift",
+      "showInGame" : true,
+      "showInMenu" : true,
+      "special" : "none",
+      "toggle" : true,
+      "width" : 69.6,
+      "x" : 0.8741068384120171,
+      "y" : 0.31131014
+    },
+    {
+      "height" : 69.6,
+      "id" : "00000000-0000-4000-8000-000000000003",
+      "inDrawer" : false,
+      "keys" : [
+        341
+      ],
+      "mouse" : -1,
+      "name" : "Sprint",
+      "showInGame" : true,
+      "showInMenu" : false,
+      "special" : "none",
+      "toggle" : true,
+      "width" : 69.6,
+      "x" : 0.7972828040772532,
+      "y" : 0.31131014
+    },
+    {
+      "height" : 69.6,
+      "id" : "00000000-0000-4000-8000-000000000004",
+      "inDrawer" : false,
+      "keys" : [
+
+      ],
+      "mouse" : 1,
+      "name" : "Right Click",
+      "showInGame" : true,
+      "showInMenu" : true,
+      "special" : "none",
+      "toggle" : false,
+      "width" : 69.6,
+      "x" : 0.8009372884120172,
+      "y" : 0.655989334883721
+    },
+    {
+      "height" : 69.6,
+      "id" : "00000000-0000-4000-8000-000000000005",
+      "inDrawer" : false,
+      "keys" : [
+
+      ],
+      "mouse" : 0,
+      "name" : "Left Click",
+      "showInGame" : true,
+      "showInMenu" : true,
+      "special" : "none",
+      "toggle" : false,
+      "width" : 69.6,
+      "x" : 0.7009615884120172,
+      "y" : 0.660628034883721
+    },
+    {
+      "height" : 69.6,
+      "id" : "00000000-0000-4000-8000-000000000006",
+      "inDrawer" : false,
+      "keys" : [
+
+      ],
+      "mouse" : 2,
+      "name" : "Middle Click",
+      "showInGame" : true,
+      "showInMenu" : true,
+      "special" : "none",
+      "toggle" : false,
+      "width" : 69.6,
+      "x" : 0.7608056184120171,
+      "y" : 0.516127284883721
+    },
+    {
+      "height" : 69.6,
+      "id" : "00000000-0000-4000-8000-000000000007",
+      "inDrawer" : false,
+      "keys" : [
+        69
+      ],
+      "mouse" : -1,
+      "name" : "Inventory",
+      "showInGame" : true,
+      "showInMenu" : false,
+      "special" : "none",
+      "toggle" : false,
+      "width" : 69.6,
+      "x" : 0.8777613227467811,
+      "y" : 0.655989334883721
+    },
+    {
+      "height" : 39.2,
+      "id" : "00000000-0000-4000-8000-000000000008",
+      "inDrawer" : false,
+      "keys" : [
+
+      ],
+      "mouse" : -1,
+      "name" : "Runtime Menu",
+      "showInGame" : true,
+      "showInMenu" : true,
+      "special" : "runtimeMenu",
+      "toggle" : false,
+      "width" : 104.8,
+      "x" : 0.8107296137339056,
+      "y" : 0
+    },
+    {
+      "height" : 40,
+      "id" : "00000000-0000-4000-8000-000000000009",
+      "inDrawer" : false,
+      "keys" : [
+
+      ],
+      "mouse" : -1,
+      "name" : "Hide GUI",
+      "showInGame" : true,
+      "showInMenu" : true,
+      "special" : "hideGUI",
+      "toggle" : false,
+      "width" : 69.6,
+      "x" : 0.9253218884120171,
+      "y" : 0
+    },
+    {
+      "height" : 39.2,
+      "id" : "00000000-0000-4000-8000-000000000010",
+      "inDrawer" : false,
+      "keys" : [
+        256
+      ],
+      "mouse" : -1,
+      "name" : "Pause",
+      "showInGame" : true,
+      "showInMenu" : false,
+      "special" : "none",
+      "toggle" : false,
+      "width" : 104.8,
+      "x" : 0.6961373390557939,
+      "y" : 0
+    },
+    {
+      "height" : 39.2,
+      "id" : "00000000-0000-4000-8000-000000000011",
+      "inDrawer" : false,
+      "keys" : [
+        256
+      ],
+      "mouse" : -1,
+      "name" : "Exit Menu",
+      "showInGame" : false,
+      "showInMenu" : true,
+      "special" : "none",
+      "toggle" : false,
+      "width" : 104.8,
+      "x" : 0.6961373390557939,
+      "y" : 0
+    },
+    {
+      "height" : 40,
+      "id" : "00000000-0000-4000-8000-000000000012",
+      "inDrawer" : false,
+      "keys" : [
+
+      ],
+      "mouse" : -1,
+      "name" : "More",
+      "showInGame" : true,
+      "showInMenu" : true,
+      "special" : "drawer",
+      "toggle" : false,
+      "width" : 96,
+      "x" : 0,
+      "y" : 0
+    },
+    {
+      "height" : 40,
+      "id" : "00000000-0000-4000-8000-000000000013",
+      "inDrawer" : true,
+      "keys" : [
+        294
+      ],
+      "mouse" : -1,
+      "name" : "Third person",
+      "showInGame" : true,
+      "showInMenu" : true,
+      "special" : "none",
+      "toggle" : false,
+      "width" : 96,
+      "x" : 0.10515021459227468,
+      "y" : 0.0026855469
+    },
+    {
+      "height" : 40,
+      "id" : "00000000-0000-4000-8000-000000000014",
+      "inDrawer" : true,
+      "keys" : [
+        292
+      ],
+      "mouse" : -1,
+      "name" : "Debug Menu",
+      "showInGame" : true,
+      "showInMenu" : true,
+      "special" : "none",
+      "toggle" : false,
+      "width" : 96,
+      "x" : 0.315450643776824,
+      "y" : 0.0026855469
+    },
+    {
+      "height" : 40,
+      "id" : "00000000-0000-4000-8000-000000000015",
+      "inDrawer" : true,
+      "keys" : [
+
+      ],
+      "mouse" : -1,
+      "name" : "Mouse Toggle",
+      "showInGame" : true,
+      "showInMenu" : true,
+      "special" : "virtualMouse",
+      "toggle" : false,
+      "width" : 96,
+      "x" : 0.21030042918454936,
+      "y" : 0.10035996550465116
+    },
+    {
+      "height" : 40,
+      "id" : "00000000-0000-4000-8000-000000000016",
+      "inDrawer" : true,
+      "keys" : [
+        84
+      ],
+      "mouse" : -1,
+      "name" : "Chat",
+      "showInGame" : true,
+      "showInMenu" : true,
+      "special" : "none",
+      "toggle" : false,
+      "width" : 96,
+      "x" : 0,
+      "y" : 0.10035996550465116
+    },
+    {
+      "height" : 40,
+      "id" : "00000000-0000-4000-8000-000000000017",
+      "inDrawer" : true,
+      "keys" : [
+
+      ],
+      "mouse" : -1,
+      "name" : "Keyboard",
+      "showInGame" : true,
+      "showInMenu" : true,
+      "special" : "keyboard",
+      "toggle" : false,
+      "width" : 96,
+      "x" : 0.10515021459227468,
+      "y" : 0.10035996550465116
+    },
+    {
+      "height" : 40,
+      "id" : "00000000-0000-4000-8000-000000000018",
+      "inDrawer" : true,
+      "keys" : [
+        258
+      ],
+      "mouse" : -1,
+      "name" : "Player List",
+      "showInGame" : true,
+      "showInMenu" : true,
+      "special" : "none",
+      "toggle" : true,
+      "width" : 96,
+      "x" : 0.21030042918454936,
+      "y" : 0.0026855469
+    }
+  ],
+  "joystick" : {
+    "size" : 204.8,
+    "x" : 0.02326631,
+    "y" : 0.4990627302325581
+  },
+  "opacity" : 1,
+  "version" : 1
+}

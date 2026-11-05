@@ -22,7 +22,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,40 +36,27 @@ import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntRect
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.movtery.inputmap.keycodes.ControlEventKeycode
-import com.movtery.inputmap.keycodes.LwjglGlfwKeycode
 import com.movtery.inputmap.keycodes.OPEN_CHAT
 import com.movtery.inputmap.keycodes.OPEN_CHAT_VALUE
-import com.movtery.layer_controller.ControlBoxLayout
-import com.movtery.layer_controller.data.HideLayerWhen
 import com.movtery.layer_controller.event.ClickEvent
-import com.movtery.layer_controller.event.EventHandler
-import com.movtery.layer_controller.layout.ControlLayout
-import com.movtery.layer_controller.layout.EmptyControlLayout
-import com.movtery.layer_controller.layout.loadLayoutFromFile
-import com.movtery.layer_controller.observable.ObservableControlLayout
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.bridge.CURSOR_DISABLED
 import com.movtery.zalithlauncher.bridge.ZLBridgeStates
@@ -83,14 +69,11 @@ import com.movtery.zalithlauncher.game.sdl.SdlTextSender
 import com.movtery.zalithlauncher.game.support.touch_controller.touchControllerInputModifier
 import com.movtery.zalithlauncher.game.support.touch_controller.touchControllerTouchModifier
 import com.movtery.zalithlauncher.game.version.installed.Version
+import com.movtery.zalithlauncher.game.voxelium.VoxeliumGame
 import com.movtery.zalithlauncher.setting.AllSettings
-import com.movtery.zalithlauncher.setting.enums.isLauncherInDarkTheme
-import com.movtery.zalithlauncher.setting.enums.toAction
 import com.movtery.zalithlauncher.terracotta.Terracotta
 import com.movtery.zalithlauncher.ui.components.BackgroundCard
-import com.movtery.zalithlauncher.ui.components.MenuState
 import com.movtery.zalithlauncher.ui.components.rememberBoxSize
-import com.movtery.zalithlauncher.ui.control.MinecraftHotbar
 import com.movtery.zalithlauncher.ui.control.event.launcherEvent
 import com.movtery.zalithlauncher.ui.control.event.lwjglEvent
 import com.movtery.zalithlauncher.ui.control.gamepad.GamepadKeyListener
@@ -99,29 +82,20 @@ import com.movtery.zalithlauncher.ui.control.gamepad.GamepadStickMovementListene
 import com.movtery.zalithlauncher.ui.control.gamepad.SimpleGamepadCapture
 import com.movtery.zalithlauncher.ui.control.gyroscope.GyroscopeReader
 import com.movtery.zalithlauncher.ui.control.gyroscope.isGyroscopeAvailable
-import com.movtery.zalithlauncher.ui.control.hotbarPercentage
 import com.movtery.zalithlauncher.ui.control.input.TextInputMode
-import com.movtery.zalithlauncher.ui.control.mouse.SwitchableMouseLayout
-import com.movtery.zalithlauncher.ui.screens.game.elements.DraggableGameBall
 import com.movtery.zalithlauncher.ui.screens.game.elements.ForceCloseOperation
-import com.movtery.zalithlauncher.ui.screens.game.elements.GameMenuSubscreen
 import com.movtery.zalithlauncher.ui.screens.game.elements.GamepadModePromptDialog
 import com.movtery.zalithlauncher.ui.screens.game.elements.LogBox
 import com.movtery.zalithlauncher.ui.screens.game.elements.LogState
-import com.movtery.zalithlauncher.ui.screens.game.elements.ReplacementControlOperation
-import com.movtery.zalithlauncher.ui.screens.game.elements.ReplacementControlState
-import com.movtery.zalithlauncher.ui.screens.game.elements.SendKeycodeOperation
-import com.movtery.zalithlauncher.ui.screens.game.elements.SendKeycodeState
 import com.movtery.zalithlauncher.ui.screens.game.multiplayer.TerracottaOperation
 import com.movtery.zalithlauncher.ui.screens.game.multiplayer.rememberTerracottaViewModel
-import com.movtery.zalithlauncher.ui.screens.main.control_editor.ControlEditor
-import com.movtery.zalithlauncher.utils.RegionRestriction
-import com.movtery.zalithlauncher.utils.currentGameDisplayLayout
-import com.movtery.zalithlauncher.utils.logging.Logger
-import com.movtery.zalithlauncher.viewmodel.EditorViewModel
+import com.movtery.zalithlauncher.ui.voxelium.game.RuntimeMenu
+import com.movtery.zalithlauncher.ui.voxelium.game.TouchControls
+import com.movtery.zalithlauncher.ui.voxelium.game.rememberTouchControlsState
 import com.movtery.zalithlauncher.viewmodel.EventViewModel
 import com.movtery.zalithlauncher.viewmodel.GamepadViewModel
 import com.movtery.zalithlauncher.viewmodel.sendToast
+import io.github.voxelium.core.controls.ControlLayoutStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -130,150 +104,22 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.lwjgl.glfw.CallbackBridge
-import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
 
-private const val TAG = "GameScreen"
-
-/** 帧率历史记录的最大时间节点数 */
-private const val FPS_HISTORY_SIZE = 15
-/** 最高/最低帧所在节点被清理后，重算前等待的时间节点数 */
-private const val FPS_RESYNC_NODES = 10
+// Voxelium: the in-game controls are Voxelium's own (ui/voxelium/game/TouchControls.kt, after the
+// iOS app's VXTouchControls.m). ZalithLauncher2's control layout layer, mouse layer, hotbar
+// layer, menu ball, game menu and in-game layout editor are no longer shown here; gamepad,
+// gyroscope, TouchController and log box are kept.
 
 private class GameViewModel(
-    private val version: Version,
     private val onChangeTextInputMode: (TextInputMode?) -> Unit
 ) : ViewModel() {
-    /** 游戏菜单操作状态 */
-    var gameMenuState by mutableStateOf(MenuState.NONE)
-    /** 游戏菜单-控制设置区域Tab选择的索引 */
-    var controlMenuTabIndex by mutableIntStateOf(0)
+    /** Voxelium runtime menu shown */
+    var runtimeMenuOpen by mutableStateOf(false)
     /** 强制关闭弹窗操作状态 */
     var forceCloseState by mutableStateOf<ForceCloseOperation>(ForceCloseOperation.None)
-    /** 发送键值操作状态 */
-    var sendKeycodeState by mutableStateOf<SendKeycodeState>(SendKeycodeState.None)
-    /** 更换控制布局操作状态 */
-    var replacementControlState by mutableStateOf<ReplacementControlState>(ReplacementControlState.None)
-    /** 被控制布局层标记为仅滑动的指针列表 */
-    var moveOnlyPointers = mutableSetOf<PointerId>()
-    /** 鼠标触摸指针处理层占用指针列表 */
-    var occupiedPointers = mutableSetOf<PointerId>()
-
-    /** 游戏内帧率状态 */
-    var gameFps by mutableIntStateOf(0)
-        private set
-    /** 帧率历史记录（最多保留最近15个时间节点） */
-    var fpsHistory by mutableStateOf<List<Int>>(emptyList())
-        private set
-    /** 记录范围内的历史最高帧 */
-    var fpsMax by mutableIntStateOf(0)
-        private set
-    /** 记录范围内的历史最低帧 */
-    var fpsMin by mutableIntStateOf(0)
-        private set
-    /** 最高帧重算倒计时（时间节点数），-1 表示无需重算 */
-    private var fpsMaxResyncCountdown = -1
-    /** 最低帧重算倒计时（时间节点数），-1 表示无需重算 */
-    private var fpsMinResyncCountdown = -1
-    private var fpsJob: Job? = null
-    /** 开始帧率捕获 */
-    fun startFpsCapture() {
-        if (fpsJob?.isActive == true) return
-        //新一轮捕获，重置历史记录
-        fpsHistory = emptyList()
-        fpsMax = 0
-        fpsMin = 0
-        fpsMaxResyncCountdown = -1
-        fpsMinResyncCountdown = -1
-        //开启一个新的协程，每秒更新一次帧率数据
-        fpsJob = viewModelScope.launch(Dispatchers.Default) {
-            while (true) {
-                runCatching {
-                    ensureActive()
-                }.onFailure {
-                    break
-                }
-                recordFps(CallbackBridge.getCurrentFps())
-                delay(1000L.milliseconds)
-            }
-        }
-    }
-    /** 停止帧率捕获 */
-    fun stopFpsCapture() {
-        fpsJob?.cancel()
-        fpsJob = null
-    }
-
-    /**
-     * 记录一次帧率采样，并维护记录范围内的最高/最低帧。
-     * 被清理的最老节点若恰好是最高/最低帧，不立即重算：
-     * 若之后10个时间节点内没有出现更高/更低的帧，才用当前记录的所有节点重算一次
-     */
-    private fun recordFps(fps: Int) {
-        gameFps = fps
-        //衰减重算倒计时，归零说明等待期内没有出现更高/更低的帧
-        if (fpsMaxResyncCountdown > 0) fpsMaxResyncCountdown--
-        if (fpsMinResyncCountdown > 0) fpsMinResyncCountdown--
-        if (fpsMaxResyncCountdown == 0) {
-            fpsMax = fpsHistory.max()
-            fpsMaxResyncCountdown = -1
-        }
-        if (fpsMinResyncCountdown == 0) {
-            fpsMin = fpsHistory.min()
-            fpsMinResyncCountdown = -1
-        }
-
-        if (fpsHistory.isEmpty()) {
-            fpsMax = fps
-            fpsMin = fps
-        } else {
-            if (fps > fpsMax) {
-                fpsMax = fps
-                fpsMaxResyncCountdown = -1
-            }
-            if (fps < fpsMin) {
-                fpsMin = fps
-                fpsMinResyncCountdown = -1
-            }
-        }
-        fpsHistory = fpsHistory + fps
-
-        //超出最大节点数时清理最老的节点
-        if (fpsHistory.size > FPS_HISTORY_SIZE) {
-            val removed = fpsHistory.first()
-            fpsHistory = fpsHistory.drop(1)
-            if (removed == fpsMax && fpsHistory.none { it == fpsMax }) {
-                fpsMaxResyncCountdown = FPS_RESYNC_NODES
-            }
-            if (removed == fpsMin && fpsHistory.none { it == fpsMin }) {
-                fpsMinResyncCountdown = FPS_RESYNC_NODES
-            }
-        }
-    }
-
-    var editorRefresh by mutableIntStateOf(0)
-        private set
-    /** 可观察的控制布局 */
-    var observableLayout by mutableStateOf<ObservableControlLayout?>(null)
-        private set
-    /** 当前控制布局文件 */
-    var currentControlFile by mutableStateOf<File?>(null)
-        private set
-    /** 控制布局：控件层隐藏状态 */
-    var controlLayerHideState by mutableStateOf(HideLayerWhen.None)
-        private set
-
-    /** 是否正在编辑布局 */
-    var isEditingLayout by mutableStateOf(false)
-        private set
-
-    fun switchControlLayer(hideWhen: HideLayerWhen) {
-        if (controlLayerHideState != hideWhen) controlLayerHideState = hideWhen
-    }
 
     /** 虚拟鼠标滚动事件处理 */
     val mouseScrollUpEvent = MouseScrollEvent(viewModelScope, 1.0)
@@ -282,12 +128,7 @@ private class GameViewModel(
     /** 游戏内消息发送器 */
     val gameTextSender = GameTextSender(viewModelScope)
 
-    /** 控制布局控件点击事件处理器 */
-    val eventHandler = EventHandler { event, pressed ->
-        onKeyEvent(event, pressed)
-    }
-
-    /** 处理控制布局类点击事件 */
+    /** 处理手柄映射的点击事件 */
     fun onKeyEvent(event: ClickEvent, pressed: Boolean) {
         val key = event.key
         when (event.type) {
@@ -325,68 +166,9 @@ private class GameViewModel(
         }
     }
 
-    fun replaceControlLayout(layoutFile: File) {
-        viewModelScope.launch(Dispatchers.Main) {
-            loadControlLayout(layoutFile)
-        }
-    }
-
-    private val layoutMutex = Mutex()
-    suspend fun loadControlLayout(layoutFile: File? = version.getControlPath()) {
-        layoutMutex.withLock {
-            withContext(Dispatchers.Main) {
-                observableLayout = null
-                val layout = withContext(Dispatchers.IO) {
-                    delay(10L.milliseconds) //刻意等待一会再加载
-                    currentControlFile = layoutFile
-                    getLayout(layoutFile)
-                }
-                //将控制布局加载为可供Compose加载的形式
-                observableLayout = ObservableControlLayout(layout)
-            }
-        }
-    }
-
-    private fun getLayout(layoutFile: File? = currentControlFile): ControlLayout {
-        return layoutFile?.let {
-            try {
-                loadLayoutFromFile(it)
-            } catch (e: Exception) {
-                Logger.warning(TAG, "Failed to load control layout: $it", e)
-                null
-            }
-        } ?: EmptyControlLayout
-    }
-
-    /**
-     * 开始编辑控制布局模式
-     */
-    fun startControlEditor(editorVM: EditorViewModel) {
-        if (!isEditingLayout) {
-            clearState()
-            editorVM.initLayout(getLayout())
-            isEditingLayout = true
-        }
-    }
-
-    /**
-     * 退出编辑控制布局模式（如果当前确实正在编辑控制布局）
-     */
-    fun exitControlEditor() {
-        viewModelScope.launch(Dispatchers.Main) {
-            if (isEditingLayout) {
-                isEditingLayout = false
-                loadControlLayout(currentControlFile)
-                editorRefresh++
-            }
-        }
-    }
-
-    /**
-     * 切换游戏菜单
-     */
+    /** Opens or closes the runtime menu */
     fun switchMenu() {
-        this.gameMenuState = this.gameMenuState.next()
+        runtimeMenuOpen = !runtimeMenuOpen
     }
 
     /**
@@ -397,14 +179,6 @@ private class GameViewModel(
         mouseScrollDownEvent.cancel()
         gameTextSender.cancel()
         onChangeTextInputMode(TextInputMode.DISABLE)
-        moveOnlyPointers.clear()
-        occupiedPointers.clear()
-    }
-
-    init {
-        viewModelScope.launch(Dispatchers.Main) {
-            loadControlLayout()
-        }
     }
 
     override fun onCleared() {
@@ -544,6 +318,7 @@ private class GameTextSender(private val scope: CoroutineScope) {
     }
 }
 
+
 @Composable
 private fun rememberGameViewModel(
     version: Version,
@@ -551,18 +326,10 @@ private fun rememberGameViewModel(
 ) = viewModel(
     key = version.toString()
 ) {
-    GameViewModel(version, onChangeTextInputMode)
+    GameViewModel(onChangeTextInputMode)
 }
 
-@Composable
-private fun rememberEditorViewModel(
-    key: String
-)= viewModel(
-    key = key
-) {
-    EditorViewModel()
-}
-
+@Suppress("UNUSED_PARAMETER")
 @Composable
 fun GameScreen(
     version: Version,
@@ -582,7 +349,6 @@ fun GameScreen(
     val viewModel = rememberGameViewModel(version) { mode ->
         eventViewModel.sendEvent(EventViewModel.Event.Game.SwitchIme(mode))
     }
-    val editorViewModel = rememberEditorViewModel("ControlEditor_Times=${viewModel.editorRefresh}")
     val cursorMode by ZLBridgeStates.cursorMode.collectAsStateWithLifecycle()
     val isGrabbing = remember(cursorMode) {
         cursorMode == CURSOR_DISABLED
@@ -594,19 +360,20 @@ fun GameScreen(
         getUserName = getAccountName
     )
 
-    val regionState by RegionRestriction.state.collectAsStateWithLifecycle()
-
-    LaunchedEffect(viewModel.isEditingLayout, viewModel.gameMenuState) {
-        //向VMActivity同步状态，编辑控制布局或打开游戏菜单时，不会继续处理按键事件
-        val allowKeyHandle = !viewModel.isEditingLayout && viewModel.gameMenuState != MenuState.SHOW
-        eventViewModel.sendEvent(EventViewModel.Event.Game.KeyHandle(allowKeyHandle))
-    }
-
-    SendKeycodeOperation(
-        operation = viewModel.sendKeycodeState,
-        onChange = { viewModel.sendKeycodeState = it },
-        lifecycleScope = viewModel.viewModelScope
+    //Voxelium 触控：布局来自 controls/layout.json（与 iOS 相同的格式）
+    val controlsStore = remember { ControlLayoutStore(VoxeliumGame.paths()) }
+    val gameDir = remember(version) { version.getGameDir() }
+    val controls = rememberTouchControlsState(
+        store = controlsStore,
+        gameDir = gameDir,
+        onRuntimeMenu = { viewModel.runtimeMenuOpen = true },
+        onKeyboard = { eventViewModel.sendEvent(EventViewModel.Event.Game.SwitchIme(null)) }
     )
+
+    LaunchedEffect(viewModel.runtimeMenuOpen) {
+        //向VMActivity同步状态，打开运行菜单时，不会继续处理按键事件
+        eventViewModel.sendEvent(EventViewModel.Event.Game.KeyHandle(!viewModel.runtimeMenuOpen))
+    }
 
     ForceCloseOperation(
         operation = viewModel.forceCloseState,
@@ -616,13 +383,6 @@ fun GameScreen(
             ZLNativeInvoker.jvmExit(0, false)
         },
         text = stringResource(R.string.game_menu_option_force_close_text)
-    )
-
-    ReplacementControlOperation(
-        operation = viewModel.replacementControlState,
-        onChange = { viewModel.replacementControlState = it },
-        currentLayout = viewModel.currentControlFile,
-        replacementControl = { viewModel.replaceControlLayout(it) }
     )
 
     TerracottaOperation(
@@ -637,88 +397,54 @@ fun GameScreen(
     ) {
         val screenSize = rememberBoxSize()
 
-        if (!viewModel.isEditingLayout) {
-            if (AllSettings.gamepadControl.state) {
-                GamepadOnActionListener(
-                    gamepadViewModel = gamepadViewModel,
-                    onAction = {
-                        viewModel.switchControlLayer(HideLayerWhen.WhenGamepad)
-                    }
-                )
-            }
-
-            if (AllSettings.gamepadControl.state && gamepadViewModel.gamepadEngaged) {
-                //手柄事件监听
-                GamepadKeyListener(
-                    gamepadViewModel = gamepadViewModel,
-                    isGrabbing = isGrabbing,
-                    onKeyEvent = { events, pressed ->
-                        events.forEach { event ->
-                            viewModel.onKeyEvent(event, pressed)
-                        }
-                    }
-                )
-
-                //手柄摇杆控制移动事件监听
-                GamepadStickMovementListener(
-                    gamepadViewModel = gamepadViewModel,
-                    isGrabbing = isGrabbing,
-                    onKeyEvent = { event, pressed ->
-                        viewModel.onKeyEvent(event, pressed)
-                    }
-                )
-            }
-
-            //控制布局层
-            ControlBoxLayout(
-                modifier = Modifier.fillMaxSize(),
-                observedLayout = viewModel.observableLayout,
-                eventHandler = viewModel.eventHandler,
-                checkOccupiedPointers = { viewModel.occupiedPointers.contains(it) },
-                opacity = (AllSettings.controlsOpacity.state.toFloat() / 100f).coerceIn(0f, 1f),
-                markPointerAsMoveOnly = { viewModel.moveOnlyPointers.add(it) },
-                onOccupiedPointer = { viewModel.occupiedPointers.add(it) },
-                onReleasePointer = { viewModel.occupiedPointers.remove(it) },
-                isCursorGrabbing = isGrabbing,
-                hideLayerWhen = viewModel.controlLayerHideState,
-                isDark = isLauncherInDarkTheme()
-            ) {
-                //虚拟鼠标控制层
-                MouseControlLayout(
-                    isTouchProxyEnabled = isTouchProxyEnabled,
-                    modifier = Modifier.fillMaxSize(),
-                    cursorMode = cursorMode,
-                    screenSize = screenSize,
-                    onInputAreaRectUpdated = onInputAreaRectUpdated,
-                    textInputMode = textInputMode,
-                    isMoveOnlyPointer = { viewModel.moveOnlyPointers.contains(it) },
-                    onOccupiedPointer = { viewModel.occupiedPointers.add(it) },
-                    onReleasePointer = {
-                        viewModel.occupiedPointers.remove(it)
-                        viewModel.moveOnlyPointers.remove(it)
-                    },
-                    onMouseMoved = { viewModel.switchControlLayer(HideLayerWhen.WhenMouse) },
-                    onTouch = { viewModel.switchControlLayer(HideLayerWhen.None) },
-                    gamepadViewModel = gamepadViewModel.takeIf { AllSettings.gamepadControl.state }
-                )
-            }
-
-            //物品栏触发层
-            val gameDisplayLayout = currentGameDisplayLayout(screenSize)
-            MinecraftHotbar(
-                screenSize = screenSize,
-                rule = AllSettings.hotbarRule.state,
-                widthPercentage = AllSettings.hotbarWidth.state.hotbarPercentage(),
-                heightPercentage = AllSettings.hotbarHeight.state.hotbarPercentage(),
-                sendKeycode = { keycode ->
-                    CallbackBridge.sendKeyPress(keycode)
-                },
-                isGrabbing = isGrabbing,
-                displayOffset = gameDisplayLayout.offset,
-                onOccupiedPointer = { viewModel.occupiedPointers.add(it) },
-                onReleasePointer = { viewModel.occupiedPointers.remove(it) }
+        if (AllSettings.gamepadControl.state) {
+            GamepadOnActionListener(
+                gamepadViewModel = gamepadViewModel,
+                onAction = {
+                    controls.hiddenForGamepad = true
+                }
             )
         }
+
+        if (AllSettings.gamepadControl.state && gamepadViewModel.gamepadEngaged) {
+            //手柄事件监听
+            GamepadKeyListener(
+                gamepadViewModel = gamepadViewModel,
+                isGrabbing = isGrabbing,
+                onKeyEvent = { events, pressed ->
+                    events.forEach { event ->
+                        viewModel.onKeyEvent(event, pressed)
+                    }
+                }
+            )
+
+            //手柄摇杆控制移动事件监听
+            GamepadStickMovementListener(
+                gamepadViewModel = gamepadViewModel,
+                isGrabbing = isGrabbing,
+                onKeyEvent = { event, pressed ->
+                    viewModel.onKeyEvent(event, pressed)
+                }
+            )
+        }
+
+        //Voxelium 触控层：按键、摇杆、视角、放置/破坏、物品栏、菜单指针
+        TouchControls(
+            state = controls,
+            inGame = isGrabbing,
+            modifier = Modifier
+                .fillMaxSize()
+                .then(
+                    if (isTouchProxyEnabled) {
+                        Modifier
+                            .touchControllerTouchModifier(screenSize = screenSize)
+                            .touchControllerInputModifier(
+                                screenSize = screenSize,
+                                onInputAreaRectUpdated = onInputAreaRectUpdated,
+                            )
+                    } else Modifier
+                )
+        )
 
         //陀螺仪控制
         val isGyroscopeAvailable = remember(context) {
@@ -750,38 +476,23 @@ fun GameScreen(
         )
 
         LogBox(
-            enableLog = !viewModel.isEditingLayout && logState.value,
+            enableLog = logState.value,
             onClose = {
                 onLogStateChange(LogState.CLOSE)
             },
             modifier = Modifier.fillMaxSize()
         )
 
-        GameMenuSubscreen(
-            state = viewModel.gameMenuState,
-            controlMenuTabIndex = viewModel.controlMenuTabIndex,
-            onControlMenuTabChange = { viewModel.controlMenuTabIndex = it },
-            gamepadViewModel = gamepadViewModel,
-            closeScreen = { viewModel.gameMenuState = MenuState.HIDE },
-            onForceClose = { viewModel.forceCloseState = ForceCloseOperation.Show },
-            onSwitchLog = { onLogStateChange(logState.next()) },
-            enableTerracotta = AllSettings.enableTerracotta.state && !regionState.restricting,
-            onOpenTerracottaMenu = { terracottaViewModel.openMenu() },
-            onRefreshWindowSize = { eventViewModel.sendEvent(EventViewModel.Event.Game.RefreshSize) },
-            onInputMethod = {
-                eventViewModel.sendEvent(EventViewModel.Event.Game.SwitchIme(null))
-            },
-            onSendKeycode = { viewModel.sendKeycodeState = SendKeycodeState.ShowDialog },
-            onReplacementControl = { viewModel.replacementControlState = ReplacementControlState.Show },
-            onEditLayout = {
-                viewModel.startControlEditor(
-                    editorVM = editorViewModel
-                )
-            },
-            onShowToast = { text, duration ->
-                eventViewModel.sendToast(text, duration)
-            }
-        )
+        if (viewModel.runtimeMenuOpen) {
+            RuntimeMenu(
+                state = controls,
+                logsShown = logState.value,
+                onDismiss = { viewModel.runtimeMenuOpen = false },
+                onKeyboard = { eventViewModel.sendEvent(EventViewModel.Event.Game.SwitchIme(null)) },
+                onSwitchLogs = { onLogStateChange(logState.next()) },
+                onForceClose = { viewModel.forceCloseState = ForceCloseOperation.Show }
+            )
+        }
 
         if (AllSettings.gamepadControl.state) {
             //手柄事件捕获层
@@ -797,64 +508,6 @@ fun GameScreen(
                 gamepadViewModel.confirmModePrompt(mode)
             }
         )
-
-        if (viewModel.isEditingLayout) {
-            viewModel.currentControlFile?.let {
-                ControlEditor(
-                    viewModel = editorViewModel,
-                    targetFile = it,
-                    exit = {
-                        viewModel.exitControlEditor()
-                    },
-                    menuExit = {
-                        editorViewModel.showExitEditorDialog(
-                            context = context,
-                            onExit = {
-                                viewModel.exitControlEditor()
-                            }
-                        )
-                    }
-                )
-            }
-        } else {
-            if (AllSettings.showMenuBall.state) {
-                //在这里根据设置决定是否启用帧率捕获协程
-                val showFps = AllSettings.showFPS.state
-                DisposableEffect(showFps) {
-                    if (showFps) viewModel.startFpsCapture()
-                    onDispose {
-                        viewModel.stopFpsCapture()
-                    }
-                }
-
-                val gameFps: Int? = if (showFps) {
-                    viewModel.gameFps
-                } else {
-                    null
-                }
-
-                DraggableGameBall(
-                    position = AllSettings.menuBallPos.state,
-                    onPositionChanged = {
-                        AllSettings.menuBallPos.updateState(it)
-                    },
-                    onSavePos = {
-                        AllSettings.menuBallPos.save()
-                    },
-                    gameFps = gameFps,
-                    fpsDisplayMode = AllSettings.fpsDisplayMode.state,
-                    fpsHistory = viewModel.fpsHistory,
-                    fpsMax = viewModel.fpsMax,
-                    fpsMin = viewModel.fpsMin,
-                    showMemory = AllSettings.showMemory.state,
-                    opened = viewModel.gameMenuState == MenuState.SHOW,
-                    alpha = AllSettings.menuBallOpacity.state / 100f,
-                    onClick = {
-                        viewModel.switchMenu()
-                    }
-                )
-            }
-        }
     }
 
     LaunchedEffect(Unit) {
@@ -863,29 +516,18 @@ fun GameScreen(
             .collect { event ->
                 when (event) {
                     is EventViewModel.Event.Game.OnBack -> {
-                        if (viewModel.isEditingLayout) {
-                            //处于控制布局编辑模式
-                            editorViewModel.onBackPressed(
-                                context = context,
-                                onExit = {
-                                    viewModel.exitControlEditor()
-                                }
-                            )
-                        } else if (!AllSettings.showMenuBall.getValue()) {
-                            viewModel.switchMenu()
-                        } else {
-                            //按下返回键
-                            val event = ClickEvent(
-                                type = ClickEvent.Type.Key,
-                                key = ControlEventKeycode.GLFW_KEY_ESCAPE
-                            )
-                            viewModel.onKeyEvent(event, true)
-                            delay(10L.milliseconds)
-                            viewModel.onKeyEvent(event, false)
-                        }
+                        //按下返回键：发送 Escape（暂停 / 关闭界面）
+                        val escape = ClickEvent(
+                            type = ClickEvent.Type.Key,
+                            key = ControlEventKeycode.GLFW_KEY_ESCAPE
+                        )
+                        viewModel.onKeyEvent(escape, true)
+                        delay(10L.milliseconds)
+                        viewModel.onKeyEvent(escape, false)
                     }
                     is EventViewModel.Event.Game.OnResume -> {
                         viewModel.clearState()
+                        controls.releaseAll()
                     }
                     else -> { /*忽略*/ }
                 }
@@ -973,114 +615,4 @@ private fun PreviewGameInfoBox() {
             onClose = {}
         )
     }
-}
-
-/**
- * 鼠标控制层
- * @param isTouchProxyEnabled 是否启用控制代理（TouchController模组支持）
- * @param cursorMode 当前鼠标模式
- * @param textInputMode 输入法状态
- * @param isMoveOnlyPointer 检查指针是否被标记为仅处理滑动事件
- * @param onOccupiedPointer 标记指针已被占用
- * @param onReleasePointer 标记指针已被释放
- * @param onMouseMoved 实体鼠标操作时回调
- * @param onTouch 手指触摸操作鼠标层时回调
- */
-@Composable
-private fun MouseControlLayout(
-    isTouchProxyEnabled: Boolean,
-    modifier: Modifier = Modifier,
-    cursorMode: Int,
-    screenSize: IntSize,
-    onInputAreaRectUpdated: (IntRect?) -> Unit,
-    textInputMode: TextInputMode,
-    isMoveOnlyPointer: (PointerId) -> Boolean,
-    onOccupiedPointer: (PointerId) -> Unit,
-    onReleasePointer: (PointerId) -> Unit,
-    onMouseMoved: () -> Unit,
-    onTouch: () -> Unit,
-    gamepadViewModel: GamepadViewModel?
-) {
-    Box(
-        modifier = modifier
-            .then(
-                if (isTouchProxyEnabled) {
-                    Modifier
-                        .touchControllerTouchModifier(
-                            screenSize = screenSize
-                        )
-                        .touchControllerInputModifier(
-                            screenSize = screenSize,
-                            onInputAreaRectUpdated = onInputAreaRectUpdated,
-                        )
-                } else Modifier
-            )
-    ) {
-
-        val capturedSpeedFactor = AllSettings.mouseCaptureSensitivity.state / 100f
-        val capturedTapMouseAction = AllSettings.gestureTapMouseAction.state.toAction()
-        val capturedLongPressMouseAction = AllSettings.gestureLongPressMouseAction.state.toAction()
-
-        SwitchableMouseLayout(
-            modifier = Modifier.fillMaxSize(),
-            screenSize = screenSize,
-            cursorMode = cursorMode,
-            onTouch = onTouch,
-            onMouse = onMouseMoved,
-            gamepadViewModel = gamepadViewModel,
-            onTap = { position ->
-                val gamePosition = currentGameDisplayLayout(screenSize).mapToGame(position)
-                CallbackBridge.putMouseEventWithCoords(LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_LEFT.toInt(), gamePosition.x, gamePosition.y)
-            },
-            onCapturedTap = {
-                if (AllSettings.gestureControl.state) {
-                    CallbackBridge.putMouseEvent(capturedTapMouseAction)
-                }
-            },
-            onLongPress = {
-                CallbackBridge.putMouseEvent(LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_LEFT.toInt(), true)
-            },
-            onLongPressEnd = {
-                CallbackBridge.putMouseEvent(LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_LEFT.toInt(), false)
-            },
-            onCapturedLongPress = {
-                if (AllSettings.gestureControl.state) {
-                    CallbackBridge.putMouseEvent(capturedLongPressMouseAction, true)
-                }
-            },
-            onCapturedLongPressEnd = {
-                if (AllSettings.gestureControl.state) {
-                    CallbackBridge.putMouseEvent(capturedLongPressMouseAction, false)
-                }
-            },
-            onPointerMove = { pos ->
-                pos.sendPosition(screenSize)
-            },
-            onCapturedMove = { delta ->
-                CallbackBridge.sendCursorDelta(
-                    delta.x * capturedSpeedFactor,
-                    delta.y * capturedSpeedFactor
-                )
-            },
-            onMouseScroll = { scroll ->
-                CallbackBridge.sendScroll(scroll.x.toDouble(), scroll.y.toDouble())
-            },
-            onMouseButton = { button, pressed ->
-                val code = LWJGLCharSender.getMouseButton(button) ?: return@SwitchableMouseLayout
-                CallbackBridge.sendMouseButton(code.toInt(), pressed)
-            },
-            isMoveOnlyPointer = isMoveOnlyPointer,
-            onOccupiedPointer = onOccupiedPointer,
-            onReleasePointer = onReleasePointer,
-            enableScrollGesture = AllSettings.gestureControl.state,
-            onScrollGesture = { scroll ->
-                CallbackBridge.sendScroll(scroll.x.toDouble(), scroll.y.toDouble())
-            }
-        )
-    }
-}
-
-private fun Offset.sendPosition(screenSize: IntSize) {
-    val gamePosition = currentGameDisplayLayout(screenSize).mapToGame(this)
-    CallbackBridge.sendCursorPos(gamePosition.x, gamePosition.y)
 }

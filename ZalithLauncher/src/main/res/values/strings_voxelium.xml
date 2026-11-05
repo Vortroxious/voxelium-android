@@ -146,4 +146,17 @@
     <string name="voxelium_accounts">Accounts</string>
     <string name="voxelium_classic_home">ZalithLauncher home</string>
     <string name="voxelium_version_settings">Version settings…</string>
+    <!-- In-game controls and runtime menu (ui/voxelium/game) -->
+    <string name="voxelium_game_menu_title">Voxelium</string>
+    <string name="voxelium_game_resume">Resume</string>
+    <string name="voxelium_game_keyboard">Show / hide keyboard</string>
+    <string name="voxelium_game_hide_controls">Hide controls</string>
+    <string name="voxelium_game_show_controls">Show controls</string>
+    <string name="voxelium_game_virtual_mouse_on">Virtual mouse: on</string>
+    <string name="voxelium_game_virtual_mouse_off">Virtual mouse: off</string>
+    <string name="voxelium_game_controls_opacity">Controls opacity</string>
+    <string name="voxelium_game_show_logs">Show logs</string>
+    <string name="voxelium_game_hide_logs">Hide logs</string>
+    <string name="voxelium_game_force_close">Force close</string>
+    <string name="voxelium_game_memory">Memory %1$s</string>
 </resources>
