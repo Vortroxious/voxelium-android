@@ -64,4 +64,38 @@
 
     <string name="voxelium_ui_controls_soon">The layout editor comes with the new in-game controls.</string>
     <string name="voxelium_ui_controls_soon_hint">It will use the same layout file as Voxelium for iOS.</string>
+
+    <string name="voxelium_ui_controls_mode_game">In game</string>
+    <string name="voxelium_ui_controls_mode_menu">In menus</string>
+    <string name="voxelium_ui_controls_mode_drawer">Drawer open</string>
+    <string name="voxelium_ui_controls_kind_keys">Keys</string>
+    <string name="voxelium_ui_controls_kind_mouse">Mouse</string>
+    <string name="voxelium_ui_controls_kind_special">Special</string>
+    <string name="voxelium_ui_controls_imported">Imported a layout with %d buttons.</string>
+    <string name="voxelium_ui_controls_import_failed">That file is not a Voxelium control layout.</string>
+    <string name="voxelium_ui_controls_new_button">Button</string>
+    <string name="voxelium_ui_controls_add">+ Button</string>
+    <string name="voxelium_ui_controls_import">Import iOS layout</string>
+    <string name="voxelium_ui_controls_reset">Reset</string>
+    <string name="voxelium_ui_controls_reset_title">Reset all controls to the default layout?</string>
+    <string name="voxelium_ui_controls_reset_text">Your buttons are replaced by the default layout.</string>
+    <string name="voxelium_ui_controls_hint_custom">Drag to move, tap to edit. Saved at once; used the next time Minecraft starts. Same file as Voxelium for iOS.</string>
+    <string name="voxelium_ui_controls_hint_default">Using the default layout (Amethyst\'s). Drag to move, tap to edit.</string>
+    <string name="voxelium_ui_controls_joystick">Joystick</string>
+    <string name="voxelium_ui_controls_layout">Layout</string>
+    <string name="voxelium_ui_controls_layout_hint">Tap a button in the preview to edit it.</string>
+    <string name="voxelium_ui_controls_opacity">Button opacity: %d%%</string>
+    <string name="voxelium_ui_controls_joystick_size">Joystick size: %d dp</string>
+    <string name="voxelium_ui_controls_button_count">%d buttons</string>
+    <string name="voxelium_ui_controls_done">Done</string>
+    <string name="voxelium_ui_controls_name">Name</string>
+    <string name="voxelium_ui_controls_choose_key">Choose a key</string>
+    <string name="voxelium_ui_controls_add_key">Add another key</string>
+    <string name="voxelium_ui_controls_toggle">Toggle (tap to hold)</string>
+    <string name="voxelium_ui_controls_in_game">Show in game</string>
+    <string name="voxelium_ui_controls_in_menu">Show in menus</string>
+    <string name="voxelium_ui_controls_in_drawer">In the More drawer</string>
+    <string name="voxelium_ui_controls_width">Width: %d dp</string>
+    <string name="voxelium_ui_controls_height">Height: %d dp</string>
+    <string name="voxelium_ui_controls_delete">Delete button</string>
 </resources>
