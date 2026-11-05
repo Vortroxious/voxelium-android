@@ -38,7 +38,6 @@ import com.movtery.zalithlauncher.setting.enums.GestureActionType
 import com.movtery.zalithlauncher.setting.enums.MirrorSourceType
 import com.movtery.zalithlauncher.setting.enums.MouseControlMode
 import com.movtery.zalithlauncher.setting.enums.ResolutionRule
-import com.movtery.zalithlauncher.ui.control.HotbarRule
 import com.movtery.zalithlauncher.ui.control.gamepad.JoystickMode
 import com.movtery.zalithlauncher.ui.control.mouse.CENTER_HOTSPOT
 import com.movtery.zalithlauncher.ui.control.mouse.CursorHotspot
@@ -526,10 +525,6 @@ object AllSettings : SettingsRegistry() {
      */
     val menuBallOpacity = intSetting("menuBallOpacity", 100, 20..100)
 
-    /**
-     * 快捷栏判定箱计算规则
-     */
-    val hotbarRule = enumSetting("hotbarRule", HotbarRule.Auto)
 
     /**
      * 快捷栏宽度百分比
@@ -575,26 +570,6 @@ object AllSettings : SettingsRegistry() {
      * 控制布局编辑器：控件吸附模式
      */
     val editorWidgetSnapMode = enumSetting("editorWidgetSnapMode", SnapMode.FullScreen)
-
-    /**
-     * 是否启用陶瓦联机
-     */
-    val enableTerracotta = boolSetting("enableTerracotta", false)
-
-    /**
-     * 是否使用自定义 EasyTier 服务器节点
-     */
-    val enableTerracottaNodes = boolSetting("enableTerracottaNodes", false)
-
-    /**
-     * 陶瓦联机：自定义 EasyTier 服务器节点
-     */
-    val terracottaNodes = stringSetting("terracottaNodes", "")
-
-    /**
-     * 陶瓦联机公告版本号
-     */
-    val terracottaNoticeVer = intSetting("terracottaNoticeVer", -1)
 
     /**
      * 上次检查更新的时间戳

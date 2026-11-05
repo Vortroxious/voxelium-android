@@ -1,21 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Voxelium: strings for the screens built on VoxeliumCore (English only for now). -->
 <resources>
-    <string name="voxelium_versions">Versions</string>
-    <string name="voxelium_versions_title">Minecraft Versions</string>
     <string name="voxelium_installing">Installing %s</string>
     <string name="voxelium_installed">Installed</string>
-    <string name="voxelium_versions_section">Versions</string>
-    <string name="voxelium_show_snapshots">Show snapshots</string>
     <string name="voxelium_refresh">Refresh</string>
-    <string name="voxelium_loading_versions">Loading the version list…</string>
     <string name="voxelium_versions_failed">Couldn\'t load the version list. Check your internet connection and refresh.</string>
-    <string name="voxelium_play">Play</string>
-    <string name="voxelium_install">Install</string>
-    <string name="voxelium_install_with_loader">Install with a mod loader…</string>
     <string name="voxelium_repair">Verify / repair files</string>
     <string name="voxelium_delete">Delete version…</string>
-    <string name="voxelium_vanilla">Vanilla</string>
     <string name="voxelium_stage_game_files">Game files</string>
     <string name="voxelium_stage_assets">Assets</string>
     <string name="voxelium_progress">%1$s: %2$d/%3$d</string>
@@ -25,21 +16,10 @@
     <string name="voxelium_all_verified">All %d files verified</string>
     <string name="voxelium_some_failed">%d files failed. See the launcher log.</string>
 
-    <string name="voxelium_install_title">Install %s</string>
     <string name="voxelium_mod_loader">Mod loader</string>
-    <string name="voxelium_loader_for_newer">For Minecraft %s and newer</string>
-    <string name="voxelium_blurb_vanilla">No mods</string>
-    <string name="voxelium_blurb_fabric">Lightweight mod loader; most performance mods (Sodium, Lithium…)</string>
-    <string name="voxelium_blurb_quilt">Fabric-compatible loader; runs most Fabric mods</string>
-    <string name="voxelium_blurb_forge">The classic mod loader; most big modpacks for 1.20.1</string>
-    <string name="voxelium_blurb_neoforge">Forge\'s successor for 1.20.2 and newer (Create, many tech mods)</string>
     <string name="voxelium_forge_note">Installing also sets up %s, which takes a minute or two.</string>
     <string name="voxelium_loader_version">%s version</string>
-    <string name="voxelium_loading_builds">Loading %s builds…</string>
     <string name="voxelium_try_again">Try again</string>
-    <string name="voxelium_build_beta">%s (beta)</string>
-    <string name="voxelium_build_recommended">%s · recommended</string>
-    <string name="voxelium_show_all_builds">Show all %d builds</string>
     <string name="voxelium_install_vanilla">Install %s</string>
     <string name="voxelium_install_loader">Install %1$s for %2$s</string>
 
@@ -55,7 +35,6 @@
     <string name="voxelium_needed_by">%1$s is needed by %2$s. Delete those first.</string>
 
     <string name="voxelium_modpacks">Modpacks</string>
-    <string name="voxelium_modpacks_button">Modpacks…</string>
     <string name="voxelium_back">Back</string>
     <string name="voxelium_close">Close</string>
     <string name="voxelium_ok">OK</string>
@@ -78,9 +57,6 @@
     <string name="voxelium_modpack_background">You can close this; the install continues in the background.</string>
     <string name="voxelium_modpack_installed">Installed as %s. Find it under Installed on the Versions page.</string>
 
-    <string name="voxelium_mods_and_packs">Mods &amp; packs…</string>
-    <string name="voxelium_resource_packs_menu">Resource packs…</string>
-    <string name="voxelium_worlds_menu">Worlds…</string>
     <string name="voxelium_kind_mods">Mods</string>
     <string name="voxelium_kind_resource_packs">Resource packs</string>
     <string name="voxelium_kind_shader_packs">Shader packs</string>
@@ -127,7 +103,6 @@
     <string name="voxelium_open_curseforge">Open on CurseForge</string>
     <string name="voxelium_website_only">Only on CurseForge\'s website</string>
     <string name="voxelium_website_only_note">These authors only allow downloads on CurseForge\'s website. Download the file there, then add it with Import file.</string>
-    <string name="voxelium_worlds_title">Worlds · %s</string>
     <string name="voxelium_import_world">Import .zip</string>
     <string name="voxelium_working">Working…</string>
     <string name="voxelium_world_imported">Imported %s.</string>
@@ -139,13 +114,8 @@
     <string name="voxelium_delete_world_text">The world is deleted from this version\'s saves folder. Share it as a .zip first if you want a copy.</string>
     <string name="voxelium_worlds_note">Import and delete worlds only while Minecraft is closed.</string>
 
-    <string name="voxelium_no_account">No account</string>
-    <string name="voxelium_no_account_hint">Add a Microsoft or offline account to play.</string>
     <string name="voxelium_account_microsoft">Microsoft account</string>
     <string name="voxelium_account_offline">Offline account</string>
-    <string name="voxelium_accounts">Accounts</string>
-    <string name="voxelium_classic_home">ZalithLauncher home</string>
-    <string name="voxelium_version_settings">Version settings…</string>
     <!-- In-game controls and runtime menu (ui/voxelium/game) -->
     <string name="voxelium_game_menu_title">Voxelium</string>
     <string name="voxelium_game_resume">Resume</string>

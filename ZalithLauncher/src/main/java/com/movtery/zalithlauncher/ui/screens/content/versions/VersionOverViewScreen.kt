@@ -68,8 +68,6 @@ import com.movtery.zalithlauncher.ui.screens.TitledNavKey
 import com.movtery.zalithlauncher.ui.screens.content.elements.DeleteVersionDialog
 import com.movtery.zalithlauncher.ui.screens.content.elements.ImportFileButton
 import com.movtery.zalithlauncher.ui.screens.content.elements.RenameVersionDialog
-import com.movtery.zalithlauncher.ui.screens.content.home.version.VersionCardDir
-import com.movtery.zalithlauncher.ui.screens.content.home.version.VersionCardManager
 import com.movtery.zalithlauncher.ui.screens.content.versions.layouts.VersionChunkBackground
 import com.movtery.zalithlauncher.ui.screens.content.versions.layouts.VersionOverviewItem
 import com.movtery.zalithlauncher.utils.file.ensureDirectory
@@ -90,7 +88,6 @@ fun VersionOverViewScreen(
     mainScreenKey: TitledNavKey?,
     versionsScreenKey: TitledNavKey?,
     backToMainScreen: () -> Unit,
-    onExport: () -> Unit,
     eventViewModel: EventViewModel,
     version: Version,
     submitError: (ErrorViewModel.ThrowableMessage) -> Unit
@@ -166,38 +163,7 @@ fun VersionOverViewScreen(
                     },
                     onEditSummary = { versionsOperation = VersionsOperation.EditSummary(version) },
                     onRename = { versionsOperation = VersionsOperation.Rename(version) },
-                    onExport = onExport,
                     onDelete = { versionsOperation = VersionsOperation.Delete(version) }
-                )
-            }
-
-            AnimatedItem(scope) { yOffset ->
-                VersionQuickActions(
-                    modifier = Modifier.offset { IntOffset(x = 0, y = yOffset.roundToPx()) },
-                    accessFolder = { path ->
-                        val folder = if (path.isEmpty()) {
-                            version.getGameDir()
-                        } else {
-                            File(version.getGameDir(), path)
-                        }
-                        runCatching {
-                            folder.ensureDirectory()
-                        }.onFailure { e ->
-                            submitError(
-                                ErrorViewModel.ThrowableMessage(
-                                    title = androidText(R.string.error_create_dir, folder.absolutePath),
-                                    message = androidText(e.getMessageOrToString())
-                                )
-                            )
-                            return@VersionQuickActions
-                        }
-                        eventViewModel.sendEvent(
-                            EventViewModel.Event.OpenFileManager(
-                                rootPath = version.getGameHome(),
-                                currentPath = folder.absolutePath,
-                            )
-                        )
-                    }
                 )
             }
         }
@@ -244,25 +210,6 @@ private fun VersionInfoLayout(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                //添加卡片到主界面
-                val cardExists by remember(version) {
-                    VersionCardManager.cards.map { states ->
-                        states.any {
-                            it.record.versionName == version.getVersionName() &&
-                                    it.record.dir == VersionCardDir.fromGameHome(version.getGameHome())
-                        }
-                    }
-                }.collectAsStateWithLifecycle(
-                    VersionCardManager.hasCard(version.getVersionName(), version.getGameHome())
-                )
-                IconTextButton(
-                    onClick = { VersionCardManager.addCard(version) },
-                    painter = painterResource(R.drawable.ic_add_box_outlined),
-                    contentDescription = stringResource(R.string.home_add_version_card),
-                    text = stringResource(R.string.home_add_version_card),
-                    enabled = !cardExists
-                )
-
                 ImportFileButton(
                     contract = MediaPickerContract(
                         allowImages = true,
@@ -320,7 +267,6 @@ private fun VersionManagementLayout(
     onShareLog: (File) -> Unit,
     onEditSummary: () -> Unit,
     onRename: () -> Unit,
-    onExport: () -> Unit,
     onDelete: () -> Unit,
 ) {
     val logFile = remember(version) {
@@ -366,14 +312,6 @@ private fun VersionManagementLayout(
                 }
                 OutlinedButton(
                     modifier = Modifier.padding(end = 12.dp),
-                    onClick = onExport
-                ) {
-                    Text(
-                        text = stringResource(R.string.versions_export)
-                    )
-                }
-                OutlinedButton(
-                    modifier = Modifier.padding(end = 12.dp),
                     enabled = logExists,
                     onClick = {
                         onShareLog(logFile)
@@ -391,99 +329,6 @@ private fun VersionManagementLayout(
                 ) {
                     Text(
                         text = stringResource(R.string.versions_manage_delete_version)
-                    )
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun VersionQuickActions(
-    modifier: Modifier = Modifier,
-    accessFolder: (folderName: String) -> Unit = {}
-) {
-    VersionChunkBackground(
-        modifier = modifier,
-        paddingValues = PaddingValues(all = 8.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 4.dp)
-        ) {
-            Text(
-                modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .padding(top = 4.dp, bottom = 8.dp),
-                text = stringResource(R.string.versions_settings_overview_quick_actions),
-                style = MaterialTheme.typography.labelLarge
-            )
-
-            FlowRow {
-                OutlinedButton(
-                    modifier = Modifier.padding(end = 12.dp),
-                    onClick = { accessFolder("") }
-                ) {
-                    Text(
-                        text = stringResource(R.string.versions_overview_version_folder)
-                    )
-                }
-                OutlinedButton(
-                    modifier = Modifier.padding(end = 12.dp),
-                    onClick = { accessFolder(VersionFolders.SAVES.folderName) }
-                ) {
-                    Text(
-                        text = stringResource(R.string.versions_overview_saves_folder)
-                    )
-                }
-                OutlinedButton(
-                    modifier = Modifier.padding(end = 12.dp),
-                    onClick = { accessFolder(VersionFolders.RESOURCE_PACK.folderName) }
-                ) {
-                    Text(
-                        text = stringResource(R.string.versions_overview_resource_pack_folder)
-                    )
-                }
-                OutlinedButton(
-                    modifier = Modifier.padding(end = 12.dp),
-                    onClick = { accessFolder(VersionFolders.SHADERS.folderName) }
-                ) {
-                    Text(
-                        text = stringResource(R.string.versions_overview_shaders_pack_folder)
-                    )
-                }
-                OutlinedButton(
-                    modifier = Modifier.padding(end = 12.dp),
-                    onClick = { accessFolder(VersionFolders.MOD.folderName) }
-                ) {
-                    Text(
-                        text = stringResource(R.string.versions_overview_mod_folder)
-                    )
-                }
-                OutlinedButton(
-                    modifier = Modifier.padding(end = 12.dp),
-                    onClick = { accessFolder("screenshots") }
-                ) {
-                    Text(
-                        text = stringResource(R.string.versions_overview_screenshot_folder)
-                    )
-                }
-                OutlinedButton(
-                    modifier = Modifier.padding(end = 12.dp),
-                    onClick = { accessFolder("logs") }
-                ) {
-                    Text(
-                        text = stringResource(R.string.versions_overview_logs_folder)
-                    )
-                }
-                OutlinedButton(
-                    modifier = Modifier.padding(end = 12.dp),
-                    onClick = { accessFolder("crash-reports") }
-                ) {
-                    Text(
-                        text = stringResource(R.string.versions_overview_crash_report_folder)
                     )
                 }
             }
@@ -534,11 +379,6 @@ private fun VersionsOperation(
                             title = R.string.versions_manage_rename_version,
                             task = {
                                 VersionsManager.renameVersion(versionsOperation.version, it)
-                                VersionCardManager.onVersionRenamed(
-                                    gameHome = versionsOperation.version.getGameHome(),
-                                    oldName = versionsOperation.version.getVersionName(),
-                                    newName = it
-                                )
                             }
                         )
                     )

@@ -7,16 +7,18 @@ An Android launcher for **Minecraft: Java Edition**, the Android sibling of [Vox
 Not affiliated with or endorsed by Mojang Studios, Microsoft or the ZalithLauncher team. Voxelium does not include any Minecraft game files. They are downloaded from Mojang's servers to your device, and you need to own Minecraft: Java Edition to play online.
 
 ## Status
-Version 0.2.0. The launcher's logic (installs, sign-in, mods, modpacks, worlds) runs on **VoxeliumCore**, the same core as Voxelium for iOS, ported to Kotlin ([docs/CORE_PARITY.md](docs/CORE_PARITY.md)). Zalith Launcher 2 provides the engine: starting Java, the renderers and the touch controls.
+Version 0.2.0. The launcher's logic (installs, sign-in, mods, modpacks, worlds, touch controls) runs on **VoxeliumCore**, the same core as Voxelium for iOS, ported to Kotlin ([docs/CORE_PARITY.md](docs/CORE_PARITY.md)). The interface is Voxelium's own. Zalith Launcher 2 provides the engine: starting Java, the renderers, the Java runtimes and gamepad input.
 
-- **Versions** (the home screen): install Minecraft with Vanilla, Fabric, Quilt, Forge or NeoForge, with the recommended loader build preselected; play, check and repair, or delete. Forge and NeoForge finish setting up while installing.
-- **Modpacks**: Modrinth search and `.mrpack` import; each pack becomes its own version.
-- **Mods & packs** for each version: mods, resource packs and shader packs, switched on/off or removed; Modrinth updates; browsing Modrinth and CurseForge with required dependencies. CurseForge files whose authors only allow their website are linked there, never downloaded.
-- **Worlds** for each version: import a `.zip`, share as `.zip`, delete.
-- Microsoft sign-in (tokens encrypted with the Android Keystore), offline accounts, and offline play with the saved sign-in.
-- Java 8 / 17 / 21 / 25 runtimes; renderers Krypton Wrapper (default), GL4ES, Zink, VirGL, Freedreno (Adreno) and Panfrost (Mali), plus Turnip on Adreno.
-- On-screen touch controls with a layout editor, per-version settings (memory, renderer, Java) and logs, from Zalith Launcher 2.
+- **Play** (the home screen): your installed versions, the last played one first, and who you play as.
+- **Install**: Minecraft with Vanilla, Fabric, Quilt, Forge or NeoForge, with the recommended loader build preselected, and Modpacks (Modrinth search and `.mrpack` import; each pack becomes its own version). Forge and NeoForge finish setting up while installing.
+- **Each version** has its own page: mods, resource packs and shader packs (switch on/off, remove, Modrinth updates, browse Modrinth and CurseForge with required dependencies), worlds (import or share a `.zip`, delete), and settings (memory, Java, renderer, Vulkan driver, arguments), plus check and repair, and delete. CurseForge files whose authors only allow their website are linked there, never downloaded.
+- **Accounts**: Microsoft sign-in (tokens encrypted with the Android Keystore), offline accounts, offline play with the saved sign-in, and skins.
+- **Controls**: the same on-screen layout, gestures and `layout.json` as Voxelium for iOS, with an editor. A layout made on iOS can be imported unchanged.
+- **Settings**: memory and Java arguments, renderer and Vulkan driver, resolution, Java runtimes (8 / 17 / 21 / 25, or import your own), gamepad, appearance and language.
+- Renderers Krypton Wrapper (default), GL4ES, Zink, VirGL, Freedreno (Adreno) and Panfrost (Mali), plus Turnip on Adreno.
 - Update checks against this repo's GitHub releases.
+
+Voxelium's files can be browsed from Android's Files app (Voxelium appears there as a location).
 
 Minecraft 26.2 and newer draw with Vulkan and need Vulkan extensions such as `VK_KHR_dynamic_rendering` and `VK_KHR_synchronization2`. The launcher's Vulkan check shows what a phone is missing; GPUs without them (the Mali-G76, for example) run up to 26.1.x.
 

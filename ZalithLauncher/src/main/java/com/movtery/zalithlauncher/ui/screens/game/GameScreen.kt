@@ -71,7 +71,6 @@ import com.movtery.zalithlauncher.game.support.touch_controller.touchControllerT
 import com.movtery.zalithlauncher.game.version.installed.Version
 import com.movtery.zalithlauncher.game.voxelium.VoxeliumGame
 import com.movtery.zalithlauncher.setting.AllSettings
-import com.movtery.zalithlauncher.terracotta.Terracotta
 import com.movtery.zalithlauncher.ui.components.BackgroundCard
 import com.movtery.zalithlauncher.ui.components.rememberBoxSize
 import com.movtery.zalithlauncher.ui.control.event.launcherEvent
@@ -87,8 +86,6 @@ import com.movtery.zalithlauncher.ui.screens.game.elements.ForceCloseOperation
 import com.movtery.zalithlauncher.ui.screens.game.elements.GamepadModePromptDialog
 import com.movtery.zalithlauncher.ui.screens.game.elements.LogBox
 import com.movtery.zalithlauncher.ui.screens.game.elements.LogState
-import com.movtery.zalithlauncher.ui.screens.game.multiplayer.TerracottaOperation
-import com.movtery.zalithlauncher.ui.screens.game.multiplayer.rememberTerracottaViewModel
 import com.movtery.zalithlauncher.ui.voxelium.game.RuntimeMenu
 import com.movtery.zalithlauncher.ui.voxelium.game.TouchControls
 import com.movtery.zalithlauncher.ui.voxelium.game.rememberTouchControlsState
@@ -353,12 +350,6 @@ fun GameScreen(
     val isGrabbing = remember(cursorMode) {
         cursorMode == CURSOR_DISABLED
     }
-    val terracottaViewModel = rememberTerracottaViewModel(
-        keyTag = gameHandler.toString() + "_Terracotta",
-        gameHandler = gameHandler,
-        eventViewModel = eventViewModel,
-        getUserName = getAccountName
-    )
 
     //Voxelium 触控：布局来自 controls/layout.json（与 iOS 相同的格式）
     val controlsStore = remember { ControlLayoutStore(VoxeliumGame.paths()) }
@@ -379,17 +370,9 @@ fun GameScreen(
         operation = viewModel.forceCloseState,
         onChange = { viewModel.forceCloseState = it },
         onForceClose = {
-            Terracotta.setWaiting(false)
             ZLNativeInvoker.jvmExit(0, false)
         },
         text = stringResource(R.string.game_menu_option_force_close_text)
-    )
-
-    TerracottaOperation(
-        viewModel = terracottaViewModel,
-        onShowToast = { text, duration ->
-            eventViewModel.sendToast(text, duration)
-        }
     )
 
     BoxWithConstraints(

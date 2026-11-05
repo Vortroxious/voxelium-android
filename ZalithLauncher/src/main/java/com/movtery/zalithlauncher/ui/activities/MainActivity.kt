@@ -43,9 +43,6 @@ import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.context.COPY_LABEL_LINK
 import com.movtery.zalithlauncher.coroutine.Task
 import com.movtery.zalithlauncher.coroutine.TaskSystem
-import com.movtery.zalithlauncher.filemanager.FileManagerLauncher
-import com.movtery.zalithlauncher.filemanager.events.FileManagerEvent
-import com.movtery.zalithlauncher.filemanager.events.FileManagerEventRegistrar
 import com.movtery.zalithlauncher.game.control.ControlManager
 import com.movtery.zalithlauncher.game.path.getVersionsHome
 import com.movtery.zalithlauncher.game.plugin.PluginLoader
@@ -69,7 +66,7 @@ import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.content.elements.Background
 import com.movtery.zalithlauncher.ui.screens.content.elements.LaunchGameOperation
 import com.movtery.zalithlauncher.ui.screens.content.elements.TitleTaskFlowDialog
-import com.movtery.zalithlauncher.ui.screens.content.navigateToLogView
+import com.movtery.zalithlauncher.ui.voxelium.logs.navigateToLogView
 import com.movtery.zalithlauncher.ui.screens.content.navigateToWeb
 import com.movtery.zalithlauncher.ui.screens.main.MainScreen
 import com.movtery.zalithlauncher.ui.screens.main.crashlogs.LogShareMenu
@@ -189,11 +186,6 @@ class MainActivity : BaseAppCompatActivity() {
      */
     private var isCaptureKey = false
 
-    /**
-     * 文件管理器事件监听
-     */
-    private var fmEventRegistrar: FileManagerEventRegistrar? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //处理外部导入
@@ -204,9 +196,6 @@ class MainActivity : BaseAppCompatActivity() {
         //加载插件
         PluginLoader.loadAllPlugins(this, false)
         refreshData()
-
-        //注册文件管理器事件监听
-        fmEventRegistrar = FileManagerEventRegistrar(this, ::onFileManagerEvent).also { it.start() }
 
         //初始化通知管理（创建渠道）
         NotificationManager.initManager(this)
@@ -258,9 +247,6 @@ class MainActivity : BaseAppCompatActivity() {
                     is EventViewModel.Event.KeepScreen -> {
                         keepScreen(event.on)
                     }
-                    is EventViewModel.Event.ImportControls -> {
-                        importControlFiles(event.uris)
-                    }
                     is EventViewModel.Event.DownloadPlugins -> {
                         showDownloadPlugins(event.link)
                     }
@@ -289,14 +275,6 @@ class MainActivity : BaseAppCompatActivity() {
                             event.text.toAndroidString(this@MainActivity),
                             event.duration
                         ).show()
-                    }
-                    is EventViewModel.Event.OpenFileManager -> {
-                        FileManagerLauncher.launch(
-                            context = this@MainActivity,
-                            rootPath = event.rootPath,
-                            currentPath = event.currentPath,
-                            logsDir = PathManager.DIR_LAUNCHER_LOGS.absolutePath
-                        )
                     }
                     else -> {
                         //忽略
@@ -354,11 +332,9 @@ class MainActivity : BaseAppCompatActivity() {
                                 screenKey = NormalNavKey.AccountManager(menu)
                             )
                         },
+                        //Voxelium: the version list is the Play page
                         toVersionManageScreen = {
-                            screenBackStackModel.mainScreen.removeAndNavigateTo(
-                                remove = NestedNavKey.VersionSettings::class,
-                                screenKey = NormalNavKey.VersionsManager
-                            )
+                            screenBackStackModel.mainScreen.clearWith(NormalNavKey.Voxelium)
                         },
                         navigateToWeb = { url ->
                             screenBackStackModel.mainScreen.backStack.navigateToWeb(url)
@@ -531,26 +507,6 @@ class MainActivity : BaseAppCompatActivity() {
         PluginLoader.loadAllPlugins(this, true)
     }
 
-    override fun onDestroy() {
-        fmEventRegistrar?.stop()
-        fmEventRegistrar = null
-        super.onDestroy()
-    }
-
-    /**
-     * 文件管理器文件变更事件处理
-     */
-    private fun onFileManagerEvent(event: FileManagerEvent) {
-        val versionsHome = File(getVersionsHome()).absolutePath
-        val touchesVersions = event.changedDirs.any { dir ->
-            val normalized = File(dir).absolutePath
-            normalized == versionsHome || normalized.startsWith("$versionsHome${File.separator}")
-        }
-        if (touchesVersions) {
-            VersionsManager.refresh("[FileManager] ${event.type.name}")
-        }
-    }
-
     /**
      * 检查设备 Vulkan 支持情况
      */
@@ -642,66 +598,6 @@ class MainActivity : BaseAppCompatActivity() {
     /**
      * 导入控制布局
      */
-    private fun importControlFiles(uris: List<Uri>) {
-        fun showError(
-            title: AndroidStringText = androidText(R.string.control_manage_import_failed),
-            message: AndroidStringText
-        ) {
-            errorViewModel.showError(
-                ErrorViewModel.ThrowableMessage(
-                    title = title,
-                    message = message
-                )
-            )
-        }
-        TaskSystem.submitTask(
-            Task.runTask(
-                dispatcher = Dispatchers.IO,
-                task = {
-                    var done = false
-                    uris.forEach { uri ->
-                        val inputStream = contentResolver.openInputStream(uri) ?: run {
-                            showError(message = androidText(R.string.multirt_runtime_import_failed_input_stream))
-                            return@forEach
-                        }
-                        ControlManager.importControl(
-                            inputStream = inputStream,
-                            onSerializationError = {
-                                showError(
-                                    message = buildAppendedText {
-                                        append(R.string.control_manage_import_failed_to_parse)
-                                        append("\n")
-                                        append(it.getMessageOrToString())
-                                    }
-                                )
-                            },
-                            catchedError =  {
-                                showError(message = androidText(it.getMessageOrToString()))
-                            },
-                            onFinished = {
-                                done = true
-                            }
-                        )
-                    }
-                    ControlManager.refresh()
-                    if (done) {
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(
-                                this@MainActivity,
-                                getString(R.string.generic_done),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-                }
-            )
-        )
-    }
-
-    /**
-     * 处理外部导入
-     * @return 是否有导入任务正在进行中
-     */
     private fun handleImportIfNeeded(intent: Intent?): Boolean {
         if (intent == null) return false
 
@@ -709,7 +605,6 @@ class MainActivity : BaseAppCompatActivity() {
 
         val importing = when (type) {
             IMPORT_TYPE_MODPACK -> handleModpackImport(intent)
-            IMPORT_TYPE_CONTROLS -> handleControlsImport(intent)
             else -> false
         }
 
@@ -749,19 +644,6 @@ class MainActivity : BaseAppCompatActivity() {
     /**
      * @return 是否已经触发了控制布局导入程序
      */
-    private fun handleControlsImport(intent: Intent): Boolean {
-        val uri: Uri? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(EXTRA_IMPORT_URI, Uri::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            intent.getParcelableExtra(EXTRA_IMPORT_URI)
-        }
-        if (uri != null) {
-            importControlFiles(listOf(uri))
-        }
-        return uri != null
-    }
-
     override fun onResume() {
         super.onResume()
         ControlManager.checkDefaultAndRefresh(this@MainActivity)

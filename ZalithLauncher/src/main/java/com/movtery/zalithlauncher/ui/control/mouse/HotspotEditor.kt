@@ -62,7 +62,7 @@ import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.bridge.CursorShape
 import com.movtery.zalithlauncher.setting.unit.ParcelableSettingUnit
 import com.movtery.zalithlauncher.ui.components.rememberDialogMaxHeight
-import com.movtery.zalithlauncher.ui.screens.main.control_editor.InfoLayoutSliderItem
+import com.movtery.zalithlauncher.ui.components.InfoLayoutSliderItem
 import com.movtery.zalithlauncher.ui.theme.cardColor
 import com.movtery.zalithlauncher.ui.theme.onCardColor
 import com.movtery.zalithlauncher.utils.file.ifExists

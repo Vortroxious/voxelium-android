@@ -152,7 +152,7 @@ import com.movtery.zalithlauncher.ui.components.SingleLineTextCheck
 import com.movtery.zalithlauncher.ui.components.fadeEdge
 import com.movtery.zalithlauncher.ui.components.rememberDialogMaxHeight
 import com.movtery.zalithlauncher.ui.components.verticalScrollWithBar
-import com.movtery.zalithlauncher.ui.screens.main.control_editor.InfoLayoutTextItem
+import com.movtery.zalithlauncher.ui.components.InfoLayoutTextItem
 import com.movtery.zalithlauncher.ui.theme.cardColor
 import com.movtery.zalithlauncher.ui.theme.itemColor
 import com.movtery.zalithlauncher.ui.theme.onCardColor

@@ -9,9 +9,14 @@ Voxelium for Android is an **unofficial modified version** of [Zalith Launcher 2
 - Upstream source files keep their original copyright headers. Voxelium changes are marked with `Voxelium:` comments.
 - Upstream READMEs, including their third-party library table, are kept in [`docs/upstream/`](docs/upstream/).
 
+### What is Voxelium's and what remains Zalith Launcher 2's
+- **Voxelium's own:** the interface (`ui/voxelium/`: theme, Play, Install, version pages, Accounts, Controls, Settings, first start, crash and log pages), the in-game touch controls and their editor, and VoxeliumCore (`VoxeliumCore/`), the launcher logic shared with Voxelium for iOS.
+- **Kept from Zalith Launcher 2:** the engine (Java launch over JNI, renderers, LWJGL/SDL, Java runtime management, gamepad and gyroscope input), the settings and account storage, the Microsoft sign-in flow, and some screens still reachable from Voxelium's pages: the full version settings, the full settings (More → ZalithLauncher settings), its About and licence screens, and the asset download screens those open.
+- **Removed:** Terracotta multiplayer (and its `Terracotta` module), the in-app file manager, Zalith Launcher 2's home screen and cards, its control layouts and control editor, version export, and the screenshot and server-list pages. The background image and colour themes are no longer applied.
+
 ### Zalith Launcher 2's additional terms (GPLv3 §7), and how Voxelium meets them
-1. *A modified version must change the name or version, must not use "ZalithLauncher" or "ZL" or a confusingly similar name, and must say "Unofficial Modified Version" on its startup screen or main interface.* This app is named **Voxelium**, with its own version (0.x) and application ID (`io.github.voxelium.launcher`). The main screen shows a permanent notice that it is an Unofficial Modified Version of Zalith Launcher 2.
-2. *The copyright notices the program displays must not be removed.* Zalith Launcher 2's About screen, licence screens and copyright notices are kept.
+1. *A modified version must change the name or version, must not use "ZalithLauncher" or "ZL" or a confusingly similar name, and must say "Unofficial Modified Version" on its startup screen or main interface.* This app is named **Voxelium**, with its own version (0.x) and application ID (`io.github.voxelium.launcher`). The Play screen and Settings → About show a permanent notice that it is an Unofficial Modified Version of Zalith Launcher 2.
+2. *The copyright notices the program displays must not be removed.* Zalith Launcher 2's About screen, licence screens and copyright notices are kept, and reachable from Settings → About → Credits and licences.
 
 ## Lineage
 Zalith Launcher 2 uses [PojavLauncher](https://github.com/PojavLauncherTeam/PojavLauncher) (LGPL-3.0/GPL-3.0) as its core launching engine. The native launch code under `ZalithLauncher/src/main/jni` comes from PojavLauncher.

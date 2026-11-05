@@ -95,12 +95,9 @@ import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.TitledNavKey
 import com.movtery.zalithlauncher.ui.screens.content.AccountManageScreen
 import com.movtery.zalithlauncher.ui.screens.content.DownloadScreen
-import com.movtery.zalithlauncher.ui.screens.content.FileSelectorScreen
-import com.movtery.zalithlauncher.ui.screens.content.LauncherScreen
 import com.movtery.zalithlauncher.ui.screens.content.LicenseScreen
-import com.movtery.zalithlauncher.ui.screens.content.LogViewScreen
+import com.movtery.zalithlauncher.ui.voxelium.logs.VoxeliumLogScreen
 import com.movtery.zalithlauncher.ui.screens.content.FirstLoginMenu
-import com.movtery.zalithlauncher.ui.screens.content.MultiplayerScreen
 import com.movtery.zalithlauncher.ui.voxelium.accounts.VoxeliumAccountsScreen
 import com.movtery.zalithlauncher.ui.voxelium.controls.VoxeliumControlsScreen
 import com.movtery.zalithlauncher.ui.voxelium.settings.VoxeliumSettingsScreen
@@ -108,9 +105,7 @@ import com.movtery.zalithlauncher.ui.voxelium.install.VoxeliumInstallScreen
 import com.movtery.zalithlauncher.ui.voxelium.play.VoxeliumPlayScreen
 import com.movtery.zalithlauncher.ui.voxelium.version.VoxeliumVersionScreen
 import com.movtery.zalithlauncher.ui.screens.content.SettingsScreen
-import com.movtery.zalithlauncher.ui.screens.content.VersionExportScreen
 import com.movtery.zalithlauncher.ui.screens.content.VersionSettingsScreen
-import com.movtery.zalithlauncher.ui.screens.content.VersionsManageScreen
 import com.movtery.zalithlauncher.ui.screens.content.WebViewScreen
 import com.movtery.zalithlauncher.ui.screens.content.assetinfo.AssetInfoScreen
 import com.movtery.zalithlauncher.ui.screens.content.navigateToDownload
@@ -210,19 +205,10 @@ fun MainScreen(
                 onTasks = { changeTasksExpandedState() },
                 onMore = { item ->
                     when (item) {
-                        MoreItem.DOWNLOAD -> screenBackStackModel.navigateToDownload()
-                        MoreItem.MULTIPLAYER -> screenBackStackModel.mainScreen.removeAndNavigateTo(
-                            removes = screenBackStackModel.clearBeforeNavKeys,
-                            screenKey = NormalNavKey.Multiplayer
-                        )
-                        MoreItem.FILES -> eventViewModel.sendEvent(
-                            EventViewModel.Event.OpenFileManager(rootPath = PathManager.DIR_FILES_EXTERNAL.absolutePath)
-                        )
                         MoreItem.CLASSIC_SETTINGS -> screenBackStackModel.mainScreen.removeAndNavigateTo(
                             removes = screenBackStackModel.clearBeforeNavKeys,
                             screenKey = screenBackStackModel.settingsScreen
                         )
-                        MoreItem.CLASSIC_HOME -> screenBackStackModel.mainScreen.navigateTo(screenKey = NormalNavKey.LauncherMain)
                     }
                 }
             )
@@ -259,254 +245,6 @@ fun MainScreen(
 }
 
 @Composable
-private fun <E: TitledNavKey> TopBar(
-    mainScreenKey: E?,
-    inLauncherScreen: Boolean,
-    taskRunning: Boolean,
-    isTasksExpanded: Boolean,
-    modifier: Modifier = Modifier,
-    contentColor: Color,
-    onScreenBack: () -> Unit,
-    toMainScreen: () -> Unit,
-    toSettingsScreen: () -> Unit,
-    toDownloadScreen: () -> Unit,
-    toMultiplayerScreen: () -> Unit,
-    toVoxeliumScreen: () -> Unit,
-    openFileManager: () -> Unit,
-    changeExpandedState: () -> Unit,
-) {
-    val festivals = LocalFestivals.current
-
-    val inMultiplayerScreen = mainScreenKey is NormalNavKey.Multiplayer
-    val inVoxeliumScreen = mainScreenKey is NormalNavKey.Voxelium
-    val inDownloadScreen = mainScreenKey is NestedNavKey.Download
-    val inSettingsScreen = mainScreenKey is NestedNavKey.Settings
-
-    CompositionLocalProvider(
-        LocalContentColor provides contentColor
-    ) {
-        ConstraintLayout(modifier = modifier) {
-            val (backCenter, title, endButtons) = createRefs()
-
-            val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-
-            Row(
-                modifier = Modifier
-                    .constrainAs(backCenter) {
-                        start.linkTo(parent.start)
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                    }
-                    .fillMaxHeight()
-            ) {
-                AnimatedVisibility(
-                    visible = !inLauncherScreen
-                ) {
-                    Row(modifier = Modifier.fillMaxHeight()) {
-                        Spacer(Modifier.width(12.dp))
-
-                        IconButton(
-                            modifier = Modifier.fillMaxHeight(),
-                            onClick = {
-                                if (!inLauncherScreen) {
-                                    //不在主屏幕时才允许返回
-                                    backDispatcher?.onBackPressed() ?: run {
-                                        onScreenBack()
-                                    }
-                                }
-                            }
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(24.dp),
-                                painter = painterResource(R.drawable.ic_arrow_back),
-                                contentDescription = stringResource(R.string.generic_back)
-                            )
-                        }
-
-                        IconButton(
-                            modifier = Modifier.fillMaxHeight(),
-                            onClick = {
-                                if (!inLauncherScreen) {
-                                    //不在主屏幕时才允许回到主页面
-                                    toMainScreen()
-                                }
-                            }
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_home_filled),
-                                contentDescription = stringResource(R.string.generic_main_menu)
-                            )
-                        }
-                    }
-                }
-            }
-            val parentRes = mainScreenKey?.title
-            val childRes = (mainScreenKey as? BackStackNavKey<*>)?.currentKey?.title
-
-            Crossfade(
-                modifier = Modifier.constrainAs(title) {
-                    centerVerticallyTo(parent)
-                    start.linkTo(backCenter.end, margin = 16.dp)
-                },
-                targetState = parentRes to childRes
-            ) { (parent, child) ->
-                val style = MaterialTheme.typography.titleMedium
-                val softWarp = false
-                val maxLines = 1
-
-                if (parent == null) {
-                    if (festivals.isEmpty()) {
-                        Text(
-                            text = BuildKeys.LAUNCHER_IDENTIFIER,
-                            style = style,
-                            softWrap = softWarp,
-                            maxLines = maxLines
-                        )
-                    } else {
-                        FestivalTitleText(
-                            festivals = festivals,
-                            style = style,
-                            maxLines = maxLines
-                        )
-                    }
-                } else {
-                    val titleText = if (child != null) {
-                        androidText(parent, androidText(" - "), child)
-                    } else {
-                        parent
-                    }
-
-                    AndroidStringText(
-                        text = titleText,
-                        style = style,
-                        softWrap = softWarp,
-                        maxLines = maxLines
-                    )
-                }
-            }
-
-            Row(
-                modifier = Modifier
-                    .constrainAs(endButtons) {
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                        end.linkTo(parent.end, margin = 12.dp)
-                    },
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                AnimatedVisibility(
-                    visible = !(isTasksExpanded || taskRunning),
-                    enter = slideInVertically(
-                        initialOffsetY = { -50 }
-                    ) + fadeIn(),
-                    exit = slideOutVertically(
-                        targetOffsetY = { -50 }
-                    ) + fadeOut()
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .clip(shape = MaterialTheme.shapes.large)
-                            .clickable { changeExpandedState() }
-                            .padding(all = 8.dp)
-                            .width(120.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        LinearProgressIndicator(modifier = Modifier.weight(1f))
-                        Icon(
-                            modifier = Modifier.size(22.dp),
-                            painter = painterResource(R.drawable.ic_assignment_filled),
-                            contentDescription = stringResource(R.string.main_task_menu)
-                        )
-                    }
-                }
-
-                IconButton(
-                    onClick = openFileManager
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_folder_filled),
-                        contentDescription = null
-                    )
-                }
-
-                TopBarRailItem(
-                    selected = inMultiplayerScreen,
-                    painter = painterResource(R.drawable.ic_group_filled),
-                    text = stringResource(R.string.terracotta),
-                    onClick = {
-                        if (!inMultiplayerScreen) toMultiplayerScreen()
-                    },
-                )
-
-                TopBarRailItem(
-                    selected = inVoxeliumScreen,
-                    painter = painterResource(R.drawable.ic_package_2_outlined),
-                    text = stringResource(R.string.voxelium_versions),
-                    onClick = {
-                        if (!inVoxeliumScreen) toVoxeliumScreen()
-                    },
-                )
-
-                TopBarRailItem(
-                    selected = inDownloadScreen,
-                    painter = painterResource(R.drawable.ic_download_2_filled),
-                    text = stringResource(R.string.generic_download),
-                    onClick = {
-                        if (!inDownloadScreen) toDownloadScreen()
-                    },
-                )
-
-                TopBarRailItem(
-                    selected = inSettingsScreen,
-                    painter = painterResource(R.drawable.ic_settings_filled),
-                    text = stringResource(R.string.generic_setting),
-                    onClick = {
-                        if (!inSettingsScreen) toSettingsScreen()
-                    },
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun TopBarRailItem(
-    selected: Boolean,
-    painter: Painter,
-    text: String,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit = {},
-    textStyle: TextStyle = MaterialTheme.typography.labelMedium
-) {
-    TextRailItem(
-        modifier = modifier,
-        onClick = onClick,
-        text = {
-            AnimatedVisibility(visible = selected) {
-                Row {
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = text,
-                        style = textStyle
-                    )
-                }
-            }
-        },
-        icon = {
-            Icon(
-                painter = painter,
-                contentDescription = text
-            )
-        },
-        selected = selected,
-        selectedPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
-        unSelectedPadding = PaddingValues(all = 8.dp),
-    )
-}
-
-@Composable
 private fun NavigationUI(
     modifier: Modifier = Modifier,
     screenBackStackModel: ScreenBackStackViewModel,
@@ -531,15 +269,6 @@ private fun NavigationUI(
                 useClassEquality = true
             )
         }
-        /** 导航至整合包导出屏幕 */
-        val navigateToExport: (Version) -> Unit = { version ->
-            screenBackStackModel.mainScreen.removeAndNavigateTo(
-                remove = NestedNavKey.VersionSettings::class,
-                screenKey = NestedNavKey.VersionExport(version),
-                useClassEquality = true
-            )
-        }
-
         NavDisplay(
             backStack = backStack,
             modifier = modifier,
@@ -549,34 +278,6 @@ private fun NavigationUI(
             transitionSpec = rememberTransitionSpec(),
             popTransitionSpec = rememberTransitionSpec(),
             entryProvider = entryProvider {
-                entry<NormalNavKey.LauncherMain> {
-                    LauncherScreen(
-                        backStackViewModel = screenBackStackModel,
-                        navigateToVersions = navigateToVersions,
-                        onLaunchGame = { version ->
-                            eventViewModel.sendEvent(
-                                EventViewModel.Event.Launch.Game(version)
-                            )
-                        },
-                        onQuickPlayServer = { version, address ->
-                            val target = (version ?: VersionsManager.currentVersion.value)?.takeIf { it.isValid() }
-                            if (target != null) {
-                                eventViewModel.sendEvent(
-                                    EventViewModel.Event.Launch.PlayServer(target, address)
-                                )
-                            } else {
-                                eventViewModel.sendToast(androidText(R.string.game_launch_no_version))
-                                screenBackStackModel.mainScreen.navigateTo(NormalNavKey.VersionsManager)
-                            }
-                        },
-                        onOpenLink = {
-                            eventViewModel.sendEvent(EventViewModel.Event.OpenLink(it))
-                        },
-                        startGuideOnce = { keys ->
-                            eventViewModel.sendStartGuideOnce(keys)
-                        }
-                    )
-                }
                 entry<NestedNavKey.Settings> { key ->
                     SettingsScreen(
                         key = key,
@@ -613,42 +314,14 @@ private fun NavigationUI(
                         eventViewModel = eventViewModel
                     )
                 }
-                entry<NormalNavKey.VersionsManager> {
-                    VersionsManageScreen(
-                        backScreenViewModel = screenBackStackModel,
-                        navigateToVersions = navigateToVersions,
-                        navigateToExport = navigateToExport,
-                        eventViewModel = eventViewModel,
-                        submitError = submitError
-                    )
-                }
-                entry<NormalNavKey.FileSelector> { key ->
-                    FileSelectorScreen(
-                        key = key,
-                        backScreenViewModel = screenBackStackModel
-                    ) {
-                        backStack.removeLastOrNull()
-                    }
-                }
                 entry<NestedNavKey.VersionSettings> { key ->
                     VersionSettingsScreen(
                         key = key,
                         modifyViewModel = modifyVersionViewModel,
                         backScreenViewModel = screenBackStackModel,
                         backToMainScreen = toMainScreen,
-                        onExportModpack = {
-                            navigateToExport(key.version)
-                        },
                         eventViewModel = eventViewModel,
                         submitError = submitError
-                    )
-                }
-                entry<NestedNavKey.VersionExport> { key ->
-                    VersionExportScreen(
-                        key = key,
-                        backScreenViewModel = screenBackStackModel,
-                        eventViewModel = eventViewModel,
-                        backToMainScreen = toMainScreen
                     )
                 }
                 entry<NestedNavKey.Download> { key ->
@@ -667,12 +340,6 @@ private fun NavigationUI(
                         assetInfoScreenKey = key.currentKey,
                         eventViewModel = eventViewModel,
                         submitError = submitError,
-                    )
-                }
-                entry<NormalNavKey.Multiplayer> {
-                    MultiplayerScreen(
-                        backScreenViewModel = screenBackStackModel,
-                        eventViewModel = eventViewModel
                     )
                 }
                 entry<NormalNavKey.Voxelium> {
@@ -729,9 +396,10 @@ private fun NavigationUI(
                     VoxeliumControlsScreen(backScreenViewModel = screenBackStackModel)
                 }
                 entry<NormalNavKey.LogView> { key ->
-                    LogViewScreen(
+                    VoxeliumLogScreen(
                         key = key,
                         backStackViewModel = screenBackStackModel,
+                        onBack = { backStack.removeLastOrNull() }
                     )
                 }
             }

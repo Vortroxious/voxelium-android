@@ -16,7 +16,6 @@
     <string name="generic_setting">تەڭشەش</string>
     <string name="generic_expand">ئېچىش</string>
     <string name="generic_collapse">يىغىشتۇرۇش</string>
-    <string name="generic_main_menu">ئاساسىي تىزىملىك</string>
     <string name="generic_download">چۈشۈرۈش</string>
     <string name="generic_done">ئورۇنلىاندى</string>
     <string name="generic_close">تاقاش</string>
@@ -30,7 +29,6 @@
     <string name="generic_input_failed_to_number">كىرگۈزگەن مەزمۇنلارنى رەقەمگە ئايرىشقا بولمايدۇ</string>
     <string name="generic_input_too_small">"كىرگۈزگەن سان  %sدىن كىچىك بولماسلىقى كېرەك"</string>
     <string name="generic_input_too_large">كىرگۈزگەن %s ئېشىپ كەتمەسلىكى كېرەك</string>
-    <string name="generic_input_length">%1$d/%2$d :تېكىست بوشلۇقىدىكى خەت سانى</string>
     <string name="generic_unpacking">ھازىر بېسىمنى تۆۋەنلىتىۋاتىدۇ%s</string>
     <string name="generic_unknown">نامەلۇم</string>
     <string name="generic_follow_global">پۈتۈن ئەگىشىش</string>
@@ -47,20 +45,14 @@
     <string name="generic_all">ھەممىسى</string>
     <string name="generic_enabled">قوزغىتىقلىق</string>
     <string name="generic_disabled">ئېتىفلىك</string>
-    <string name="generic_unspecified">بەلگىلەنمىگەن</string>
     <string name="generic_save">ساقلاش</string>
-    <string name="generic_saved">ساقلاندى</string>
-    <string name="generic_saving">ساقلاشتىۋاتىدۇ…</string>
-    <string name="generic_share">ھەمبەھرلەش</string>
     <string name="generic_copied">كۆپەيتىلدى</string>
     <string name="generic_no_matching_items">شەرتكە ئۇيغۇن كېلىدىغان تۈر يوق</string>
     <string name="generic_follow_system">سىستېمىغا ئەگىشىش</string>
     <string name="unit_day">كۆن</string>
     <string name="date_format">MMM d, yyyy, h:mm:ss a</string>
-    <string name="page_title_version_list">نۇسخا تىزىملىكى</string>
     <string name="page_title_version_manage">نۇسخىسى باشقۇرۇش</string>
     <string name="page_title_account_list">ئابۇنىچى تىزىملىك</string>
-    <string name="page_title_select_files">يول تاللاش</string>
     <string name="files_browse_folder">مۇندەرىجىنى كۆزدىن كەچۈرۈش</string>
     <string name="files_importing">ڧايلىق فايلنى كىرگۈزئىۋاتىتۇ</string>
     <string name="files_delete_file">سىز %s نى ئۆچۈرۈشنى جەزملەشتۈردىڭىزمۇ؟</string>
@@ -75,8 +67,6 @@
     <string name="sort_by_file_name">ھۆججەت نامى بويىچە رەتكە تىزىش</string>
     <string name="sort_by_last_modified">ئۆزگەرتىش ۋاقتى بويىچە رەتكە تىزىلدى</string>
     <string name="sort_by_last_played">ئالدىنقى قېتىملىق ساياھەت ۋاقتى بويىچە رەتكە تىزىلدى</string>
-    <string name="launcher_version_debug_warning">سىز سىناق نۇسخىسىدىكى%s نى ئىشلىتىۋاتىسىز ! بۇ نۇسخا مۇقىم بولماسلىقى مۇمكىن، ئاساسلىقى ئىقتىدار سىنىقى، يېڭىلىقنى سىناش ئۈچۈن ئىشلىتىلىدۇ، بۇ نۇسخىنى ئۇزاق مۇددەت ئىشلىتىش تەۋسىيە قىلىنمايدۇ! ئەگەر سىز سىناق جەريانىدا ھەرقانداق مەسىلىنى بايقىسىڭىز، ئەگەر Github بىزگە ئىنكاس قىلىڭ، بىز تېزدىن بىر تەرەپ قىلىمىز.</string>
-    <string name="launcher_version_debug_warning_cant_close">بۇ ئاگاھلاندۇرۇشنى تاقالغىلى بولمايدۇ</string>
     <string name="theme_color_dynamic">ھەرىكەتچان (Android 12+)</string>
     <string name="theme_color_embermire">يۈجىن</string>
     <string name="theme_color_velvet_rose">روڭمېي</string>

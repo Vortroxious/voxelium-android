@@ -24,10 +24,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.movtery.zalithlauncher.R
@@ -40,12 +36,11 @@ import com.movtery.zalithlauncher.components.jre.UnpackJnaTask
 import com.movtery.zalithlauncher.components.jre.UnpackJreTask
 import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.ui.base.BaseAppCompatActivity
-import com.movtery.zalithlauncher.ui.screens.splash.SplashScreen
 import com.movtery.zalithlauncher.ui.theme.ZalithLauncherTheme
-import com.movtery.zalithlauncher.ui.theme.backgroundColor
-import com.movtery.zalithlauncher.ui.theme.onBackgroundColor
+import com.movtery.zalithlauncher.setting.enums.isLauncherInDarkTheme
+import com.movtery.zalithlauncher.ui.voxelium.splash.VoxeliumSplash
+import com.movtery.zalithlauncher.ui.voxelium.theme.VoxeliumTheme
 import com.movtery.zalithlauncher.utils.logging.Logger
-import com.movtery.zalithlauncher.viewmodel.SplashBackStackViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.joinAll
@@ -59,7 +54,6 @@ const val EXTRA_IMPORT_URI    = "EXTRA_IMPORT_URI"
 const val EXTRA_IMPORT_TYPE   = "EXTRA_IMPORT_TYPE"
 
 const val IMPORT_TYPE_MODPACK = "modpack"
-const val IMPORT_TYPE_CONTROLS = "controls"
 const val IMPORT_TYPE_UNKNOWN = "unknown"
 
 @SuppressLint("CustomSplashScreen")
@@ -69,8 +63,6 @@ class SplashActivity : BaseAppCompatActivity() {
     private val finishedTaskCount = AtomicInteger(0)
 
     private var pendingImportIntent: Intent? = null
-
-    private val backStackViewModel: SplashBackStackViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -85,16 +77,9 @@ class SplashActivity : BaseAppCompatActivity() {
 
         setContent {
             ZalithLauncherTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = backgroundColor(),
-                    contentColor = onBackgroundColor()
-                ) {
-                    SplashScreen(
-                        startAllTask = { startAllTask() },
-                        unpackItems = unpackItems,
-                        screenViewModel = backStackViewModel
-                    )
+                //Voxelium: its own first-start screen
+                VoxeliumTheme(dark = isLauncherInDarkTheme()) {
+                    VoxeliumSplash(items = unpackItems, onInstall = { startAllTask() })
                 }
             }
         }

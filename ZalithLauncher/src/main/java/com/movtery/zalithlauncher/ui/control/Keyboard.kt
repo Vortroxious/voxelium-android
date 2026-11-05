@@ -70,7 +70,7 @@ import com.movtery.zalithlauncher.ui.components.AutoSizeText
 import com.movtery.zalithlauncher.ui.components.MarqueeText
 import com.movtery.zalithlauncher.ui.control.gamepad.SPECIAL_KEY_MOUSE_SCROLL_DOWN
 import com.movtery.zalithlauncher.ui.control.gamepad.SPECIAL_KEY_MOUSE_SCROLL_UP
-import com.movtery.zalithlauncher.ui.screens.main.control_editor.InfoLayoutTextItem
+import com.movtery.zalithlauncher.ui.components.InfoLayoutTextItem
 import com.movtery.zalithlauncher.ui.theme.cardColor
 import com.movtery.zalithlauncher.ui.theme.cardTitleColor
 import com.movtery.zalithlauncher.ui.theme.itemColor

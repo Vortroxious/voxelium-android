@@ -34,10 +34,6 @@ sealed interface NormalNavKey : TitledNavKey {
     @Contextual override val title: AndroidStringText?
         get() = null
 
-    /** 解压依赖内容屏幕（启动屏幕） */
-    @Serializable data object UnpackDeps: NormalNavKey
-    /** 启动器主页屏幕 */
-    @Serializable data object LauncherMain : NormalNavKey
     /** 账号管理屏幕 */
     @Serializable data class AccountManager(
         val loginMenu: FirstLoginMenu = FirstLoginMenu.NONE
@@ -46,19 +42,6 @@ sealed interface NormalNavKey : TitledNavKey {
     }
     /** Web屏幕 */
     @Serializable data class WebScreen(val url: String) : NormalNavKey
-    /** 版本管理屏幕 */
-    @Serializable data object VersionsManager : NormalNavKey {
-        @Contextual override val title: AndroidStringText = androidText(R.string.page_title_version_list)
-    }
-    /** 文件选择屏幕 */
-    @Serializable data class FileSelector(
-        val startPath: String,
-        val selectFile: Boolean,
-        val saveKey: TitledNavKey,
-        val onSelected: (path: String) -> Unit
-    ) : NormalNavKey {
-        @Contextual override val title: AndroidStringText = androidText(R.string.page_title_select_files)
-    }
     /** Voxelium: Play, the home screen (installed versions) */
     @Serializable data object Voxelium: NormalNavKey {
         @Contextual override val title: AndroidStringText = androidText(R.string.voxelium_ui_play)
@@ -79,10 +62,6 @@ sealed interface NormalNavKey : TitledNavKey {
     @Serializable data object VoxeliumSettings: NormalNavKey {
         @Contextual override val title: AndroidStringText = androidText(R.string.voxelium_ui_settings)
     }
-    /** 多人联机屏幕 */
-    @Serializable data object Multiplayer: NormalNavKey {
-        @Contextual override val title: AndroidStringText = androidText(R.string.terracotta_terracotta)
-    }
 
     /** 查看日志屏幕 */
     @Serializable data class LogView(
@@ -101,10 +80,6 @@ sealed interface NormalNavKey : TitledNavKey {
         @Serializable data object Game : Settings {
             @Contextual override val title: AndroidStringText = androidText(R.string.settings_tab_game)
         }
-        /** 控制设置屏幕 */
-        @Serializable data object Control : Settings {
-            @Contextual override val title: AndroidStringText = androidText(R.string.settings_tab_control)
-        }
         /** 手柄设置屏幕 */
         @Serializable data object Gamepad : Settings {
             @Contextual override val title: AndroidStringText = androidText(R.string.settings_tab_gamepad)
@@ -116,10 +91,6 @@ sealed interface NormalNavKey : TitledNavKey {
         /** Java管理屏幕 */
         @Serializable data object JavaManager : Settings {
             @Contextual override val title: AndroidStringText = androidText(R.string.settings_tab_java_manage)
-        }
-        /** 控制管理屏幕 */
-        @Serializable data object ControlManager : Settings {
-            @Contextual override val title: AndroidStringText = androidText(R.string.settings_tab_control_manage)
         }
         /** 关于屏幕 */
         @Serializable data object AboutInfo : Settings {
@@ -161,25 +132,8 @@ sealed interface NormalNavKey : TitledNavKey {
         @Serializable data object ShadersManager : Versions {
             @Contextual override var title: AndroidStringText = androidText(R.string.shader_pack_manage)
         }
-        /** 截屏管理屏幕 */
-        @Serializable data object ScreenshotsManager : Versions {
-            @Contextual override var title: AndroidStringText = androidText(R.string.screenshots_manage)
-        }
-        /** 服务器列表屏幕 */
-        @Serializable data object ServerList : Versions {
-            @Contextual override val title: AndroidStringText = androidText(R.string.servers_list)
-        }
     }
 
-    /** 导出整合包屏幕 */
-    sealed interface VersionExports : NormalNavKey {
-        /** 选择导出格式 */
-        @Serializable data object SelectType : VersionExports
-        /** 编辑整合包导出配置 */
-        @Serializable data object EditInfo : VersionExports
-        /** 选择要导出的文件 */
-        @Serializable data object SelectFiles : VersionExports
-    }
 
     /** 下载游戏嵌套子屏幕 */
     sealed interface DownloadGame : NormalNavKey {

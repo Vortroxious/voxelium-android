@@ -19,7 +19,7 @@
 package com.movtery.zalithlauncher.ui.code_editor
 
 import android.content.Context
-import com.movtery.zalithlauncher.filemanager.os.FmLog
+import com.movtery.zalithlauncher.utils.logging.Logger
 import io.github.rosemoe.sora.lang.Language
 import io.github.rosemoe.sora.langs.textmate.TextMateColorScheme
 import io.github.rosemoe.sora.langs.textmate.TextMateLanguage
@@ -136,7 +136,7 @@ object TextMateRegistry {
         return if (missing.isEmpty()) {
             true
         } else {
-            FmLog.warn(TAG, "jcodings tables unavailable: $missing, TextMate highlighting disabled")
+            Logger.warning(TAG, "jcodings tables unavailable: $missing, TextMate highlighting disabled")
             false
         }
     }
@@ -164,7 +164,7 @@ object TextMateRegistry {
                         DefaultGrammarDefinition.withGrammarSource(source, scopeName, scopeName)
                     )
                 }.onFailure {
-                    FmLog.warn(TAG, "Load TextMate grammar failed: $file", it)
+                    Logger.warning(TAG, "Load TextMate grammar failed: $file", it)
                 }
             }
 
@@ -176,7 +176,7 @@ object TextMateRegistry {
                         index == 0
                     )
                 }.onFailure {
-                    FmLog.warn(TAG, "Load TextMate theme failed: $name", it)
+                    Logger.warning(TAG, "Load TextMate theme failed: $name", it)
                 }
             }
             // 库内不会自动从主题 JSON 读取明暗属性，手动标记以让配色方案正确判定
@@ -207,7 +207,7 @@ object TextMateRegistry {
                         TextMateLanguage.create(scopeName, grammarRegistry, themeRegistry, true)
                     }
                 }.getOrElse { e ->
-                    FmLog.warn(TAG, "Create TextMate language failed: $scopeName", e)
+                    Logger.warning(TAG, "Create TextMate language failed: $scopeName", e)
                     null
                 }
             }
@@ -237,7 +237,7 @@ object TextMateRegistry {
         return runCatching {
             FmTextMateColorScheme(themeRegistry, themeModel)
         }.getOrElse { e ->
-            FmLog.warn(TAG, "Create TextMate color scheme failed", e)
+            Logger.warning(TAG, "Create TextMate color scheme failed", e)
             null
         }
     }

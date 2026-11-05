@@ -57,8 +57,6 @@ import com.movtery.zalithlauncher.ui.screens.TitledNavKey
 import com.movtery.zalithlauncher.ui.screens.content.elements.CategoryIcon
 import com.movtery.zalithlauncher.ui.screens.content.elements.CategoryItem
 import com.movtery.zalithlauncher.ui.screens.content.settings.AboutInfoScreen
-import com.movtery.zalithlauncher.ui.screens.content.settings.ControlManageScreen
-import com.movtery.zalithlauncher.ui.screens.content.settings.ControlSettingsScreen
 import com.movtery.zalithlauncher.ui.screens.content.settings.GameSettingsScreen
 import com.movtery.zalithlauncher.ui.screens.content.settings.GamepadSettingsScreen
 import com.movtery.zalithlauncher.ui.screens.content.settings.JavaManageScreen
@@ -113,11 +111,9 @@ fun SettingsScreen(
 private val settingItems = listOf(
     CategoryItem(NormalNavKey.Settings.Renderer, { CategoryIcon(R.drawable.ic_video_settings, R.string.settings_tab_renderer) }, R.string.settings_tab_renderer),
     CategoryItem(NormalNavKey.Settings.Game, { CategoryIcon(R.drawable.ic_rocket_launch_filled, R.string.settings_tab_game) }, R.string.settings_tab_game),
-    CategoryItem(NormalNavKey.Settings.Control, { CategoryIcon(R.drawable.ic_videogame_asset_outlined, R.string.settings_tab_control) }, R.string.settings_tab_control),
     CategoryItem(NormalNavKey.Settings.Gamepad, { CategoryIcon(R.drawable.ic_sports_esports_outlined, R.string.settings_tab_gamepad) }, R.string.settings_tab_gamepad),
     CategoryItem(NormalNavKey.Settings.Launcher, { CategoryIcon(R.drawable.ic_setting_launcher, R.string.settings_tab_launcher) }, R.string.settings_tab_launcher),
     CategoryItem(NormalNavKey.Settings.JavaManager, { CategoryIcon(R.drawable.ic_java, R.string.settings_tab_java_manage) }, R.string.settings_tab_java_manage, division = true),
-    CategoryItem(NormalNavKey.Settings.ControlManager, { CategoryIcon(R.drawable.ic_videogame_asset_outlined, R.string.settings_tab_control_manage) }, R.string.settings_tab_control_manage),
     CategoryItem(NormalNavKey.Settings.AboutInfo, { CategoryIcon(R.drawable.ic_info_outlined, R.string.settings_tab_info_about) }, R.string.settings_tab_info_about, division = true)
 )
 
@@ -212,9 +208,6 @@ private fun NavigationUI(
                 entry<NormalNavKey.Settings.Game> {
                     GameSettingsScreen(key, settingsScreenKey, mainScreenKey, eventViewModel)
                 }
-                entry<NormalNavKey.Settings.Control> {
-                    ControlSettingsScreen(key, settingsScreenKey, mainScreenKey, eventViewModel, submitError)
-                }
                 entry<NormalNavKey.Settings.Gamepad> {
                     GamepadSettingsScreen(key, settingsScreenKey, mainScreenKey, eventViewModel)
                 }
@@ -228,9 +221,6 @@ private fun NavigationUI(
                 }
                 entry<NormalNavKey.Settings.JavaManager> {
                     JavaManageScreen(key, settingsScreenKey, mainScreenKey, eventViewModel, submitError)
-                }
-                entry<NormalNavKey.Settings.ControlManager> {
-                    ControlManageScreen(key, settingsScreenKey, mainScreenKey, eventViewModel, submitError)
                 }
                 entry<NormalNavKey.Settings.AboutInfo> {
                     AboutInfoScreen(

@@ -69,8 +69,6 @@ import com.movtery.zalithlauncher.ui.screens.content.versions.ModifyVersionScree
 import com.movtery.zalithlauncher.ui.screens.content.versions.ModsManagerScreen
 import com.movtery.zalithlauncher.ui.screens.content.versions.ResourcePackManageScreen
 import com.movtery.zalithlauncher.ui.screens.content.versions.SavesManagerScreen
-import com.movtery.zalithlauncher.ui.screens.content.versions.ScreenshotsManagerScreen
-import com.movtery.zalithlauncher.ui.screens.content.versions.ServerListScreen
 import com.movtery.zalithlauncher.ui.screens.content.versions.ShadersManagerScreen
 import com.movtery.zalithlauncher.ui.screens.content.versions.VersionConfigScreen
 import com.movtery.zalithlauncher.ui.screens.content.versions.VersionOverViewScreen
@@ -92,7 +90,6 @@ fun VersionSettingsScreen(
     modifyViewModel: ModifyVersionViewModel,
     backScreenViewModel: ScreenBackStackViewModel,
     backToMainScreen: () -> Unit,
-    onExportModpack: () -> Unit,
     eventViewModel: EventViewModel,
     submitError: (ErrorViewModel.ThrowableMessage) -> Unit
 ) {
@@ -134,7 +131,6 @@ fun VersionSettingsScreen(
                         key.currentKey = newKey
                     },
                     backToMainScreen = backToMainScreen,
-                    onExport = onExportModpack,
                     version = key.version,
                     onModify = { payload ->
                         if (modifyViewModel.installOperation !is ModifyOperation.None) {
@@ -164,8 +160,6 @@ private val settingItems = listOf(
     CategoryItem(NormalNavKey.Versions.SavesManager, { CategoryIcon(R.drawable.ic_public, R.string.saves_manage) }, R.string.saves_manage),
     CategoryItem(NormalNavKey.Versions.ResourcePackManager, { CategoryIcon(R.drawable.ic_format_paint_outlined, R.string.resource_pack_manage) }, R.string.resource_pack_manage),
     CategoryItem(NormalNavKey.Versions.ShadersManager, { CategoryIcon(R.drawable.ic_lightbulb, R.string.shader_pack_manage) }, R.string.shader_pack_manage),
-    CategoryItem(NormalNavKey.Versions.ScreenshotsManager, { CategoryIcon(R.drawable.ic_photo_library_outlined, R.string.screenshots_manage) }, R.string.screenshots_manage),
-    CategoryItem(NormalNavKey.Versions.ServerList, { CategoryIcon(R.drawable.ic_dns_outlined, R.string.servers_list) }, R.string.servers_list, division = true),
 )
 
 @Composable
@@ -235,7 +229,6 @@ private fun NavigationUI(
     versionsScreenKey: TitledNavKey?,
     onCurrentKeyChange: (TitledNavKey?) -> Unit,
     backToMainScreen: () -> Unit,
-    onExport: () -> Unit,
     version: Version,
     onModify: (ModifyPayload) -> Unit,
     eventViewModel: EventViewModel,
@@ -264,7 +257,6 @@ private fun NavigationUI(
                         mainScreenKey = mainScreenKey,
                         versionsScreenKey = versionsScreenKey,
                         backToMainScreen = backToMainScreen,
-                        onExport = onExport,
                         version = version,
                         eventViewModel = eventViewModel,
                         submitError = submitError
@@ -366,32 +358,6 @@ private fun NavigationUI(
                             )
                         },
                         submitError = submitError
-                    )
-                }
-                entry<NormalNavKey.Versions.ScreenshotsManager> {
-                    ScreenshotsManagerScreen(
-                        mainScreenKey = mainScreenKey,
-                        versionsScreenKey = versionsScreenKey,
-                        version = version,
-                        backToMainScreen = backToMainScreen,
-                        eventViewModel = eventViewModel,
-                        submitError = submitError
-                    )
-                }
-                entry<NormalNavKey.Versions.ServerList> {
-                    ServerListScreen(
-                        mainScreenKey = mainScreenKey,
-                        versionsScreenKey = versionsScreenKey,
-                        version = version,
-                        onQuickPlay = { version, address ->
-                            eventViewModel.sendEvent(
-                                EventViewModel.Event.Launch.PlayServer(
-                                    version = version,
-                                    address = address
-                                )
-                            )
-                        },
-                        backToMainScreen = backToMainScreen,
                     )
                 }
             }

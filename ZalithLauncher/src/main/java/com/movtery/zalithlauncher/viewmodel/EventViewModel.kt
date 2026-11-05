@@ -90,7 +90,6 @@ class EventViewModel : ViewModel() {
         /** 让 MainActivity 防止熄屏 */
         data class KeepScreen(val on: Boolean) : Event
         /** 导入控制布局 */
-        data class ImportControls(val uris: List<Uri>) : Event
         /** 打开下载插件的链接窗口 */
         data class DownloadPlugins(val link: Links): Event {
             data class Links(
@@ -118,12 +117,6 @@ class EventViewModel : ViewModel() {
         data class ShowToast(
             val text: AndroidStringText,
             val duration: Int = Toast.LENGTH_SHORT
-        ) : Event
-
-        /** 打开文件管理器 */
-        data class OpenFileManager(
-            val rootPath: String,
-            val currentPath: String? = null,
         ) : Event
 
         sealed interface Guide : Event {

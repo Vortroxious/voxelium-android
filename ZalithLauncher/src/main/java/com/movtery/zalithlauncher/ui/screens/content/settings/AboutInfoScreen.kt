@@ -64,7 +64,7 @@ import com.movtery.zalithlauncher.library.LibraryInfo
 import com.movtery.zalithlauncher.library.libraryData
 import com.movtery.zalithlauncher.path.URL_COMMUNITY
 import com.movtery.zalithlauncher.path.URL_MCMOD
-import com.movtery.zalithlauncher.path.URL_PROJECT
+import com.movtery.zalithlauncher.ui.voxelium.settings.URL_VOXELIUM_ANDROID
 import com.movtery.zalithlauncher.path.URL_SUPPORT
 import com.movtery.zalithlauncher.path.URL_WEBLATE
 import com.movtery.zalithlauncher.ui.base.BaseScreen
@@ -113,7 +113,7 @@ fun AboutInfoScreen(
                                     Text(text = stringResource(R.string.upgrade_title))
                                 }
                                 Button(
-                                    onClick = { openLink(URL_PROJECT) }
+                                    onClick = { openLink(URL_VOXELIUM_ANDROID) }
                                 ) {
                                     Text(text = stringResource(R.string.about_launcher_project_link))
                                 }
@@ -123,7 +123,7 @@ fun AboutInfoScreen(
                         ButtonIconItem(
                             icon = painterResource(R.drawable.img_avatar_movtery),
                             title = stringResource(R.string.about_launcher_author_movtery_title),
-                            text = stringResource(R.string.about_launcher_author_movtery_text, BuildKeys.LAUNCHER_NAME),
+                            text = stringResource(R.string.about_launcher_author_movtery_text, "Zalith Launcher 2"),
                             button = {
                                 Button(
                                     onClick = { openLink(URL_SUPPORT) }

@@ -2,7 +2,7 @@
 
 The Android launcher's logic lives in the `:VoxeliumCore` module (`VoxeliumCore/src/main/kotlin/io/github/voxelium/core`), a Kotlin port of the iOS app's Swift `Sources/VoxeliumCore` (repository `Vortroxious/Voxelium-launcher`).
 
-ZalithLauncher2 code remains only as the engine: Java launch over JNI, renderers, LWJGL/SDL, and touch controls.
+ZalithLauncher2 code remains only as the engine: Java launch over JNI, renderers, LWJGL/SDL, Java runtimes, gamepad and gyroscope input. The touch controls are VoxeliumCore's `ControlLayout` with the iOS gestures (see the Controls row).
 
 **Rules:**
 - Kotlin files mirror the Swift file names. Each header names the Swift file and iOS commit it was ported from.

@@ -24,21 +24,16 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.ui.Modifier
 import com.jakewharton.processphoenix.ProcessPhoenix
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.context.COPY_LABEL_LINK
 import com.movtery.zalithlauncher.path.PathManager
 import com.movtery.zalithlauncher.ui.base.BaseAppCompatActivity
-import com.movtery.zalithlauncher.ui.screens.main.ErrorScreen
 import com.movtery.zalithlauncher.ui.screens.main.crashlogs.ShareLinkOperation
 import com.movtery.zalithlauncher.ui.theme.ZalithLauncherTheme
-import com.movtery.zalithlauncher.ui.theme.backgroundColor
-import com.movtery.zalithlauncher.ui.theme.onBackgroundColor
+import com.movtery.zalithlauncher.setting.enums.isLauncherInDarkTheme
+import com.movtery.zalithlauncher.ui.voxelium.crash.VoxeliumCrashScreen
+import com.movtery.zalithlauncher.ui.voxelium.theme.VoxeliumTheme
 import com.movtery.zalithlauncher.utils.copyText
 import com.movtery.zalithlauncher.utils.file.shareFile
 import com.movtery.zalithlauncher.utils.getParcelableSafely
@@ -98,7 +93,7 @@ class ErrorActivity : BaseAppCompatActivity() {
         val errorMessage = when (exitType) {
             EXIT_JVM -> {
                 val jvmCrash = extras.getParcelableSafely(BUNDLE_JVM_CRASH, JvmCrash::class.java) ?: return runFinish()
-                val messageResId = if (jvmCrash.isSignal) R.string.crash_singnal_message else R.string.crash_exit_message
+                val messageResId = if (jvmCrash.isSignal) R.string.voxelium_ui_crash_signal else R.string.voxelium_ui_crash_exit_code
                 val message = getString(messageResId, jvmCrash.code)
                 val messageBody = getString(R.string.crash_exit_note)
                 ErrorMessage(
@@ -113,7 +108,7 @@ class ErrorActivity : BaseAppCompatActivity() {
             }
             else -> {
                 val throwable = extras.getSerializableSafely(BUNDLE_THROWABLE, Throwable::class.java) ?: return runFinish()
-                val message = getString(R.string.crash_launcher_message)
+                val message = getString(R.string.voxelium_ui_crash_launcher_message)
                 val messageBody = throwableToString(throwable)
                 ErrorMessage(
                     message = message,
@@ -142,41 +137,20 @@ class ErrorActivity : BaseAppCompatActivity() {
                     }
                 )
 
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = backgroundColor(),
-                    contentColor = onBackgroundColor()
-                ) {
-                    ErrorScreen(
-                        crashType = errorMessage.crashType,
-                        shareLogs = logExists,
+                //Voxelium: its own crash page
+                VoxeliumTheme(dark = isLauncherInDarkTheme()) {
+                    VoxeliumCrashScreen(
+                        gameCrash = errorMessage.crashType == CrashType.GAME_CRASH,
+                        message = errorMessage.message,
+                        details = errorMessage.messageBody.takeIf { errorMessage.crashType == CrashType.LAUNCHER_CRASH },
+                        logFile = logFile.takeIf { logExists },
                         canUpload = viewModel.canUpload,
                         canRestart = canRestart,
-                        onShareLogsClick = {
-                            if (logExists) {
-                                shareFile(this@ErrorActivity, logFile)
-                            }
-                        },
-                        onUploadClick = {
-                            viewModel.operation = ShareLinkOperation.Tip
-                        },
-                        onRestartClick = {
-                            ProcessPhoenix.triggerRebirth(this@ErrorActivity)
-                        },
-                        onExitClick = { finish() },
-                        onOrientationChanged = {
-                            this@ErrorActivity.requestedOrientation = it
-                        },
-                    ) {
-                        Text(
-                            text = errorMessage.message,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Text(
-                            text = errorMessage.messageBody,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
+                        onShareLog = { if (logExists) shareFile(this@ErrorActivity, logFile) },
+                        onUpload = { viewModel.operation = ShareLinkOperation.Tip },
+                        onRestart = { ProcessPhoenix.triggerRebirth(this@ErrorActivity) },
+                        onClose = { finish() }
+                    )
                 }
             }
         }

@@ -63,11 +63,8 @@ enum class VoxeliumPlace(@DrawableRes val icon: Int, val label: Int) {
 
 /** Screens from Zalith Launcher 2 that stay reachable until Voxelium replaces or drops them. */
 enum class MoreItem(val label: Int) {
-    DOWNLOAD(R.string.voxelium_ui_more_download),
-    MULTIPLAYER(R.string.voxelium_ui_more_multiplayer),
-    FILES(R.string.voxelium_ui_more_files),
-    CLASSIC_SETTINGS(R.string.voxelium_ui_more_classic_settings),
-    CLASSIC_HOME(R.string.voxelium_ui_more_classic_home)
+    CLASSIC_SETTINGS(R.string.voxelium_ui_more_classic_settings)
+
 }
 
 /**

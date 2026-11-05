@@ -73,7 +73,6 @@ import com.movtery.zalithlauncher.ui.components.rememberDialogMaxHeight
 import com.movtery.zalithlauncher.ui.components.verticalScrollWithBar
 import com.movtery.zalithlauncher.ui.screens.content.elements.TitleTaskFlowDialog
 import com.movtery.zalithlauncher.ui.screens.content.elements.isFilenameInvalid
-import com.movtery.zalithlauncher.ui.screens.content.home.version.VersionCardManager
 import com.movtery.zalithlauncher.ui.theme.cardColor
 import com.movtery.zalithlauncher.ui.theme.onCardColor
 import com.movtery.zalithlauncher.utils.logging.Logger
@@ -185,19 +184,6 @@ class ModifyVersionViewModel : ViewModel() {
                             VersionsManager.renameVersion(version, payload.newVersionName, false)
                         }
 
-                        if (isNameChanged) {
-                            lateinit var refreshListener: suspend () -> Unit
-                            refreshListener = {
-                                // 同步主界面版本卡片的记录，避免卡片因改名失效
-                                VersionCardManager.onVersionRenamed(
-                                    gameHome = gameHome,
-                                    oldName = payload.currentVersionName,
-                                    newName = payload.newVersionName
-                                )
-                                VersionsManager.unregisterListener(refreshListener)
-                            }
-                            VersionsManager.registerListener(refreshListener)
-                        }
 
                         VersionsManager.refresh("[ModifyVersion] GameInstaller.onModified")
 
