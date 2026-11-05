@@ -22,7 +22,7 @@ import com.movtery.zalithlauncher.game.download.assets.platform.mirroredModrinth
 import com.movtery.zalithlauncher.game.download.assets.platform.mirroredPlatformSearcher
 import com.movtery.zalithlauncher.game.download.assets.platform.modrinth.models.ModrinthVersion
 import com.movtery.zalithlauncher.game.download.assets.platform.modrinth.models.getPrimary
-import com.movtery.zalithlauncher.ui.screens.content.download.assets.elements.initAllGeneric
+import com.movtery.zalithlauncher.game.download.assets.platform.initAllGeneric
 import com.movtery.zalithlauncher.utils.logging.Logger
 import kotlinx.coroutines.CancellationException
 

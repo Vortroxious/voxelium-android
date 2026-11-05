@@ -25,7 +25,7 @@ import com.movtery.zalithlauncher.game.download.assets.platform.curseforge.model
 import com.movtery.zalithlauncher.game.download.assets.platform.curseforge.models.isApproved
 import com.movtery.zalithlauncher.game.download.assets.platform.searchRankWithChineseBias
 import com.movtery.zalithlauncher.game.download.assets.utils.getTranslations
-import com.movtery.zalithlauncher.ui.screens.content.download.assets.elements.AssetsPage
+import com.movtery.zalithlauncher.game.download.assets.platform.AssetsPage
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

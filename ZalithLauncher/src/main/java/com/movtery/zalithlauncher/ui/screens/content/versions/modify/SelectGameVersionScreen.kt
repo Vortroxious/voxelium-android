@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
  */
 
-package com.movtery.zalithlauncher.ui.screens.content.download.game
+package com.movtery.zalithlauncher.ui.screens.content.versions.modify
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Image
@@ -190,13 +190,6 @@ private class VersionsViewModel: ViewModel() {
  * 选择 Minecraft 版本屏幕的宿主信息，提供可见性判定所需的导航层级
  */
 sealed interface SelectGameVersionHost {
-    /** 下载游戏流程 */
-    data class Download(
-        val mainScreenKey: TitledNavKey?,
-        val downloadScreenKey: TitledNavKey?,
-        val downloadGameScreenKey: TitledNavKey?
-    ) : SelectGameVersionHost
-
     /** 版本设置流程（修改版本） */
     data class VersionSettings(
         val mainScreenKey: TitledNavKey?,
@@ -211,27 +204,12 @@ fun SelectGameVersionScreen(
     onVersionSelect: (String) -> Unit = {}
 ) {
     val viewModel = viewModel(
-        key = NormalNavKey.DownloadGame.SelectGameVersion.toString()
+        key = NormalNavKey.Versions.SelectGameVersion.toString()
     ) {
         VersionsViewModel()
     }
 
     when (host) {
-        is SelectGameVersionHost.Download -> BaseScreen(
-            levels1 = listOf(
-                Pair(NestedNavKey.Download::class.java, host.mainScreenKey),
-                Pair(NestedNavKey.DownloadGame::class.java, host.downloadScreenKey)
-            ),
-            Triple(NormalNavKey.DownloadGame.SelectGameVersion, host.downloadGameScreenKey, false)
-        ) { isVisible ->
-            SelectGameVersionContent(
-                isVisible = isVisible,
-                viewModel = viewModel,
-                eventViewModel = eventViewModel,
-                onVersionSelect = onVersionSelect
-            )
-        }
-
         is SelectGameVersionHost.VersionSettings -> BaseScreen(
             levels1 = listOf(
                 Pair(NestedNavKey.VersionSettings::class.java, host.mainScreenKey)

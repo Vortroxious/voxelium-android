@@ -27,23 +27,6 @@ class ScreenBackStackViewModel : ViewModel() {
     val mainScreen = NestedNavKey.Main()
     /** 设置屏幕 */
     val settingsScreen = NestedNavKey.Settings()
-    /** 下载屏幕 */
-    val downloadScreen = NestedNavKey.Download()
-
-    /** 下载游戏屏幕 */
-    val downloadGameScreen = NestedNavKey.DownloadGame()
-    /** 下载整合包屏幕 */
-    val downloadModPackScreen = NestedNavKey.DownloadModPack()
-    /** 下载模组屏幕 */
-    val downloadModScreen = NestedNavKey.DownloadMod()
-    /** 下载资源包屏幕 */
-    val downloadResourcePackScreen = NestedNavKey.DownloadResourcePack()
-    /** 下载存档屏幕 */
-    val downloadSavesScreen = NestedNavKey.DownloadSaves()
-    /** 下载光影包屏幕 */
-    val downloadShadersScreen = NestedNavKey.DownloadShaders()
-    /** 下载收藏屏幕 */
-    val downloadFavoritesScreen = NestedNavKey.DownloadFavorites()
 
     /**
      * 在跳转前，先将导航栈中所有属于 [clearBeforeNavKeys] 的页面全部移除
@@ -51,7 +34,6 @@ class ScreenBackStackViewModel : ViewModel() {
      */
     val clearBeforeNavKeys = listOf(
         settingsScreen::class,
-        downloadScreen::class,
         NormalNavKey.VoxeliumInstall::class,
         NormalNavKey.VoxeliumControls::class,
         NormalNavKey.VoxeliumSettings::class,

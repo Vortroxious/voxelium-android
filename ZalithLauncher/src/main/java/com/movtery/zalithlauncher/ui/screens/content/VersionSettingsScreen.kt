@@ -53,6 +53,7 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.movtery.zalithlauncher.R
+import com.movtery.zalithlauncher.game.download.assets.platform.Platform
 import com.movtery.zalithlauncher.game.download.assets.platform.PlatformClasses
 import com.movtery.zalithlauncher.game.version.installed.Version
 import com.movtery.zalithlauncher.game.version.installed.VersionsManager
@@ -235,6 +236,13 @@ private fun NavigationUI(
     submitError: (ErrorViewModel.ThrowableMessage) -> Unit
 ) {
     val mainScreenKey = backScreenViewModel.mainScreen.currentKey
+    //Voxelium: "download more" opens this version's Voxelium page, which has Browse
+    val openVoxeliumVersion = {
+        backScreenViewModel.mainScreen.removeAndNavigateTo(
+            removes = backScreenViewModel.clearBeforeNavKeys + NestedNavKey.VersionSettings::class,
+            screenKey = NormalNavKey.VoxeliumVersion(version.getVersionName())
+        )
+    }
 
     val backStack = key.backStack
     val stackTopKey = backStack.lastOrNull()
@@ -295,16 +303,9 @@ private fun NavigationUI(
                         versionsScreenKey = versionsScreenKey,
                         version = version,
                         backToMainScreen = backToMainScreen,
-                        swapToDownload = {
-                            backScreenViewModel.navigateToDownload(
-                                targetScreen = backScreenViewModel.downloadModScreen
-                            )
-                        },
+                        swapToDownload = { openVoxeliumVersion() },
                         onSwapMoreInfo = { projectId, platform ->
-                            backScreenViewModel.mainScreen.removeAndNavigateTo(
-                                NestedNavKey.AssetInfo::class,
-                                NestedNavKey.AssetInfo(platform, projectId, PlatformClasses.MOD)
-                            )
+                            eventViewModel.sendEvent(EventViewModel.Event.OpenLink(projectPage(platform, projectId)))
                         },
                         eventViewModel = eventViewModel,
                         submitError = submitError
@@ -316,11 +317,7 @@ private fun NavigationUI(
                         versionsScreenKey = versionsScreenKey,
                         version = version,
                         backToMainScreen = backToMainScreen,
-                        swapToDownload = {
-                            backScreenViewModel.navigateToDownload(
-                                targetScreen = backScreenViewModel.downloadSavesScreen
-                            )
-                        },
+                        swapToDownload = { openVoxeliumVersion() },
                         onQuickPlay = { version, saveName ->
                             eventViewModel.sendEvent(
                                 EventViewModel.Event.Launch.PlaySave(
@@ -338,11 +335,7 @@ private fun NavigationUI(
                         versionsScreenKey = versionsScreenKey,
                         version = version,
                         backToMainScreen = backToMainScreen,
-                        swapToDownload =  {
-                            backScreenViewModel.navigateToDownload(
-                                targetScreen = backScreenViewModel.downloadResourcePackScreen
-                            )
-                        },
+                        swapToDownload = { openVoxeliumVersion() },
                         submitError = submitError
                     )
                 }
@@ -352,11 +345,7 @@ private fun NavigationUI(
                         versionsScreenKey = versionsScreenKey,
                         version = version,
                         backToMainScreen = backToMainScreen,
-                        swapToDownload = {
-                            backScreenViewModel.navigateToDownload(
-                                targetScreen = backScreenViewModel.downloadShadersScreen
-                            )
-                        },
+                        swapToDownload = { openVoxeliumVersion() },
                         submitError = submitError
                     )
                 }
@@ -365,4 +354,10 @@ private fun NavigationUI(
     } else {
         Box(modifier)
     }
+}
+
+/** Voxelium: a project's page on its site (ZalithLauncher2's in-app details page was removed). */
+private fun projectPage(platform: Platform, projectId: String): String = when (platform) {
+    Platform.MODRINTH -> "https://modrinth.com/project/$projectId"
+    Platform.CURSEFORGE -> "https://www.curseforge.com/projects/$projectId"
 }

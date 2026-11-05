@@ -3,7 +3,6 @@
     <string name="generic_cancel">قايىتىش</string>
     <string name="generic_confirm">جەزىملەشتۈرۈش</string>
     <string name="generic_error">خاتا</string>
-    <string name="generic_tip">ئەسكەرتىش</string>
     <string name="generic_warning">ئاگاھلاندۇرۇش</string>
     <string name="generic_back">قايتىش</string>
     <string name="generic_refresh">يىڭىلاش</string>
@@ -37,7 +36,6 @@
     <string name="generic_loading">كىرگۈزىۋاتىدۇ</string>
     <string name="generic_in_progress">ئىجارە قىلىنىۋاتىدۇ</string>
     <string name="generic_anyway">چۇقۇم ئىشلىتىش</string>
-    <string name="generic_got_it">مەن چۈشەندىم</string>
     <string name="generic_ignore">سەل قاراش</string>
     <string name="generic_authorization">ھوقۇق بېرىش</string>
     <string name="generic_file_name">ھۆججەت نامى: %s</string>

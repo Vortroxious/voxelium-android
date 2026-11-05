@@ -31,7 +31,6 @@
     <string name="crash_share_logs">ログを共有</string>
     <string name="main_launch_game">起動</string>
     <string name="main_task_menu">タスクメニュー</string>
-    <string name="download_category_game">ゲーム</string>
     <string name="download_category_modpack">モッドパック</string>
     <string name="download_category_mod">モッド</string>
     <string name="download_category_resource_pack">リソースパック</string>
@@ -46,9 +45,7 @@
     <string name="download_game_addon_release">リリース</string>
     <string name="download_game_addon_preview">プレビュー</string>
     <string name="download_game_addon_debug">デバッグ</string>
-    <string name="download_install">インストール</string>
     <string name="download_install_error_title">インストールに失敗しました</string>
-    <string name="download_install_error_message">ゲームのインストール中に例外が発生しました:</string>
     <string name="download_install_error_jvm_crash">インストール中に例外が発生しました、終了コード: %s</string>
     <string name="download_install_error_download_failed">一部のファイルのダウンロードに失敗しました、ネットワークの問題が原因の可能性があります。</string>
     <string name="download_install_clear_temp">キャッシュファイルをクリア</string>
@@ -58,9 +55,6 @@
     <string name="download_assets_filter_sort_by_popularity">人気度</string>
     <string name="download_assets_filter_sort_by_recently_created">最近作成</string>
     <string name="download_assets_filter_sort_by_recently_updated">最近更新</string>
-    <string name="download_assets_result_previous_page">前のページ</string>
-    <string name="download_assets_result_next_page">次のページ</string>
-    <string name="download_assets_no_installed_versions">利用可能なゲームバージョンが現在インストールされていないため、アセットのダウンロード先を特定できません。まずゲームバージョンをインストールしてください！</string>
     <string name="generic_done">完了</string>
     <string name="generic_clear">クリア</string>
     <string name="error_network_unreachable">ネットワークが利用できません</string>
@@ -77,7 +71,6 @@
     <string name="download_game_type_release">リリース</string>
     <string name="download_game_addon_available">利用可能</string>
     <string name="download_game_addon_unavailable">利用不能</string>
-    <string name="download_game_install_title">ゲームをインストール</string>
     <string name="download_game_version_name">バージョン名</string>
     <string name="download_game_addon_list_load_error">リストの読み込みに失敗: %s</string>
     <string name="unpack_screen_lwjgl">軽量Javaゲームライブラリ (Minecraftに必要)</string>
@@ -86,12 +79,8 @@
     <string name="generic_input_failed_to_number">入力を数値として解析できません</string>
     <string name="generic_confirm">確認</string>
     <string name="generic_rename">名前を変更</string>
-    <string name="download_assets_wiki_link">Wikiを見る</string>
     <string name="download_assets_release_type_beta">ベータ</string>
     <string name="download_assets_release_type_alpha">アルファ</string>
-    <string name="download_assets_search_mc_versions">MCバージョンを検索</string>
-    <string name="download_assets_dependency_projects">依存関係</string>
-    <string name="download_modpack_install_title">モッドパックをインストール</string>
     <string name="download_modpack_install_parse">モッドパックを解析</string>
     <string name="download_assets_category_worldgen">ワールド生成</string>
     <string name="download_assets_category_biomes">バイオーム</string>
@@ -145,7 +134,6 @@
     <string name="game_button_log_output">ログを出力</string>
     <string name="game_button_mouse_left">左クリック</string>
     <string name="game_button_mouse_right">右クリック</string>
-    <string name="download_install_success_message">ゲームが正常にインストールされました！</string>
     <string name="download_game_install_base_install">%s をインストール</string>
     <string name="download_game_install_base_installing">フォアグラウンドで%sをインストールしています</string>
     <string name="unpack_screen_cacio">OpenJDK用のポータブルGUIバックエンド</string>
@@ -154,26 +142,12 @@
     <string name="download_game_install_base_download_file">%1$s %2$s のメインファイルをダウンロード</string>
     <string name="download_game_install_base_download_file2">%s のメインファイルをダウンロード</string>
     <string name="download_game_install_game_files_progress">ゲームファイルをインストール</string>
-    <string name="download_assets_filter_category">カテゴリ</string>
-    <string name="download_assets_filter_modloader">モッドローダー</string>
-    <string name="download_assets_filter_none">未選択</string>
-    <string name="download_assets_filter_search_platform">対象プラットフォーム</string>
-    <string name="download_assets_filter_game_version">ゲームバージョン</string>
     <string name="sort_by">並び替え</string>
-    <string name="download_assets_optional_projects">任意プロジェクト</string>
-    <string name="download_assets_links">関連リンク</string>
-    <string name="download_assets_project_link">プロジェクトページ</string>
-    <string name="download_assets_source_link">ソースコードを表示</string>
-    <string name="download_assets_issues_link">問題を報告する</string>
     <string name="download_assets_release_type_release">安定版</string>
-    <string name="download_assets_show_only_mc_release">MC正式リリースのみ表示</string>
-    <string name="download_assets_install_assets_for_versions">どのゲームバージョンにインストールしますか？</string>
     <string name="download_assets_install_progress_downloading">アセットのダウンロードとインストール\n%1$s\n (%2$s / %3$s)</string>
     <string name="download_assets_install_progress_installing">アセットをインストール\n%s</string>
     <string name="download_assets_install_failed">アセットのインストールに失敗しました！</string>
     <string name="download_assets_dependency_no_compatible_version">依存関係 %s に互換性のあるバージョンが見つかりません</string>
-    <string name="download_assets_dependency_project_unavailable">プロジェクト情報を取得できません</string>
-    <string name="download_modpack_warning1">インストール前に理解してください、ほとんどのモッドパックはPC向けに作られているため、起動時にクラッシュやその他の問題が発生する可能性が高いです。これらの問題は、ランチャーでは解決できない場合が多いです。</string>
     <string name="download_modpack_install_overrides">モッドパックファイルを抽出</string>
     <string name="download_modpack_download">モッドパックに必要なコンテンツをダウンロード</string>
     <string name="download_modpack_download_mods">全てのモッドをダウンロード (%1$d/%2$d, %3$s)</string>
@@ -283,7 +257,6 @@
     <string name="generic_unknown">不明</string>
     <string name="generic_in_progress">進行中</string>
     <string name="generic_anyway">常に使用</string>
-    <string name="generic_got_it">了解</string>
     <string name="generic_ignore">無視</string>
     <string name="generic_authorization">認証</string>
     <string name="unit_day">日</string>
@@ -300,7 +273,6 @@
     <string name="crash_launch_crash_message">ランチャーに深刻な問題が発生しクラッシュしました</string>
     <string name="error_parse_failed">データの解析に失敗しました</string>
     <string name="download_category_saves">セーブ</string>
-    <string name="download_assets_result_authors">%s 作</string>
     <string name="account_logging_in_saving">スキンを取得しアカウント情報を保存</string>
     <string name="account_logging_time_out">ネットワークがタイムアウト。接続を確認してください。</string>
     <string name="account_logging_xbox_banned">あなたのアカウントはXboxコミュニティ規範に違反したため利用できなくなりました！</string>
@@ -354,8 +326,6 @@
     <string name="account_logging_xbox_not_accepted_service">あなたのアカウントはXboxの利用規約に同意していません。</string>
     <string name="download_assets_features_environment">環境</string>
     <string name="download_modpack_get_loaders">ローダー情報を取得</string>
-    <string name="download_modpack_warning2">問題を自分で解決するには関連する知識を学ぶか、他の人に助けてもらう必要があります。</string>
-    <string name="download_modpack_warning3">注意: ランチャー開発者は通常モッドパックによって引き起こされる問題を処理しません。</string>
     <string name="about_acknowledgements_fcl_text">%s はFCLのコードを組み込みその実装の一部を参照しています</string>
     <string name="about_acknowledgements_hmcl_text">%s はHMCLのコードを組み込みその実装の一部を参照しています</string>
     <string name="settings_launcher_log_share_title">ランチャーログを共有</string>
@@ -412,10 +382,6 @@
     <string name="versions_manage_game_path_delete_message">このフォルダを削除しますか？ファイルは残りますが、ランチャーからはリンクが解除されます。</string>
     <string name="download_install_input_version_name">ユーザーがバージョン名を入力するのを待機中</string>
     <string name="download_install_input_version_name_title">プリインストールバージョン名を入力してください</string>
-    <string name="download_assets_filter_search_name">検索名</string>
-    <string name="download_assets_failed_to_get_result">検索結果を取得できませんでした: %s。タップして再試行。</string>
-    <string name="download_assets_failed_to_get_project">プロジェクト情報の取得に失敗しました: %s。タップして再試行。</string>
-    <string name="download_assets_failed_to_get_versions">バージョンリストの取得に失敗しました: %s。タップして再試行。</string>
     <string name="game_auto_pick_runtime_failed">互換性のあるランタイムが見つかりません。選択しているバージョンのランタイムを使用します。</string>
     <string name="game_dialog_force_close_message">強制終了してメイン画面に戻りますか？</string>
     <string name="game_loading">ゲームは実行中で、ゲーム画面が表示されるのを待っています</string>
@@ -675,8 +641,6 @@
     <string name="version_summary_fools_creaft_mine">今ならなんでも作ることができます、世界全体までも！</string>
     <string name="account_microsoft_exit_by_user">ウェブページを閉じたため、Microsoftのログインプロセスはキャンセルされました。</string>
     <string name="cape_name_copper">Copperマント</string>
-    <string name="download_assets_loading_page_data">ページデータの読み込みを開始</string>
-    <string name="download_assets_loaded_chunk_page">ページデータが読み込まれました、チャンク %1$d 、ページ %2$d</string>
     <string name="mods_manage_no_loader">現在のバージョンにはモッドローダーが無いため、モッドは使用できません</string>
     <string name="settings_tab_gamepad">コントローラー設定</string>
     <string name="settings_gamepad_deadzone_title">コントローラーのデッドゾーンスケーリング</string>
@@ -721,9 +685,7 @@
     <string name="settings_launcher_background_reset_message">ランチャーの背景をリセットしてもよろしいですか？</string>
     <string name="settings_gamepad_title">コントローラーでの操作</string>
     <string name="settings_gamepad_summary">コントローラーでの操作を有効または無効にします。他のデバイスが誤ってコントローラーとして認識される場合は、このオプションを無効にしてください。</string>
-    <string name="generic_tip">ヒント</string>
     <string name="import_modpack">モッドパックをインポート</string>
-    <string name="import_modpack_tip">ローカルのモッドパックファイルをインポートできます。ランチャーは現在、以下の形式をサポートしています:</string>
     <string name="import_modpack_task_unpack">ファイルのインポートと解凍</string>
     <string name="import_modpack_task_parse">モッドパックを解析</string>
     <string name="import_modpack_task_extract_files">モッドパックファイルを抽出</string>
@@ -771,7 +733,6 @@
     <string name="crash_link_share_uploading">ログを %s にアップロードしています</string>
     <string name="crash_link_share_failed">アップロード失敗</string>
     <string name="crash_link_share_failed_link_not_found">利用可能なリンクが見つかりません。後でもう一度お試しください。</string>
-    <string name="download_game_addon_warning_api">%s が選択されていません。インストールしないと、ほとんどのモッドは動作しません！</string>
     <string name="account_advanced">詳細設定</string>
     <string name="account_local_uuid_tip_1">UUIDはマインクラフトプレイヤーの一意の識別子です。</string>
     <string name="account_local_uuid_tip_2">ランチャーによって生成されるUUIDが異なる場合があります。</string>

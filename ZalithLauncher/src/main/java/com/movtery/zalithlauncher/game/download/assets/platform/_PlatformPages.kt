@@ -18,7 +18,6 @@
 
 package com.movtery.zalithlauncher.game.download.assets.platform
 
-import com.movtery.zalithlauncher.ui.screens.content.download.assets.elements.AssetsPage
 
 fun previousPage(
     pageNumber: Int,

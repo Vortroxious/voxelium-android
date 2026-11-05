@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
  */
 
-package com.movtery.zalithlauncher.ui.screens.content.download.assets.elements
+package com.movtery.zalithlauncher.ui.screens.content.elements
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

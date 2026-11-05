@@ -135,41 +135,6 @@ sealed interface NormalNavKey : TitledNavKey {
     }
 
 
-    /** 下载游戏嵌套子屏幕 */
-    sealed interface DownloadGame : NormalNavKey {
-        /** 选择游戏版本屏幕 */
-        @Serializable data object SelectGameVersion : Versions
-        /** 选择附加内容屏幕 */
-        @Serializable data class Addons(val gameVersion: String) : Versions
-    }
-
-    /** 搜索整合包屏幕 */
-    @Serializable data object SearchModPack : NormalNavKey
-    /** 搜索模组屏幕 */
-    @Serializable data object SearchMod : NormalNavKey
-    /** 搜索资源包屏幕 */
-    @Serializable data object SearchResourcePack : NormalNavKey
-    /** 搜索存档屏幕 */
-    @Serializable data object SearchSaves : NormalNavKey
-    /** 搜索光影包屏幕 */
-    @Serializable data object SearchShaders : NormalNavKey
-    /** 搜索ID屏幕 */
-    @Serializable data object SearchId : NormalNavKey {
-        @Contextual override val title: AndroidStringText = androidText(R.string.download_category_by_id)
-    }
-    /** 收藏屏幕 */
-    @Serializable data object Favorites : NormalNavKey {
-        @Contextual override val title: AndroidStringText = androidText(R.string.download_category_favorites)
-    }
-
-    /** 下载资源屏幕 */
-    @Serializable data class DownloadAssets(
-        val platform: Platform,
-        val projectId: String,
-        val classes: PlatformClasses,
-        val iconUrl: String? = null
-    ) : NormalNavKey
-
     /** 协议展示屏幕 */
     @Serializable data class License(
         val raw: Int

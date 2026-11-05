@@ -30,8 +30,6 @@ import com.movtery.zalithlauncher.game.download.assets.platform.modrinth.Modrint
 import com.movtery.zalithlauncher.game.download.assets.platform.modrinth.models.ModrinthVersion
 import com.movtery.zalithlauncher.game.download.assets.utils.localizedModSearchKeywords
 import com.movtery.zalithlauncher.setting.AllSettings
-import com.movtery.zalithlauncher.ui.screens.content.download.assets.elements.DownloadAssetsState
-import com.movtery.zalithlauncher.ui.screens.content.download.assets.elements.SearchAssetsState
 import com.movtery.zalithlauncher.utils.isChinaMainland
 import com.movtery.zalithlauncher.utils.logging.Logger
 import com.movtery.zalithlauncher.utils.network.isInterruptedIOException

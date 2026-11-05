@@ -52,8 +52,8 @@ import com.movtery.zalithlauncher.ui.components.MarqueeText
 import com.movtery.zalithlauncher.ui.components.SimpleAlertDialog
 import com.movtery.zalithlauncher.ui.components.fadeEdge
 import com.movtery.zalithlauncher.ui.components.verticalScrollWithBar
-import com.movtery.zalithlauncher.ui.screens.content.download.ModpackVersionNameDialog
-import com.movtery.zalithlauncher.ui.screens.content.download.assets.elements.PackIdentifier
+import com.movtery.zalithlauncher.ui.screens.content.elements.ModpackVersionNameDialog
+import com.movtery.zalithlauncher.ui.screens.content.elements.PackIdentifier
 import com.movtery.zalithlauncher.ui.screens.content.elements.TitleTaskFlowDialog
 import com.movtery.zalithlauncher.utils.logging.Logger
 import io.ktor.client.plugins.HttpRequestTimeoutException

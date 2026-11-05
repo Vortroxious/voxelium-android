@@ -94,7 +94,6 @@ import com.movtery.zalithlauncher.ui.screens.NestedNavKey
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.TitledNavKey
 import com.movtery.zalithlauncher.ui.screens.content.AccountManageScreen
-import com.movtery.zalithlauncher.ui.screens.content.DownloadScreen
 import com.movtery.zalithlauncher.ui.screens.content.LicenseScreen
 import com.movtery.zalithlauncher.ui.voxelium.logs.VoxeliumLogScreen
 import com.movtery.zalithlauncher.ui.screens.content.FirstLoginMenu
@@ -107,8 +106,6 @@ import com.movtery.zalithlauncher.ui.voxelium.version.VoxeliumVersionScreen
 import com.movtery.zalithlauncher.ui.screens.content.SettingsScreen
 import com.movtery.zalithlauncher.ui.screens.content.VersionSettingsScreen
 import com.movtery.zalithlauncher.ui.screens.content.WebViewScreen
-import com.movtery.zalithlauncher.ui.screens.content.assetinfo.AssetInfoScreen
-import com.movtery.zalithlauncher.ui.screens.content.navigateToDownload
 import com.movtery.zalithlauncher.ui.screens.navigateTo
 import com.movtery.zalithlauncher.ui.screens.onBack
 import com.movtery.zalithlauncher.ui.screens.rememberTransitionSpec
@@ -322,24 +319,6 @@ private fun NavigationUI(
                         backToMainScreen = toMainScreen,
                         eventViewModel = eventViewModel,
                         submitError = submitError
-                    )
-                }
-                entry<NestedNavKey.Download> { key ->
-                    DownloadScreen(
-                        key = key,
-                        backScreenViewModel = screenBackStackModel,
-                        eventViewModel = eventViewModel,
-                        modpackImportViewModel = modpackImportViewModel,
-                        submitError = submitError
-                    )
-                }
-                entry<NestedNavKey.AssetInfo> { key ->
-                    AssetInfoScreen(
-                        key = key,
-                        mainScreenKey = screenBackStackModel.mainScreen.currentKey,
-                        assetInfoScreenKey = key.currentKey,
-                        eventViewModel = eventViewModel,
-                        submitError = submitError,
                     )
                 }
                 entry<NormalNavKey.Voxelium> {

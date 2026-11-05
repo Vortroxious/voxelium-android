@@ -38,7 +38,7 @@ import com.movtery.zalithlauncher.game.version.installed.VersionFolders
 import com.movtery.zalithlauncher.game.version.mod.matchInstalledMods
 import com.movtery.zalithlauncher.game.version.mod.scanModFingerprints
 import com.movtery.zalithlauncher.ui.androidText
-import com.movtery.zalithlauncher.ui.screens.content.download.assets.elements.initAll
+import com.movtery.zalithlauncher.game.download.assets.platform.initAll
 import com.movtery.zalithlauncher.utils.logging.Logger
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
 import kotlinx.coroutines.CancellationException

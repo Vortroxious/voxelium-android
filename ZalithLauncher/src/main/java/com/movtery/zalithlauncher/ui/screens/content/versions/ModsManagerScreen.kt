@@ -129,7 +129,7 @@ import com.movtery.zalithlauncher.ui.components.fadeEdge
 import com.movtery.zalithlauncher.ui.screens.NestedNavKey
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.TitledNavKey
-import com.movtery.zalithlauncher.ui.screens.content.download.assets.elements.AssetsIcon
+import com.movtery.zalithlauncher.ui.screens.content.elements.AssetsIcon
 import com.movtery.zalithlauncher.ui.screens.content.elements.ImportMultipleFileButton
 import com.movtery.zalithlauncher.ui.screens.content.elements.ModLoaderIcon
 import com.movtery.zalithlauncher.ui.screens.content.elements.SortByDropdownMenu

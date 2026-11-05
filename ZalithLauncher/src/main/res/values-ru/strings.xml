@@ -36,7 +36,6 @@
     <string name="generic_loading">Загрузка</string>
     <string name="generic_in_progress">В процессе</string>
     <string name="generic_anyway">Использовать в любом случае</string>
-    <string name="generic_got_it">Понял</string>
     <string name="generic_file_name">Имя файла: %s</string>
     <string name="generic_file_size">Размер файла: %s</string>
     <!-- Launcher Version -->
@@ -83,7 +82,6 @@
     <string name="main_launch_game">Запустить</string>
     <string name="main_task_menu">Меню задач</string>
     <!-- Download -->
-    <string name="download_category_game">Версии</string>
     <string name="download_category_modpack">Сборки</string>
     <string name="download_category_mod">Моды</string>
     <string name="download_category_resource_pack">Ресурс-паки</string>
@@ -107,7 +105,6 @@
     <string name="download_game_addon_debug">Отладочная</string>
     <string name="download_game_addon_recommended">Рекомендуется %s</string>
     <string name="download_game_addon_not_installable">Не устанавливается автоматически</string>
-    <string name="download_game_install_title">Установка игры</string>
     <string name="download_game_install_vanilla">Загрузка ваниллы %s</string>
     <string name="download_game_install_base_download_file">Загрузка основного файла %1$s %2$s</string>
     <string name="download_game_install_base_install">Установка %s</string>
@@ -116,14 +113,11 @@
     <string name="download_game_install_forgelike_analyse">Анализ библиотек для %s</string>
     <string name="download_game_install_forgelike_preparing_mapping_file">Подготовка файла отображения %s</string>
     <string name="download_game_install_game_files_progress">Установка игровых файлов</string>
-    <string name="download_install">Установить</string>
     <string name="download_install_error_title">Ошибка установки</string>
-    <string name="download_install_error_message">Произошла ошибка во время установки игры:</string>
     <string name="download_install_error_cant_fetch_optifine_download_url">Не удалось получить ссылку для загрузки основного файла OptiFine</string>
     <string name="download_install_error_jvm_crash">Произошла ошибка во время установки, код выхода: %s</string>
     <string name="download_install_error_download_failed">Не удалось скачать некоторые файлы, возможно, из-за проблем с сетью.</string>
     <string name="download_install_success_title">Установка успешна</string>
-    <string name="download_install_success_message">Ваша игра успешно установлена!</string>
     <!-- Game Launch -->
     <string name="game_launch_no_version">Не выбрана версия игры!</string>
     <string name="game_launch_no_account">Не выполнен вход в аккаунт!</string>
@@ -387,38 +381,18 @@
     <string name="years_ago">%d Лет назад</string>
     <string name="crash_share_logs">Поделиться логом</string>
     <string name="sort_by">Сортировать по</string>
-    <string name="download_assets_filter_category">Категория</string>
-    <string name="download_assets_filter_modloader">Мод-лоудер</string>
-    <string name="download_assets_filter_none">Ничего не выбрано</string>
     <string name="download_assets_filter_sort_by_relevant">Релевантность</string>
     <string name="download_assets_filter_sort_by_total_downloads">Всего загрузок</string>
     <string name="download_assets_filter_sort_by_popularity">Популярность</string>
     <string name="download_assets_filter_sort_by_recently_created">Недавно создано</string>
     <string name="download_assets_filter_sort_by_recently_updated">Недавно обновлено</string>
-    <string name="download_assets_result_previous_page">Предыдущая страница</string>
-    <string name="download_assets_result_next_page">Следующая страница</string>
-    <string name="download_assets_failed_to_get_result">Не удалось получить результаты поиска: %s. Нажмите, чтобы повторить попытку.</string>
-    <string name="download_assets_failed_to_get_project">Не удалось получить информацию о проекте: %s. Нажмите, чтобы повторить попытку.</string>
-    <string name="download_assets_failed_to_get_versions">Не удалось получить список версий: %s. Нажмите, чтобы повторить попытку.</string>
-    <string name="download_assets_show_only_mc_release">Показывать только релизы MC</string>
-    <string name="download_assets_search_mc_versions">Поиск версий MC</string>
-    <string name="download_assets_dependency_projects">Зависимости</string>
-    <string name="download_assets_optional_projects">Дополнительные проекты</string>
-    <string name="download_assets_links">Связанные ссылки</string>
-    <string name="download_assets_project_link">Страница проекта</string>
-    <string name="download_assets_source_link">Посмотреть исходный код</string>
-    <string name="download_assets_issues_link">Сообщить о проблемах</string>
-    <string name="download_assets_wiki_link">Просмотреть вики</string>
     <string name="download_assets_release_type_release">Стабильная</string>
     <string name="download_assets_release_type_beta">Бета</string>
     <string name="download_assets_release_type_alpha">Альфа</string>
-    <string name="download_assets_no_installed_versions">В данный момент не установлена ни одна версия игры, поэтому невозможно определить место для загрузки ресурсов. Сначала установите версию игры!</string>
-    <string name="download_assets_install_assets_for_versions">Установить для каких версий игры?</string>
     <string name="download_assets_install_progress_downloading">Загрузка и установка ресурсов\n%1$s\n (%2$s / %3$s)</string>
     <string name="download_assets_install_progress_installing">Установка ресурсов\n%s</string>
     <string name="download_assets_install_failed">Не удалось установить ресурсы!</string>
     <string name="download_assets_dependency_no_compatible_version">Не найдено совместимой версии для зависимости %s</string>
-    <string name="download_assets_dependency_project_unavailable">Информация о проекте недоступна</string>
     <string name="download_assets_category_worldgen">Генерация мира</string>
     <string name="download_assets_category_biomes">Биомы</string>
     <string name="download_assets_category_dimensions">Измерения</string>
@@ -436,14 +410,6 @@
     <string name="download_install_clear_temp">Очистка файлов кэша</string>
     <string name="download_install_input_version_name">Ожидание ввода пользователем названия версии</string>
     <string name="download_install_input_version_name_title">Введите название преустановленной версии</string>
-    <string name="download_assets_filter_search_name">Поиск по имени</string>
-    <string name="download_assets_filter_search_platform">Целевая платформа</string>
-    <string name="download_assets_filter_game_version">Версия игры</string>
-    <string name="download_assets_result_authors">От %s</string>
-    <string name="download_modpack_warning1">Перед установкой необходимо понимать, что большинство сборок создано под нормальный ПК, и существует высокая вероятность сбоев или других проблем при их запуске. Эти проблемы часто находятся вне возможностей лаунчера.</string>
-    <string name="download_modpack_warning2">При возникновении проблем вам необходимо иметь соответствующие знания, чтобы попытаться решить проблему самостоятельно; также вы можете обратиться к знающим людям.</string>
-    <string name="download_modpack_warning3">Примечание: разработчики лаунчера, как правило, не занимаются решением проблем, вызванных сборками.</string>
-    <string name="download_modpack_install_title">Установка сборки</string>
     <string name="download_modpack_install_parse">Разбор сборки</string>
     <string name="download_modpack_install_get_mod_url">Получить ссылку на скачивание мода (%1$d/%2$d)</string>
     <string name="download_modpack_install_overrides">Распаковка файлов сборки</string>
@@ -695,8 +661,6 @@
     <string name="version_summary_fools_creaft_mine">Теперь вы можете создать что угодно — даже целый мир!</string>
     <string name="account_microsoft_exit_by_user">Вы покинули веб-страницу, поэтому процесс входа через Microsoft был отменён.</string>
     <string name="cape_name_copper">Медный</string>
-    <string name="download_assets_loading_page_data">Начало скачивания постраничных данных</string>
-    <string name="download_assets_loaded_chunk_page">Страничные данные загружены, фрагмент %1$d, страница %2$d</string>
     <string name="mods_manage_no_loader">Для текущей версии нет мод-лоудера, моды использовать нельзя</string>
     <string name="settings_tab_gamepad">Геймпад</string>
     <string name="settings_gamepad_deadzone_title">Масштабирование мёртвой зоны геймпада</string>
@@ -741,9 +705,7 @@
     <string name="settings_launcher_background_reset_message">Вы уверены, что хотите сбросить фон?</string>
     <string name="settings_gamepad_title">Управление геймпадом</string>
     <string name="settings_gamepad_summary">Включите или отключите управление геймпадом. Если стороннее устройство ошибочно распознаётся как геймпад, пожалуйста, отключите эту опцию.</string>
-    <string name="generic_tip">Подсказка</string>
     <string name="import_modpack">Импорт сборки</string>
-    <string name="import_modpack_tip">Вы можете импортировать файлы сборки. Лаунчер поддерживает следующие форматы:</string>
     <string name="import_modpack_task_unpack">Импорт и распаковка файла</string>
     <string name="import_modpack_task_parse">Анализ сборки</string>
     <string name="import_modpack_task_extract_files">Извлечение файлов сборки</string>
@@ -789,7 +751,6 @@
     <string name="crash_link_share_uploading">Загрузка логов:</string>
     <string name="crash_link_share_failed">Загрузка не удалась</string>
     <string name="crash_link_share_failed_link_not_found">Ссылка не найдена. Пожалуйста, попробуйте позже</string>
-    <string name="download_game_addon_warning_api">не выбран. Без его установки большинство модов не будет работать!</string>
     <string name="settings_launcher_language">Язык</string>
     <string name="about_acknowledgements_mcim_text">использует зеркальный источник MCIM</string>
     <string name="unpack_screen_jre25">Необходимая Java 25 (для Minecraft 26.1 и выше).</string>
@@ -875,9 +836,6 @@
     <string name="error_not_acceptable">(%s) Неприемлемо</string>
     <string name="error_gone">(%s) Запрошенный ресурс больше не доступен</string>
     <string name="error_too_many_requests">(%s) Попробуйте позже</string>
-    <string name="download_category_by_id">Искать по ID</string>
-    <string name="download_assets_id_holder">ID проекта</string>
-    <string name="download_assets_id_not_found">Проект не найден!</string>
     <string name="cape_name_builder">Строитель</string>
     <string name="cape_name_crafter">Крафтер</string>
     <string name="settings_title_blur">Эффект размытия</string>

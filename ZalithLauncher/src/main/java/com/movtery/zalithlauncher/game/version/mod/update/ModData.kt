@@ -24,7 +24,7 @@ import com.movtery.zalithlauncher.game.download.assets.platform.getVersions
 import com.movtery.zalithlauncher.game.download.assets.utils.ModTranslations
 import com.movtery.zalithlauncher.game.version.mod.ModFile
 import com.movtery.zalithlauncher.game.version.mod.ModProject
-import com.movtery.zalithlauncher.ui.screens.content.download.assets.elements.initAll
+import com.movtery.zalithlauncher.game.download.assets.platform.initAll
 import com.movtery.zalithlauncher.utils.logging.Logger
 import com.movtery.zalithlauncher.utils.string.parseInstant
 import kotlinx.coroutines.Dispatchers

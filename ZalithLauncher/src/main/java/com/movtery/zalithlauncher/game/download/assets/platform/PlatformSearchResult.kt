@@ -19,7 +19,6 @@
 package com.movtery.zalithlauncher.game.download.assets.platform
 
 import com.movtery.zalithlauncher.game.download.assets.utils.getTranslations
-import com.movtery.zalithlauncher.ui.screens.content.download.assets.elements.AssetsPage
 import com.movtery.zalithlauncher.utils.string.LevCalculator
 import com.movtery.zalithlauncher.utils.string.containsChinese
 import kotlin.math.max

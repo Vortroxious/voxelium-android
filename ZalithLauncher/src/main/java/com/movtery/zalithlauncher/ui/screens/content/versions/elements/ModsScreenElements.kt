@@ -75,7 +75,7 @@ import com.movtery.zalithlauncher.ui.components.SimpleAlertDialog
 import com.movtery.zalithlauncher.ui.components.fadeEdge
 import com.movtery.zalithlauncher.ui.components.rememberDialogMaxHeight
 import com.movtery.zalithlauncher.ui.components.verticalScrollWithBar
-import com.movtery.zalithlauncher.ui.screens.content.download.assets.elements.AssetsIcon
+import com.movtery.zalithlauncher.ui.screens.content.elements.AssetsIcon
 import com.movtery.zalithlauncher.ui.screens.content.elements.TitleTaskFlowDialog
 import com.movtery.zalithlauncher.ui.screens.content.versions.elements.ModStateFilter.All
 import com.movtery.zalithlauncher.ui.screens.content.versions.elements.ModStateFilter.Disabled
