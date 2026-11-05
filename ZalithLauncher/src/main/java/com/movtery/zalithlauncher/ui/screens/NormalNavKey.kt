@@ -75,6 +75,10 @@ sealed interface NormalNavKey : TitledNavKey {
     @Serializable data object VoxeliumControls: NormalNavKey {
         @Contextual override val title: AndroidStringText = androidText(R.string.voxelium_ui_controls)
     }
+    /** Voxelium: Settings (game, graphics, Java, gamepad, launcher, about) */
+    @Serializable data object VoxeliumSettings: NormalNavKey {
+        @Contextual override val title: AndroidStringText = androidText(R.string.voxelium_ui_settings)
+    }
     /** 多人联机屏幕 */
     @Serializable data object Multiplayer: NormalNavKey {
         @Contextual override val title: AndroidStringText = androidText(R.string.terracotta_terracotta)

@@ -303,7 +303,7 @@ private fun RuntimeOperation(
     }
 }
 
-private fun progressRuntimeUri(
+internal fun progressRuntimeUri(
     context: Context,
     uri: Uri,
     callRefresh: () -> Unit,

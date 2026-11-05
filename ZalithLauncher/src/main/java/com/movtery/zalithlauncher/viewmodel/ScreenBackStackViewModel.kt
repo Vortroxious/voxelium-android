@@ -55,6 +55,7 @@ class ScreenBackStackViewModel : ViewModel() {
         NormalNavKey.Multiplayer::class,
         NormalNavKey.VoxeliumInstall::class,
         NormalNavKey.VoxeliumControls::class,
+        NormalNavKey.VoxeliumSettings::class,
         NormalNavKey.VoxeliumVersion::class,
         NormalNavKey.AccountManager::class
     )

@@ -64,6 +64,7 @@ import com.movtery.zalithlauncher.ui.screens.content.voxelium.WorldsPane
 import com.movtery.zalithlauncher.ui.screens.content.voxelium.kindTitle
 import com.movtery.zalithlauncher.ui.voxelium.components.LoaderBadge
 import com.movtery.zalithlauncher.ui.voxelium.components.PageHeader
+import com.movtery.zalithlauncher.ui.voxelium.components.SectionLabel
 import com.movtery.zalithlauncher.ui.voxelium.play.playVersion
 import com.movtery.zalithlauncher.ui.voxelium.play.statusText
 import com.movtery.zalithlauncher.ui.voxelium.play.zalithVersion
@@ -148,12 +149,16 @@ private fun SettingsPane(
 ) {
     var deleting by remember { mutableStateOf(false) }
     var problem by remember { mutableStateOf<String?>(null) }
-    Column(modifier = modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    val version = remember(v.id) { zalithVersion(v.id) }
+    Column(modifier = modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        if (version != null) VersionConfigSection(version)
+        else Text(stringResource(R.string.voxelium_ui_set_not_supported), color = MaterialTheme.colorScheme.onSurfaceVariant)
+        SectionLabel(stringResource(R.string.voxelium_ui_version_more), modifier = Modifier.padding(top = 8.dp))
         SettingRow(
             title = stringResource(R.string.voxelium_ui_version_settings_title),
             text = stringResource(R.string.voxelium_ui_version_settings_more)
         ) {
-            OutlinedButton(onClick = { zalithVersion(v.id)?.let(onVersionSettings) }) { Text(stringResource(R.string.voxelium_ui_version_settings_open)) }
+            OutlinedButton(onClick = { version?.let(onVersionSettings) }, enabled = version != null) { Text(stringResource(R.string.voxelium_ui_version_settings_open)) }
         }
         // ZalithLauncher2 checks its own versions' files when they launch.
         if (v.isCore) {

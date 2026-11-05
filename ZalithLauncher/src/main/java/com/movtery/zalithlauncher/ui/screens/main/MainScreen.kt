@@ -103,6 +103,7 @@ import com.movtery.zalithlauncher.ui.screens.content.FirstLoginMenu
 import com.movtery.zalithlauncher.ui.screens.content.MultiplayerScreen
 import com.movtery.zalithlauncher.ui.voxelium.accounts.VoxeliumAccountsScreen
 import com.movtery.zalithlauncher.ui.voxelium.controls.VoxeliumControlsScreen
+import com.movtery.zalithlauncher.ui.voxelium.settings.VoxeliumSettingsScreen
 import com.movtery.zalithlauncher.ui.voxelium.install.VoxeliumInstallScreen
 import com.movtery.zalithlauncher.ui.voxelium.play.VoxeliumPlayScreen
 import com.movtery.zalithlauncher.ui.voxelium.version.VoxeliumVersionScreen
@@ -181,7 +182,7 @@ fun MainScreen(
                     is NormalNavKey.VoxeliumInstall -> VoxeliumPlace.INSTALL
                     is NormalNavKey.AccountManager -> VoxeliumPlace.ACCOUNTS
                     is NormalNavKey.VoxeliumControls -> VoxeliumPlace.CONTROLS
-                    is NestedNavKey.Settings -> VoxeliumPlace.SETTINGS
+                    is NormalNavKey.VoxeliumSettings, is NestedNavKey.Settings -> VoxeliumPlace.SETTINGS
                     else -> null
                 },
                 taskCount = tasks.size,
@@ -202,7 +203,7 @@ fun MainScreen(
                         )
                         VoxeliumPlace.SETTINGS -> screenBackStackModel.mainScreen.removeAndNavigateTo(
                             removes = screenBackStackModel.clearBeforeNavKeys,
-                            screenKey = screenBackStackModel.settingsScreen
+                            screenKey = NormalNavKey.VoxeliumSettings
                         )
                     }
                 },
@@ -216,6 +217,10 @@ fun MainScreen(
                         )
                         MoreItem.FILES -> eventViewModel.sendEvent(
                             EventViewModel.Event.OpenFileManager(rootPath = PathManager.DIR_FILES_EXTERNAL.absolutePath)
+                        )
+                        MoreItem.CLASSIC_SETTINGS -> screenBackStackModel.mainScreen.removeAndNavigateTo(
+                            removes = screenBackStackModel.clearBeforeNavKeys,
+                            screenKey = screenBackStackModel.settingsScreen
                         )
                         MoreItem.CLASSIC_HOME -> screenBackStackModel.mainScreen.navigateTo(screenKey = NormalNavKey.LauncherMain)
                     }
@@ -704,6 +709,20 @@ private fun NavigationUI(
                         eventViewModel = eventViewModel,
                         onBack = toMainScreen,
                         onVersionSettings = navigateToVersions
+                    )
+                }
+                entry<NormalNavKey.VoxeliumSettings> {
+                    VoxeliumSettingsScreen(
+                        backScreenViewModel = screenBackStackModel,
+                        eventViewModel = eventViewModel,
+                        submitError = submitError,
+                        openCredits = {
+                            screenBackStackModel.settingsScreen.clearWith(NormalNavKey.Settings.AboutInfo)
+                            screenBackStackModel.mainScreen.removeAndNavigateTo(
+                                removes = screenBackStackModel.clearBeforeNavKeys,
+                                screenKey = screenBackStackModel.settingsScreen
+                            )
+                        }
                     )
                 }
                 entry<NormalNavKey.VoxeliumControls> {
