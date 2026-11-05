@@ -81,7 +81,8 @@ import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
  * 导航至DownloadScreen
  */
 fun ScreenBackStackViewModel.navigateToDownload(targetScreen: TitledNavKey? = null) {
-    downloadScreen.clearWith(targetScreen ?: downloadGameScreen)
+    //Voxelium: games, modpacks and mods are installed from the Versions screen
+    downloadScreen.clearWith(targetScreen ?: downloadResourcePackScreen)
     mainScreen.removeAndNavigateTo(
         removes = clearBeforeNavKeys,
         screenKey = downloadScreen,
@@ -164,10 +165,9 @@ private fun TabMenu(
     backStack: NavBackStack<TitledNavKey>,
     backScreenViewModel: ScreenBackStackViewModel,
 ) {
+    //Voxelium: Game, Modpack and Mod are replaced by the Versions screen (install, Modpacks…, Mods & packs…);
+    //their screens stay reachable from ZalithLauncher2's version settings
     val downloadsList = listOf(
-        CategoryItem(backScreenViewModel.downloadGameScreen, { CategoryIcon(R.drawable.ic_sports_esports_outlined, R.string.download_category_game) }, R.string.download_category_game),
-        CategoryItem(backScreenViewModel.downloadModPackScreen, { CategoryIcon(R.drawable.ic_package_2_outlined, R.string.download_category_modpack) }, R.string.download_category_modpack),
-        CategoryItem(backScreenViewModel.downloadModScreen, { CategoryIcon(R.drawable.ic_extension_outlined, R.string.download_category_mod) }, R.string.download_category_mod, division = true),
         CategoryItem(backScreenViewModel.downloadResourcePackScreen, { CategoryIcon(R.drawable.ic_format_paint_outlined, R.string.download_category_resource_pack) }, R.string.download_category_resource_pack),
         CategoryItem(backScreenViewModel.downloadSavesScreen, { CategoryIcon(R.drawable.ic_public, R.string.download_category_saves) }, R.string.download_category_saves),
         CategoryItem(backScreenViewModel.downloadShadersScreen, { CategoryIcon(R.drawable.ic_lightbulb, R.string.download_category_shaders) }, R.string.download_category_shaders),

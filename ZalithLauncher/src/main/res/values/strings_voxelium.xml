@@ -138,4 +138,12 @@
     <string name="voxelium_delete_world_title">Delete %s?</string>
     <string name="voxelium_delete_world_text">The world is deleted from this version\'s saves folder. Share it as a .zip first if you want a copy.</string>
     <string name="voxelium_worlds_note">Import and delete worlds only while Minecraft is closed.</string>
+
+    <string name="voxelium_no_account">No account</string>
+    <string name="voxelium_no_account_hint">Add a Microsoft or offline account to play.</string>
+    <string name="voxelium_account_microsoft">Microsoft account</string>
+    <string name="voxelium_account_offline">Offline account</string>
+    <string name="voxelium_accounts">Accounts</string>
+    <string name="voxelium_classic_home">ZalithLauncher home</string>
+    <string name="voxelium_version_settings">Version settings…</string>
 </resources>

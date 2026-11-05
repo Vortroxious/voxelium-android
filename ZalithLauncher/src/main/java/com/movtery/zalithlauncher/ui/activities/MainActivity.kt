@@ -370,7 +370,7 @@ class MainActivity : BaseAppCompatActivity() {
                             screenBackStackModel.mainScreen.backStack.navigateToWeb(url)
                         },
                         backToMain = {
-                            screenBackStackModel.mainScreen.clearWith(NormalNavKey.LauncherMain)
+                            screenBackStackModel.mainScreen.clearWith(NormalNavKey.Voxelium)
                         },
                         checkIfInWebScreen = {
                             screenBackStackModel.mainScreen.currentKey is NormalNavKey.WebScreen
@@ -501,7 +501,7 @@ class MainActivity : BaseAppCompatActivity() {
                     onModify = { payload ->
                         modifyVersionViewModel.modify(this@MainActivity, payload)
                         //任务开始执行，立刻返回主界面，不停留在可能失效的版本设置屏幕
-                        screenBackStackModel.mainScreen.clearWith(NormalNavKey.LauncherMain)
+                        screenBackStackModel.mainScreen.clearWith(NormalNavKey.Voxelium)
                     },
                     onCancel = {
                         modifyVersionViewModel.cancel()

@@ -36,10 +36,10 @@ sealed interface NestedNavKey {
             backStack.addIfEmpty(NormalNavKey.UnpackDeps)
         }
     }
-    /** 主屏幕 */
+    /** 主屏幕 (Voxelium: opens on the Versions screen; ZalithLauncher2's home is one tap away) */
     @Serializable class Main : BackStackNavKey<TitledNavKey>() {
         init {
-            backStack.addIfEmpty(NormalNavKey.LauncherMain)
+            backStack.addIfEmpty(NormalNavKey.Voxelium)
         }
     }
     /** 设置屏幕 */

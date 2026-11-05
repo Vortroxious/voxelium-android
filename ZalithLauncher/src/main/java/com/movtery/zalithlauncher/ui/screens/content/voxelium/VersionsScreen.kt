@@ -40,6 +40,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -57,6 +59,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.coroutine.TaskSystem
+import com.movtery.zalithlauncher.game.account.AccountsManager
+import com.movtery.zalithlauncher.game.account.isLocalAccount
+import com.movtery.zalithlauncher.game.account.isMicrosoftAccount
+import com.movtery.zalithlauncher.game.path.getGameHome
+import com.movtery.zalithlauncher.game.version.installed.Version
+import com.movtery.zalithlauncher.game.version.installed.VersionsManager
 import com.movtery.zalithlauncher.game.voxelium.VoxeliumContent
 import com.movtery.zalithlauncher.game.voxelium.VoxeliumGame
 import com.movtery.zalithlauncher.game.voxelium.VoxeliumGame.InstallState
@@ -67,6 +75,7 @@ import com.movtery.zalithlauncher.ui.components.BackgroundCard
 import com.movtery.zalithlauncher.ui.components.DefaultSwitch
 import com.movtery.zalithlauncher.ui.components.SimpleAlertDialog
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
+import com.movtery.zalithlauncher.ui.screens.content.home.HomeCards
 import com.movtery.zalithlauncher.viewmodel.EventViewModel
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
 import com.movtery.zalithlauncher.viewmodel.sendToast
@@ -84,7 +93,10 @@ import java.time.format.FormatStyle
 @Composable
 fun VoxeliumVersionsScreen(
     backScreenViewModel: ScreenBackStackViewModel,
-    eventViewModel: EventViewModel
+    eventViewModel: EventViewModel,
+    onAccounts: () -> Unit,
+    onClassicHome: () -> Unit,
+    onVersionSettings: (Version) -> Unit
 ) {
     BaseScreen(
         screenKey = NormalNavKey.Voxelium,
@@ -96,6 +108,8 @@ fun VoxeliumVersionsScreen(
         val states by VoxeliumGame.installState.collectAsStateWithLifecycle()
         val tasks by TaskSystem.tasksFlow.collectAsStateWithLifecycle()
         val showSnapshots = AllSettings.voxeliumShowSnapshots.state
+        val zalithVersions by VersionsManager.versions.collectAsStateWithLifecycle()
+        val account by AccountsManager.currentAccountFlow.collectAsStateWithLifecycle()
 
         var installTarget by remember { mutableStateOf<Pair<VersionManifest.Entry, ModLoader>?>(null) }
         var deleteTarget by remember { mutableStateOf<VoxeliumGame.InstalledVersion?>(null) }
@@ -105,9 +119,10 @@ fun VoxeliumVersionsScreen(
         var worldsFor by remember { mutableStateOf<VoxeliumGame.InstalledVersion?>(null) }
 
         LaunchedEffect(Unit) {
-            VoxeliumGame.refreshInstalled()
             if (VoxeliumGame.manifest.value !is VoxeliumGame.ManifestState.Loaded) VoxeliumGame.loadManifest()
         }
+        // Also lists the versions ZalithLauncher2 installed, so refresh when its list changes.
+        LaunchedEffect(zalithVersions) { VoxeliumGame.refreshInstalled() }
 
         fun busy(key: String) = tasks.any { it.id == "voxelium-install-$key" }
 
@@ -116,6 +131,35 @@ fun VoxeliumVersionsScreen(
             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            // Required by Zalith Launcher 2's GPLv3 section 7 terms; this is the home screen now.
+            items(HomeCards.systemCards(), key = { it.id }) { card -> card.content() }
+            item {
+                BackgroundCard(modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            val a = account
+                            Text(a?.username ?: stringResource(R.string.voxelium_no_account), style = MaterialTheme.typography.titleSmall)
+                            Text(
+                                when {
+                                    a == null -> stringResource(R.string.voxelium_no_account_hint)
+                                    a.isMicrosoftAccount() -> stringResource(R.string.voxelium_account_microsoft)
+                                    a.isLocalAccount() -> stringResource(R.string.voxelium_account_offline)
+                                    else -> a.accountType ?: ""
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        OutlinedButton(onClick = onAccounts) { Text(stringResource(R.string.voxelium_accounts)) }
+                        Spacer(Modifier.width(8.dp))
+                        TextButton(onClick = onClassicHome) { Text(stringResource(R.string.voxelium_classic_home)) }
+                    }
+                }
+            }
+
             if (installed.isNotEmpty()) {
                 item { SectionTitle(stringResource(R.string.voxelium_installed)) }
                 items(installed, key = { "installed-" + it.id }) { v ->
@@ -131,6 +175,9 @@ fun VoxeliumVersionsScreen(
                             )
                         },
                         onRepair = { VoxeliumGame.repair(v.id) },
+                        onSettings = {
+                            VersionsManager.loadVersion(getGameHome(), v.id)?.let(onVersionSettings)
+                        },
                         onContent = { contentFor = v },
                         onWorlds = { worldsFor = v },
                         onDelete = { deleteTarget = v }
@@ -178,7 +225,7 @@ fun VoxeliumVersionsScreen(
                     }
                 }
                 is VoxeliumGame.ManifestState.Loaded -> {
-                    val installedIds = installed.map { it.id }.toSet()
+                    val installedIds = installed.filter { it.isCore }.map { it.id }.toSet()
                     items(VoxeliumGame.visibleVersions(m.manifest, showSnapshots), key = { "version-" + it.id }) { entry ->
                         VersionRow(
                             entry = entry,
@@ -272,6 +319,7 @@ private fun InstalledRow(
     busy: Boolean,
     onPlay: () -> Unit,
     onRepair: () -> Unit,
+    onSettings: () -> Unit,
     onContent: () -> Unit,
     onWorlds: () -> Unit,
     onDelete: () -> Unit
@@ -310,9 +358,16 @@ private fun InstalledRow(
                                 onClick = { menu = false; onWorlds() }
                             )
                             DropdownMenuItem(
-                                text = { Text(stringResource(R.string.voxelium_repair)) },
-                                onClick = { menu = false; onRepair() }
+                                text = { Text(stringResource(R.string.voxelium_version_settings)) },
+                                onClick = { menu = false; onSettings() }
                             )
+                            // ZalithLauncher2 checks its own versions' files when they launch.
+                            if (version.isCore) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.voxelium_repair)) },
+                                    onClick = { menu = false; onRepair() }
+                                )
+                            }
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.voxelium_delete), color = MaterialTheme.colorScheme.error) },
                                 onClick = { menu = false; onDelete() }

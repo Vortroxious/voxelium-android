@@ -317,7 +317,8 @@ fun VersionsManageScreen(
                     viewModel.resortVersions()
                 },
                 onInstall = {
-                    backScreenViewModel.navigateToDownload()
+                    //Voxelium: versions are installed from the Versions screen
+                    backScreenViewModel.mainScreen.clearWith(NormalNavKey.Voxelium)
                 }
             )
 

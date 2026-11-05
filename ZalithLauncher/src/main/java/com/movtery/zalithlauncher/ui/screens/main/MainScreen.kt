@@ -96,6 +96,7 @@ import com.movtery.zalithlauncher.ui.screens.content.FileSelectorScreen
 import com.movtery.zalithlauncher.ui.screens.content.LauncherScreen
 import com.movtery.zalithlauncher.ui.screens.content.LicenseScreen
 import com.movtery.zalithlauncher.ui.screens.content.LogViewScreen
+import com.movtery.zalithlauncher.ui.screens.content.FirstLoginMenu
 import com.movtery.zalithlauncher.ui.screens.content.MultiplayerScreen
 import com.movtery.zalithlauncher.ui.screens.content.voxelium.VoxeliumVersionsScreen
 import com.movtery.zalithlauncher.ui.screens.content.SettingsScreen
@@ -153,11 +154,12 @@ fun MainScreen(
 
     /** 回到主页面通用函数 */
     val toMainScreen: () -> Unit = {
-        screenBackStackModel.mainScreen.clearWith(NormalNavKey.LauncherMain)
+        screenBackStackModel.mainScreen.clearWith(NormalNavKey.Voxelium)
     }
 
     val mainScreenKey = screenBackStackModel.mainScreen.currentKey
-    val inLauncherScreen = mainScreenKey == null || mainScreenKey is NormalNavKey.LauncherMain
+    //Voxelium: the Versions screen is the home screen
+    val inLauncherScreen = mainScreenKey == null || mainScreenKey is NormalNavKey.Voxelium
 
     val isBackgroundValid = LocalBackgroundViewModel.current?.isValid == true
     val launcherBackgroundOpacity = AllSettings.launcherBackgroundOpacity.state.toFloat() / 100f
@@ -203,12 +205,7 @@ fun MainScreen(
                         screenKey = NormalNavKey.Multiplayer
                     )
                 },
-                toVoxeliumScreen = {
-                    screenBackStackModel.mainScreen.removeAndNavigateTo(
-                        removes = screenBackStackModel.clearBeforeNavKeys,
-                        screenKey = NormalNavKey.Voxelium
-                    )
-                },
+                toVoxeliumScreen = toMainScreen,
                 openFileManager = {
                     eventViewModel.sendEvent(
                         EventViewModel.Event.OpenFileManager(
@@ -672,7 +669,16 @@ private fun NavigationUI(
                 entry<NormalNavKey.Voxelium> {
                     VoxeliumVersionsScreen(
                         backScreenViewModel = screenBackStackModel,
-                        eventViewModel = eventViewModel
+                        eventViewModel = eventViewModel,
+                        onAccounts = {
+                            screenBackStackModel.mainScreen.navigateTo(
+                                screenKey = NormalNavKey.AccountManager(FirstLoginMenu.NONE)
+                            )
+                        },
+                        onClassicHome = {
+                            screenBackStackModel.mainScreen.navigateTo(screenKey = NormalNavKey.LauncherMain)
+                        },
+                        onVersionSettings = navigateToVersions
                     )
                 }
                 entry<NormalNavKey.LogView> { key ->

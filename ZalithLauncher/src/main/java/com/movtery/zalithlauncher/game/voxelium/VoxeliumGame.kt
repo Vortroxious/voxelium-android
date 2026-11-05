@@ -96,18 +96,26 @@ object VoxeliumGame {
         val isModded: Boolean,
         /** "Fabric", "Quilt", … for modded versions. */
         val loader: String?,
-        val releaseTime: Instant?
+        val releaseTime: Instant?,
+        /** False for versions ZalithLauncher2 installed (its own merged JSONs, its version names). */
+        val isCore: Boolean = true
     ) {
         /**
          * Loader installs are named like "fabric-loader-0.19.5-1.21.11", "neoforge-21.1.264" or
          * "1.20.1-forge-47.4.10"; anything else modded is a modpack named after itself.
          */
         val isModpack: Boolean
-            get() = isModded && !id.startsWith("fabric-loader-") && !id.startsWith("quilt-loader-") &&
+            get() = isCore && isModded && !id.startsWith("fabric-loader-") && !id.startsWith("quilt-loader-") &&
                 !id.startsWith("neoforge-") && !id.contains("-forge-")
         private val loaderLine: String get() = "${loader ?: "Modded"} $base"
-        val title: String get() = if (isModpack) id else if (isModded) loaderLine else id
-        val subtitle: String get() = if (isModpack) "Modpack · $loaderLine" else if (isModded) id else "Vanilla"
+        val title: String get() = if (!isCore || isModpack) id else if (isModded) loaderLine else id
+        val subtitle: String
+            get() = when {
+                !isCore -> "ZalithLauncher · " + if (isModded) loaderLine else base
+                isModpack -> "Modpack · $loaderLine"
+                isModded -> id
+                else -> "Vanilla"
+            }
     }
 
     private val _manifest = MutableStateFlow<ManifestState>(ManifestState.Loading)
@@ -139,17 +147,28 @@ object VoxeliumGame {
     fun visibleVersions(manifest: VersionManifest, snapshots: Boolean): List<VersionManifest.Entry> =
         manifest.versions(if (snapshots) setOf(VersionType.RELEASE, VersionType.SNAPSHOT) else setOf(VersionType.RELEASE))
 
-    /** Everything the core installed (it has `.voxelium-install-complete`), newest first. */
+    /**
+     * Everything installed, newest first: what the core installed (it has `.voxelium-install-complete`),
+     * then the versions ZalithLauncher2 installed, so every version can be played from here.
+     */
     fun refreshInstalled() {
         scope.launch {
             val paths = paths()
             val game = installer(paths)
             val resolver = VersionResolver(paths)
-            val list = (paths.versionsDir.list() ?: emptyArray()).filter { game.isInstalled(it) }.mapNotNull { id ->
+            val core = (paths.versionsDir.list() ?: emptyArray()).filter { game.isInstalled(it) }.mapNotNull { id ->
                 val r = runCatching { resolver.resolve(id) }.getOrNull() ?: return@mapNotNull null
                 InstalledVersion(id, r.baseVersionId, r.isModded, loaderName(r), r.info.releaseTime)
             }.sortedWith(compareByDescending<InstalledVersion> { it.releaseTime ?: Instant.EPOCH }.thenByDescending { it.id })
-            _installed.update { list }
+            val coreIds = core.map { it.id }.toSet()
+            val zalith = VersionsManager.versions.value
+                .filter { it.isValid() && it.getVersionName() !in coreIds }
+                .map { v ->
+                    val info = v.getVersionInfo()
+                    val loader = info?.loaderInfos?.firstOrNull { it.loader.isLoader }?.loader?.displayName
+                    InstalledVersion(v.getVersionName(), info?.minecraftVersion ?: v.getVersionName(), loader != null, loader, null, isCore = false)
+                }
+            _installed.update { core + zalith }
         }
     }
 
