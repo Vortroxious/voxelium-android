@@ -101,6 +101,7 @@ import com.movtery.zalithlauncher.ui.screens.content.LicenseScreen
 import com.movtery.zalithlauncher.ui.screens.content.LogViewScreen
 import com.movtery.zalithlauncher.ui.screens.content.FirstLoginMenu
 import com.movtery.zalithlauncher.ui.screens.content.MultiplayerScreen
+import com.movtery.zalithlauncher.ui.voxelium.accounts.VoxeliumAccountsScreen
 import com.movtery.zalithlauncher.ui.voxelium.controls.VoxeliumControlsScreen
 import com.movtery.zalithlauncher.ui.voxelium.install.VoxeliumInstallScreen
 import com.movtery.zalithlauncher.ui.voxelium.play.VoxeliumPlayScreen
@@ -589,15 +590,15 @@ private fun NavigationUI(
                     )
                 }
                 entry<NormalNavKey.AccountManager> { key ->
-                    AccountManageScreen(
+                    VoxeliumAccountsScreen(
                         key = key,
                         backStackViewModel = screenBackStackModel,
                         backToMainScreen = toMainScreen,
                         openLink = { url ->
                             eventViewModel.sendEvent(EventViewModel.Event.OpenLink(url))
                         },
-                        eventViewModel = eventViewModel,
-                        submitError = submitError
+                        submitError = submitError,
+                        eventViewModel = eventViewModel
                     )
                 }
                 entry<NormalNavKey.WebScreen> { key ->

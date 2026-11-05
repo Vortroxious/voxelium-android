@@ -116,7 +116,7 @@ import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
  * @property formatError 格式化异常为本地化字符串
  * @property submitError 提交错误到全局错误展示系统
  */
-private data class AccountActions(
+internal data class AccountActions(
     val onIntent: (AccountManageIntent) -> Unit,
     val openLink: (url: String) -> Unit,
     val backToMainScreen: () -> Unit,
@@ -869,4 +869,78 @@ private fun AccountManageContentPreview() {
             }
         }
     }
+}
+
+/**
+ * Voxelium: the account view model, its actions and its first-login and error handling, for the
+ * Voxelium Accounts page, which draws its own layout over the same flows.
+ */
+@Composable
+internal fun rememberAccountFlows(
+    key: NormalNavKey.AccountManager,
+    backStackViewModel: ScreenBackStackViewModel,
+    backToMainScreen: () -> Unit,
+    openLink: (url: String) -> Unit,
+    submitError: (ErrorViewModel.ThrowableMessage) -> Unit,
+    eventViewModel: EventViewModel
+): Pair<AccountManageViewModel, AccountActions> {
+    val viewModel: AccountManageViewModel = hiltViewModel { factory: AccountManageViewModel.Factory ->
+        factory.create(eventViewModel)
+    }
+    val actions = remember(viewModel, backToMainScreen, openLink, backStackViewModel, submitError) {
+        AccountActions(
+            onIntent = viewModel::onIntent,
+            openLink = openLink,
+            backToMainScreen = backToMainScreen,
+            navigateToWeb = { url -> backStackViewModel.mainScreen.backStack.navigateToWeb(url) },
+            checkIfInWebScreen = { backStackViewModel.mainScreen.currentKey is NormalNavKey.WebScreen },
+            formatError = { th -> viewModel.formatAccountError(th) },
+            submitError = submitError,
+        )
+    }
+    LaunchedEffect(Unit) {
+        when (key.loginMenu) {
+            FirstLoginMenu.NONE -> {}
+            FirstLoginMenu.MICROSOFT -> startMicrosoftLogin(actions)
+            FirstLoginMenu.NORMAL -> actions.onIntent(AccountManageIntent.UpdateLoginMenuOp(LoginMenuOperation.Login))
+        }
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is AccountManageEffect.ShowError -> submitError(ErrorViewModel.ThrowableMessage(effect.title, effect.message))
+            }
+        }
+    }
+    return viewModel to actions
+}
+
+/** Voxelium: Microsoft sign-in straight away (the iOS app shows no tip first). */
+internal fun startMicrosoftLogin(actions: AccountActions) {
+    if (isMicrosoftLogging()) return
+    actions.onIntent(
+        AccountManageIntent.PerformMicrosoftLogin(
+            toWeb = actions.navigateToWeb,
+            backToMain = actions.backToMainScreen,
+            checkIfInWebScreen = actions.checkIfInWebScreen
+        )
+    )
+}
+
+/** Voxelium: the account dialogs (offline name, other sign-in servers, skins and capes, delete, errors). */
+@Composable
+internal fun AccountFlows(viewModel: AccountManageViewModel, actions: AccountActions) {
+    val loginUiState by viewModel.loginUiState.collectAsStateWithLifecycle()
+    val profileUiState by viewModel.profileUiState.collectAsStateWithLifecycle()
+    val operationUiState by viewModel.operationUiState.collectAsStateWithLifecycle()
+    LoginMenuOperation(loginUiState.menuOp, actions, profileUiState.authServers)
+    MicrosoftLoginOperation(loginUiState.microsoftOp, actions)
+    LocalLoginOperation(loginUiState.localOp, actions)
+    OtherLoginOperation(loginUiState.otherOp, actions)
+    ServerTypeOperation(operationUiState.serverOp, actions)
+    AccountOperation(operationUiState.accountOp, actions)
+    AccountSkinOperation(
+        accountSkinOperation = operationUiState.accountSkinOp,
+        skinDialogState = operationUiState.accountSkinDialogState,
+        accountCapes = profileUiState.accountCapeOpMap,
+        actions = actions
+    )
 }

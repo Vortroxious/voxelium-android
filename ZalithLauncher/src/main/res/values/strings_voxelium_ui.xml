@@ -98,4 +98,17 @@
     <string name="voxelium_ui_controls_width">Width: %d dp</string>
     <string name="voxelium_ui_controls_height">Height: %d dp</string>
     <string name="voxelium_ui_controls_delete">Delete button</string>
+
+    <string name="voxelium_ui_accounts_none">No accounts yet. Sign in with Microsoft to play online, or add an offline account.</string>
+    <string name="voxelium_ui_accounts_microsoft">Sign in with Microsoft</string>
+    <string name="voxelium_ui_accounts_offline">Offline account</string>
+    <string name="voxelium_ui_accounts_other">Other sign-in</string>
+    <string name="voxelium_ui_accounts_pick">Choose who you play as on the left.</string>
+    <string name="voxelium_ui_accounts_microsoft_hint">Microsoft account · plays online and on servers; offline play uses the saved sign-in.</string>
+    <string name="voxelium_ui_accounts_offline_hint">Offline account · single-player and LAN only.</string>
+    <string name="voxelium_ui_accounts_other_hint">Signed in with %s.</string>
+    <string name="voxelium_ui_accounts_refresh">Refresh sign-in</string>
+    <string name="voxelium_ui_accounts_skin">Skin and cape</string>
+    <string name="voxelium_ui_accounts_remove">Remove account</string>
+    <string name="voxelium_ui_accounts_encrypted">Sign-in tokens stay encrypted on this phone (Android Keystore).</string>
 </resources>
