@@ -19,7 +19,6 @@
 package com.movtery.zalithlauncher.ui.screens.content.voxelium
 
 import android.net.Uri
-import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -324,10 +323,3 @@ private fun ModpackStatus(state: ModpackState, onDone: () -> Unit) {
         }
     }
 }
-
-private fun displayName(context: android.content.Context, uri: Uri): String? =
-    runCatching {
-        context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
-            if (c.moveToFirst()) c.getString(0) else null
-        }
-    }.getOrNull()

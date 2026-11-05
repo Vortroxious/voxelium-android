@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.coroutine.TaskSystem
+import com.movtery.zalithlauncher.game.voxelium.VoxeliumContent
 import com.movtery.zalithlauncher.game.voxelium.VoxeliumGame
 import com.movtery.zalithlauncher.game.voxelium.VoxeliumGame.InstallState
 import com.movtery.zalithlauncher.setting.AllSettings
@@ -100,6 +101,8 @@ fun VoxeliumVersionsScreen(
         var deleteTarget by remember { mutableStateOf<VoxeliumGame.InstalledVersion?>(null) }
         var message by remember { mutableStateOf<Pair<String, String>?>(null) }
         var showModpacks by remember { mutableStateOf(false) }
+        var contentFor by remember { mutableStateOf<VoxeliumGame.InstalledVersion?>(null) }
+        var worldsFor by remember { mutableStateOf<VoxeliumGame.InstalledVersion?>(null) }
 
         LaunchedEffect(Unit) {
             VoxeliumGame.refreshInstalled()
@@ -128,6 +131,8 @@ fun VoxeliumVersionsScreen(
                             )
                         },
                         onRepair = { VoxeliumGame.repair(v.id) },
+                        onContent = { contentFor = v },
+                        onWorlds = { worldsFor = v },
                         onDelete = { deleteTarget = v }
                     )
                 }
@@ -186,6 +191,15 @@ fun VoxeliumVersionsScreen(
                     }
                 }
             }
+        }
+
+        contentFor?.let { v ->
+            val content = remember(v.id) { VoxeliumContent(v) }
+            ContentLibraryDialog(content, onDismiss = { contentFor = null })
+        }
+        worldsFor?.let { v ->
+            val content = remember(v.id) { VoxeliumContent(v) }
+            WorldsDialog(content, onDismiss = { worldsFor = null })
         }
 
         if (showModpacks) {
@@ -258,6 +272,8 @@ private fun InstalledRow(
     busy: Boolean,
     onPlay: () -> Unit,
     onRepair: () -> Unit,
+    onContent: () -> Unit,
+    onWorlds: () -> Unit,
     onDelete: () -> Unit
 ) {
     BackgroundCard(modifier = Modifier.fillMaxWidth()) {
@@ -285,6 +301,14 @@ private fun InstalledRow(
                             Icon(painterResource(R.drawable.ic_more_vert), contentDescription = null)
                         }
                         DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(if (version.isModded) R.string.voxelium_mods_and_packs else R.string.voxelium_resource_packs_menu)) },
+                                onClick = { menu = false; onContent() }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.voxelium_worlds_menu)) },
+                                onClick = { menu = false; onWorlds() }
+                            )
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.voxelium_repair)) },
                                 onClick = { menu = false; onRepair() }

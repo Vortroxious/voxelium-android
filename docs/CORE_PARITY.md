@@ -85,6 +85,7 @@ Swift's parameterised cases (`mavenPaths`, `rejectsTraversal`) are loops inside 
 
 - **Loader builds sorted newest first** (`ModLoaderMeta.versions`, `compareVersions`; found 2026-11-03). Quilt's meta server doesn't list builds in order: for 1.21.1 it starts with `0.20.0-beta.9`, then `0.24.0`, while `0.30.2` is near the end. "The first stable build" was therefore an old one. The iOS core has the same assumption. Test: `loaderBuildsAreSortedNewestFirst`.
 - **Modpack name clash** (found 2026-11-03). Some packs give their files for different loaders the same name and version (Simply Optimized Reloaded's 1.21.1 Quilt and NeoForge files are both "Universalized Optimized 1.21.1 1.0"), so the second install is refused as already installed. Android handles it in the app (`VoxeliumGame.packVersionId`): the second one gets "(Loader)" appended. The same pack again is still refused. iOS has the same clash.
+- **A dependency installed twice** (found 2026-11-05). The Modrinth planner only knows files it can match by SHA-1, and the CurseForge planner only knows files in `.voxelium-curseforge.json`, so a dependency installed from the other site (or from a file) was planned again: AppleSkin from CurseForge wanted Fabric API although Modrinth's Fabric API was installed. Two versions of one mod stop Fabric from starting. Android drops planned dependencies whose site slug matches the id of an installed mod (`VoxeliumContent.planModrinth`/`planCurseForge`). iOS has the same gap.
 
 ## How Android launches core installs (phase 7.2, decided 2026-11-03)
 
