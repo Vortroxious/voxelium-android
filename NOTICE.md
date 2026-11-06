@@ -25,7 +25,6 @@ Zalith Launcher 2 uses [PojavLauncher](https://github.com/PojavLauncherTeam/Poja
 The APK bundles prebuilt components from upstream, under their own licences. These include:
 - OpenJDK runtimes 8/17/21/25 (GPL-2.0 with Classpath Exception)
 - LWJGL (BSD-3-Clause)
-- MobileGlues (LGPL-2.1)
 - gl4es / NG-GL4ES (MIT)
 - Mesa (Zink, Turnip; MIT)
 - ANGLE (BSD-3-Clause)
@@ -35,7 +34,7 @@ The APK bundles prebuilt components from upstream, under their own licences. The
 - MMKV (BSD-3-Clause)
 - AndroidX/Jetpack libraries (Apache-2.0)
 
-The full list with links is in [`docs/upstream/README_EN_US.md`](docs/upstream/README_EN_US.md#open-source-libraries-and-licenses). A complete THIRD_PARTY_NOTICES file will be generated before the first release.
+The full list, with authlib-injector, Caciocavallo, JNA, Flite and the other components in the APK, is in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md). Renderer plugins installed later (MobileGlues, for example) carry their own licences.
 
 ## Services and trademarks
 - "Minecraft" is a trademark of Mojang Synergies AB. Voxelium does not include or redistribute any Minecraft game files. They are downloaded from Mojang's servers to the user's device.

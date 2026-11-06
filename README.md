@@ -7,7 +7,7 @@ An Android launcher for **Minecraft: Java Edition**, the Android sibling of [Vox
 Not affiliated with or endorsed by Mojang Studios, Microsoft or the ZalithLauncher team. Voxelium does not include any Minecraft game files. They are downloaded from Mojang's servers to your device, and you need to own Minecraft: Java Edition to play online.
 
 ## Status
-Version 0.2.0. The launcher's logic (installs, sign-in, mods, modpacks, worlds, touch controls) runs on **VoxeliumCore**, the same core as Voxelium for iOS, ported to Kotlin ([docs/CORE_PARITY.md](docs/CORE_PARITY.md)). The interface is Voxelium's own. Zalith Launcher 2 provides the engine: starting Java, the renderers, the Java runtimes and gamepad input.
+Version 0.3.0. The launcher's logic (installs, sign-in, mods, modpacks, worlds, touch controls) runs on **VoxeliumCore**, the same core as Voxelium for iOS, ported to Kotlin ([docs/CORE_PARITY.md](docs/CORE_PARITY.md)). The interface is Voxelium's own. Zalith Launcher 2 provides the engine: starting Java, the renderers, the Java runtimes and gamepad input.
 
 - **Play** (the home screen): your installed versions, the last played one first, and who you play as.
 - **Install**: Minecraft with Vanilla, Fabric, Quilt, Forge or NeoForge, with the recommended loader build preselected, and Modpacks (Modrinth search and `.mrpack` import; each pack becomes its own version). Forge and NeoForge finish setting up while installing.
