@@ -61,15 +61,9 @@ enum class VoxeliumPlace(@DrawableRes val icon: Int, val label: Int) {
     SETTINGS(R.drawable.ic_settings_filled, R.string.voxelium_ui_settings)
 }
 
-/** Screens from Zalith Launcher 2 that stay reachable until Voxelium replaces or drops them. */
-enum class MoreItem(val label: Int) {
-    CLASSIC_SETTINGS(R.string.voxelium_ui_more_classic_settings)
-
-}
-
 /**
  * Voxelium: the slim navigation rail on the left (the app runs in landscape). The Voxelium mark on
- * top, the five places, then the running tasks and "More".
+ * top, the five places, then the running tasks.
  */
 @Composable
 fun VoxeliumRail(
@@ -77,7 +71,6 @@ fun VoxeliumRail(
     taskCount: Int,
     onSelect: (VoxeliumPlace) -> Unit,
     onTasks: () -> Unit,
-    onMore: (MoreItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -116,15 +109,6 @@ fun VoxeliumRail(
                 badge = taskCount,
                 onClick = onTasks
             )
-        }
-        var more by remember { mutableStateOf(false) }
-        Box {
-            RailItem(icon = R.drawable.ic_more_horiz, label = stringResource(R.string.voxelium_ui_more), selected = false) { more = true }
-            DropdownMenu(expanded = more, onDismissRequest = { more = false }) {
-                for (item in MoreItem.entries) {
-                    DropdownMenuItem(text = { Text(stringResource(item.label)) }, onClick = { more = false; onMore(item) })
-                }
-            }
         }
     }
 }

@@ -30,25 +30,10 @@ import kotlinx.serialization.Serializable
  * 嵌套NavDisplay的屏幕
  */
 sealed interface NestedNavKey {
-    /** 主屏幕 (Voxelium: opens on the Versions screen; ZalithLauncher2's home is one tap away) */
+    /** 主屏幕 (Voxelium: opens on Play) */
     @Serializable class Main : BackStackNavKey<TitledNavKey>() {
         init {
             backStack.addIfEmpty(NormalNavKey.Voxelium)
-        }
-    }
-    /** 设置屏幕 */
-    @Serializable class Settings : BackStackNavKey<TitledNavKey>(androidText(R.string.generic_setting)) {
-        init {
-            backStack.addIfEmpty(NormalNavKey.Settings.Renderer)
-        }
-    }
-    /** 版本详细设置屏幕 */
-    @Serializable
-    class VersionSettings(@Contextual val version: Version) : BackStackNavKey<TitledNavKey>(
-        androidText(R.string.page_title_version_manage)
-    ) {
-        init {
-            backStack.addIfEmpty(NormalNavKey.Versions.OverView)
         }
     }
 }

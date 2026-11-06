@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
  */
 
-package com.movtery.zalithlauncher.ui.screens.content.versions.elements
+package com.movtery.zalithlauncher.ui.screens.content.elements
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
@@ -55,7 +55,6 @@ import com.movtery.zalithlauncher.ui.buildAppendedText
 import com.movtery.zalithlauncher.ui.components.SimpleAlertDialog
 import com.movtery.zalithlauncher.ui.components.SimpleEditDialog
 import com.movtery.zalithlauncher.ui.components.SimpleTaskDialog
-import com.movtery.zalithlauncher.ui.screens.content.elements.isFilenameInvalid
 import com.movtery.zalithlauncher.utils.string.getMessageOrToString
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
 import kotlinx.coroutines.Dispatchers

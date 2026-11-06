@@ -11,10 +11,10 @@ Version 0.2.0. The launcher's logic (installs, sign-in, mods, modpacks, worlds, 
 
 - **Play** (the home screen): your installed versions, the last played one first, and who you play as.
 - **Install**: Minecraft with Vanilla, Fabric, Quilt, Forge or NeoForge, with the recommended loader build preselected, and Modpacks (Modrinth search and `.mrpack` import; each pack becomes its own version). Forge and NeoForge finish setting up while installing.
-- **Each version** has its own page: mods, resource packs and shader packs (switch on/off, remove, Modrinth updates, browse Modrinth and CurseForge with required dependencies), worlds (import or share a `.zip`, delete), and settings (memory, Java, renderer, Vulkan driver, arguments), plus check and repair, and delete. CurseForge files whose authors only allow their website are linked there, never downloaded.
+- **Each version** has its own page: mods, resource packs and shader packs (switch on/off, remove, Modrinth updates, browse Modrinth and CurseForge with required dependencies), worlds (import or share a `.zip`, delete), and settings (memory, Java, renderer, Vulkan driver, arguments, joining a server on start), plus rename, check and repair, and delete. CurseForge files whose authors only allow their website are linked there, never downloaded.
 - **Accounts**: Microsoft sign-in (tokens encrypted with the Android Keystore), offline accounts, offline play with the saved sign-in, and skins.
 - **Controls**: the same on-screen layout, gestures and `layout.json` as Voxelium for iOS, with an editor. A layout made on iOS can be imported unchanged.
-- **Settings**: memory and Java arguments, renderer and Vulkan driver, resolution, Java runtimes (8 / 17 / 21 / 25, or import your own), gamepad, appearance and language.
+- **Settings**: memory and Java arguments, renderer and Vulkan driver, resolution, Java runtimes (8 / 17 / 21 / 25, or import your own), gamepad with button mapping, aiming with the gyroscope, appearance and language.
 - Renderers Krypton Wrapper (default), GL4ES, Zink, VirGL, Freedreno (Adreno) and Panfrost (Mali), plus Turnip on Adreno.
 - Update checks against this repo's GitHub releases.
 

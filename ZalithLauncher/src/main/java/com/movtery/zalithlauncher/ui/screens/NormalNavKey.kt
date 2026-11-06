@@ -54,6 +54,10 @@ sealed interface NormalNavKey : TitledNavKey {
     @Serializable data class VoxeliumVersion(val id: String): NormalNavKey {
         @Contextual override val title: AndroidStringText = androidText(id)
     }
+    /** Voxelium: credits and licences */
+    @Serializable data object VoxeliumCredits: NormalNavKey {
+        @Contextual override val title: AndroidStringText = androidText(R.string.voxelium_ui_set_licences)
+    }
     /** Voxelium: the touch controls editor */
     @Serializable data object VoxeliumControls: NormalNavKey {
         @Contextual override val title: AndroidStringText = androidText(R.string.voxelium_ui_controls)
@@ -69,71 +73,6 @@ sealed interface NormalNavKey : TitledNavKey {
     ) : NormalNavKey {
         @Contextual override val title: AndroidStringText = androidText(R.string.versions_overview_log)
     }
-
-    /** 设置嵌套子屏幕 */
-    sealed interface Settings : NormalNavKey {
-        /** 渲染器设置屏幕 */
-        @Serializable data object Renderer : Settings {
-            @Contextual override val title: AndroidStringText = androidText(R.string.settings_tab_renderer)
-        }
-        /** 游戏设置屏幕 */
-        @Serializable data object Game : Settings {
-            @Contextual override val title: AndroidStringText = androidText(R.string.settings_tab_game)
-        }
-        /** 手柄设置屏幕 */
-        @Serializable data object Gamepad : Settings {
-            @Contextual override val title: AndroidStringText = androidText(R.string.settings_tab_gamepad)
-        }
-        /** 启动器设置屏幕 */
-        @Serializable data object Launcher : Settings {
-            @Contextual override val title: AndroidStringText = androidText(R.string.settings_tab_launcher)
-        }
-        /** Java管理屏幕 */
-        @Serializable data object JavaManager : Settings {
-            @Contextual override val title: AndroidStringText = androidText(R.string.settings_tab_java_manage)
-        }
-        /** 关于屏幕 */
-        @Serializable data object AboutInfo : Settings {
-            @Contextual override val title: AndroidStringText = androidText(R.string.settings_tab_info_about)
-        }
-    }
-
-    /** 版本详细设置嵌套子屏幕 */
-    sealed interface Versions : NormalNavKey {
-        /** 版本概览屏幕 */
-        @Serializable data object OverView : Versions {
-            @Contextual override val title: AndroidStringText = androidText(R.string.versions_settings_overview)
-        }
-        /** 版本配置屏幕 */
-        @Serializable data object Config : Versions {
-            @Contextual override val title: AndroidStringText = androidText(R.string.versions_settings_config)
-        }
-        /** 修改版本屏幕 */
-        @Serializable data object ModifyVersion : Versions {
-            @Contextual override val title: AndroidStringText = androidText(R.string.versions_modify_version)
-        }
-        /** 选择要修改的 Minecraft 版本屏幕 */
-        @Serializable data object SelectGameVersion : Versions {
-            @Contextual override val title: AndroidStringText = androidText(R.string.versions_modify_select_mc)
-        }
-        /** 模组管理屏幕 */
-        @Serializable data object ModsManager : Versions {
-            @Contextual override var title: AndroidStringText = androidText(R.string.mods_manage)
-        }
-        /** 存档管理屏幕 */
-        @Serializable data object SavesManager : Versions {
-            @Contextual override var title: AndroidStringText = androidText(R.string.saves_manage)
-        }
-        /** 资源包管理屏幕 */
-        @Serializable data object ResourcePackManager : Versions {
-            @Contextual override var title: AndroidStringText = androidText(R.string.resource_pack_manage)
-        }
-        /** 光影包管理屏幕 */
-        @Serializable data object ShadersManager : Versions {
-            @Contextual override var title: AndroidStringText = androidText(R.string.shader_pack_manage)
-        }
-    }
-
 
     /** 协议展示屏幕 */
     @Serializable data class License(

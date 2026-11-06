@@ -100,8 +100,6 @@ import com.movtery.zalithlauncher.viewmodel.LauncherUpgradeOperation
 import com.movtery.zalithlauncher.viewmodel.LauncherUpgradeViewModel
 import com.movtery.zalithlauncher.viewmodel.LogShareViewModel
 import com.movtery.zalithlauncher.viewmodel.LogsUploadViewModel
-import com.movtery.zalithlauncher.viewmodel.ModifyVersionOperation
-import com.movtery.zalithlauncher.viewmodel.ModifyVersionViewModel
 import com.movtery.zalithlauncher.viewmodel.ModpackConfirmUseMobileDataOperation
 import com.movtery.zalithlauncher.viewmodel.ModpackImportOperation
 import com.movtery.zalithlauncher.viewmodel.ModpackImportViewModel
@@ -159,7 +157,6 @@ class MainActivity : BaseAppCompatActivity() {
     /**
      * 版本修改 ViewModel
      */
-    private val modifyVersionViewModel: ModifyVersionViewModel by viewModels()
 
     /**
      * 启动器更新状态 ViewModel
@@ -308,7 +305,6 @@ class MainActivity : BaseAppCompatActivity() {
                         screenBackStackModel = screenBackStackModel,
                         eventViewModel = eventViewModel,
                         modpackImportViewModel = modpackImportViewModel,
-                        modifyVersionViewModel = modifyVersionViewModel,
                         submitError = {
                             errorViewModel.showError(it)
                         }
@@ -461,21 +457,6 @@ class MainActivity : BaseAppCompatActivity() {
                         AllSettings.lastIgnoredVersion.save(ver)
                     },
                     onLinkClick = { eventViewModel.sendEvent(EventViewModel.Event.OpenLink(it)) }
-                )
-
-                //版本修改操作流程
-                ModifyVersionOperation(
-                    operation = modifyVersionViewModel.installOperation,
-                    changeOperation = { modifyVersionViewModel.installOperation = it },
-                    installer = modifyVersionViewModel.installer,
-                    onModify = { payload ->
-                        modifyVersionViewModel.modify(this@MainActivity, payload)
-                        //任务开始执行，立刻返回主界面，不停留在可能失效的版本设置屏幕
-                        screenBackStackModel.mainScreen.clearWith(NormalNavKey.Voxelium)
-                    },
-                    onCancel = {
-                        modifyVersionViewModel.cancel()
-                    }
                 )
 
                 val vcOperation by vulkanCheckerViewModel.vcOperation.collectAsStateWithLifecycle()

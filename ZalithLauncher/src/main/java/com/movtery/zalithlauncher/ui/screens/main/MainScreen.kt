@@ -18,7 +18,6 @@
 
 package com.movtery.zalithlauncher.ui.screens.main
 
-import com.movtery.zalithlauncher.ui.voxelium.shell.MoreItem
 import com.movtery.zalithlauncher.ui.voxelium.shell.VoxeliumPlace
 import com.movtery.zalithlauncher.ui.voxelium.shell.VoxeliumRail
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -99,12 +98,11 @@ import com.movtery.zalithlauncher.ui.voxelium.logs.VoxeliumLogScreen
 import com.movtery.zalithlauncher.ui.screens.content.FirstLoginMenu
 import com.movtery.zalithlauncher.ui.voxelium.accounts.VoxeliumAccountsScreen
 import com.movtery.zalithlauncher.ui.voxelium.controls.VoxeliumControlsScreen
+import com.movtery.zalithlauncher.ui.voxelium.settings.VoxeliumCreditsScreen
 import com.movtery.zalithlauncher.ui.voxelium.settings.VoxeliumSettingsScreen
 import com.movtery.zalithlauncher.ui.voxelium.install.VoxeliumInstallScreen
 import com.movtery.zalithlauncher.ui.voxelium.play.VoxeliumPlayScreen
 import com.movtery.zalithlauncher.ui.voxelium.version.VoxeliumVersionScreen
-import com.movtery.zalithlauncher.ui.screens.content.SettingsScreen
-import com.movtery.zalithlauncher.ui.screens.content.VersionSettingsScreen
 import com.movtery.zalithlauncher.ui.screens.content.WebViewScreen
 import com.movtery.zalithlauncher.ui.screens.navigateTo
 import com.movtery.zalithlauncher.ui.screens.onBack
@@ -120,7 +118,6 @@ import com.movtery.zalithlauncher.utils.file.formatFileSize
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
 import com.movtery.zalithlauncher.viewmodel.EventViewModel
 import com.movtery.zalithlauncher.viewmodel.LocalBackgroundViewModel
-import com.movtery.zalithlauncher.viewmodel.ModifyVersionViewModel
 import com.movtery.zalithlauncher.viewmodel.ModpackImportViewModel
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
 import com.movtery.zalithlauncher.viewmodel.sendKeepScreen
@@ -131,7 +128,6 @@ fun MainScreen(
     screenBackStackModel: ScreenBackStackViewModel,
     eventViewModel: EventViewModel,
     modpackImportViewModel: ModpackImportViewModel,
-    modifyVersionViewModel: ModifyVersionViewModel,
     submitError: (ErrorViewModel.ThrowableMessage) -> Unit
 ) {
     val tasks by TaskSystem.tasksFlow.collectAsStateWithLifecycle()
@@ -174,7 +170,7 @@ fun MainScreen(
                     is NormalNavKey.VoxeliumInstall -> VoxeliumPlace.INSTALL
                     is NormalNavKey.AccountManager -> VoxeliumPlace.ACCOUNTS
                     is NormalNavKey.VoxeliumControls -> VoxeliumPlace.CONTROLS
-                    is NormalNavKey.VoxeliumSettings, is NestedNavKey.Settings -> VoxeliumPlace.SETTINGS
+                    is NormalNavKey.VoxeliumSettings, is NormalNavKey.VoxeliumCredits -> VoxeliumPlace.SETTINGS
                     else -> null
                 },
                 taskCount = tasks.size,
@@ -199,15 +195,7 @@ fun MainScreen(
                         )
                     }
                 },
-                onTasks = { changeTasksExpandedState() },
-                onMore = { item ->
-                    when (item) {
-                        MoreItem.CLASSIC_SETTINGS -> screenBackStackModel.mainScreen.removeAndNavigateTo(
-                            removes = screenBackStackModel.clearBeforeNavKeys,
-                            screenKey = screenBackStackModel.settingsScreen
-                        )
-                    }
-                }
+                onTasks = { changeTasksExpandedState() }
             )
 
             Box(
@@ -221,7 +209,6 @@ fun MainScreen(
                     toMainScreen = toMainScreen,
                     eventViewModel = eventViewModel,
                     modpackImportViewModel = modpackImportViewModel,
-                    modifyVersionViewModel = modifyVersionViewModel,
                     submitError = submitError
                 )
 
@@ -248,7 +235,6 @@ private fun NavigationUI(
     toMainScreen: () -> Unit,
     eventViewModel: EventViewModel,
     modpackImportViewModel: ModpackImportViewModel,
-    modifyVersionViewModel: ModifyVersionViewModel,
     submitError: (ErrorViewModel.ThrowableMessage) -> Unit
 ) {
     val backStack = screenBackStackModel.mainScreen.backStack
@@ -259,13 +245,6 @@ private fun NavigationUI(
     }
 
     if (backStack.isNotEmpty()) {
-        /** 导航至版本详细信息屏幕 */
-        val navigateToVersions: (Version) -> Unit = { version ->
-            screenBackStackModel.mainScreen.navigateTo(
-                screenKey = NestedNavKey.VersionSettings(version),
-                useClassEquality = true
-            )
-        }
         NavDisplay(
             backStack = backStack,
             modifier = modifier,
@@ -275,17 +254,6 @@ private fun NavigationUI(
             transitionSpec = rememberTransitionSpec(),
             popTransitionSpec = rememberTransitionSpec(),
             entryProvider = entryProvider {
-                entry<NestedNavKey.Settings> { key ->
-                    SettingsScreen(
-                        key = key,
-                        backStackViewModel = screenBackStackModel,
-                        openLicenseScreen = { raw ->
-                            backStack.navigateTo(NormalNavKey.License(raw))
-                        },
-                        eventViewModel = eventViewModel,
-                        submitError = submitError
-                    )
-                }
                 entry<NormalNavKey.License> { key ->
                     LicenseScreen(
                         key = key,
@@ -309,16 +277,6 @@ private fun NavigationUI(
                         key = key,
                         backStackViewModel = screenBackStackModel,
                         eventViewModel = eventViewModel
-                    )
-                }
-                entry<NestedNavKey.VersionSettings> { key ->
-                    VersionSettingsScreen(
-                        key = key,
-                        modifyViewModel = modifyVersionViewModel,
-                        backScreenViewModel = screenBackStackModel,
-                        backToMainScreen = toMainScreen,
-                        eventViewModel = eventViewModel,
-                        submitError = submitError
                     )
                 }
                 entry<NormalNavKey.Voxelium> {
@@ -353,8 +311,7 @@ private fun NavigationUI(
                         key = key,
                         backScreenViewModel = screenBackStackModel,
                         eventViewModel = eventViewModel,
-                        onBack = toMainScreen,
-                        onVersionSettings = navigateToVersions
+                        onBack = toMainScreen
                     )
                 }
                 entry<NormalNavKey.VoxeliumSettings> {
@@ -363,12 +320,16 @@ private fun NavigationUI(
                         eventViewModel = eventViewModel,
                         submitError = submitError,
                         openCredits = {
-                            screenBackStackModel.settingsScreen.clearWith(NormalNavKey.Settings.AboutInfo)
-                            screenBackStackModel.mainScreen.removeAndNavigateTo(
-                                removes = screenBackStackModel.clearBeforeNavKeys,
-                                screenKey = screenBackStackModel.settingsScreen
-                            )
+                            screenBackStackModel.mainScreen.navigateTo(NormalNavKey.VoxeliumCredits)
                         }
+                    )
+                }
+                entry<NormalNavKey.VoxeliumCredits> {
+                    VoxeliumCreditsScreen(
+                        backScreenViewModel = screenBackStackModel,
+                        onBack = { backStack.removeLastOrNull() },
+                        openLink = { eventViewModel.sendEvent(EventViewModel.Event.OpenLink(it)) },
+                        openLicence = { raw -> backStack.navigateTo(NormalNavKey.License(raw)) }
                     )
                 }
                 entry<NormalNavKey.VoxeliumControls> {

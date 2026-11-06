@@ -66,7 +66,7 @@ import com.movtery.zalithlauncher.ui.androidText
 import com.movtery.zalithlauncher.ui.base.BaseScreen
 import com.movtery.zalithlauncher.ui.components.SimpleAlertDialog
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
-import com.movtery.zalithlauncher.ui.screens.content.settings.progressRuntimeUri
+
 import com.movtery.zalithlauncher.ui.voxelium.components.ChoiceSetting
 import com.movtery.zalithlauncher.ui.voxelium.components.PageHeader
 import com.movtery.zalithlauncher.ui.voxelium.components.SectionLabel
@@ -87,6 +87,7 @@ private enum class Section(val label: Int) {
     GRAPHICS(R.string.voxelium_ui_set_graphics),
     JAVA(R.string.voxelium_ui_set_java),
     GAMEPAD(R.string.voxelium_ui_set_gamepad),
+    MOTION(R.string.voxelium_ui_set_motion),
     LAUNCHER(R.string.voxelium_ui_set_launcher),
     ABOUT(R.string.voxelium_ui_set_about)
 }
@@ -133,10 +134,12 @@ fun VoxeliumSettingsScreen(
                     Section.GAME -> GameSection()
                     Section.GRAPHICS -> GraphicsSection()
                     Section.JAVA -> JavaSection(submitError)
-                    Section.GAMEPAD -> GamepadSection()
+                    Section.GAMEPAD -> GamepadSectionFull()
+                    Section.MOTION -> MotionSection()
                     Section.LAUNCHER -> LauncherSection()
                     Section.ABOUT -> AboutSection(
                         openLink = { eventViewModel.sendEvent(EventViewModel.Event.OpenLink(it)) },
+                        onCheckUpdate = { eventViewModel.sendEvent(EventViewModel.Event.CheckUpdate) },
                         openCredits = openCredits
                     )
                 }
@@ -231,6 +234,7 @@ private fun GraphicsSection() {
             onClick = { AllSettings.renderer.save(r.getUniqueIdentifier()) }
         )
     }
+    RendererOptionsRow(rendererId)
     if (drivers.isNotEmpty()) {
         SectionLabel(stringResource(R.string.voxelium_ui_set_driver), modifier = Modifier.padding(top = 8.dp))
         Text(stringResource(R.string.voxelium_ui_set_driver_hint), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -266,6 +270,7 @@ private fun GraphicsSection() {
         checked = AllSettings.requestMaxRefreshRate.state,
         onChange = { AllSettings.requestMaxRefreshRate.save(it) }
     )
+    GraphicsAdvanced()
 }
 
 @Composable
@@ -330,40 +335,6 @@ private fun JavaSection(submitError: (ErrorViewModel.ThrowableMessage) -> Unit) 
 }
 
 @Composable
-private fun GamepadSection() {
-    SwitchSetting(
-        title = stringResource(R.string.voxelium_ui_set_gamepad_on),
-        summary = stringResource(R.string.voxelium_ui_set_gamepad_on_hint),
-        checked = AllSettings.gamepadControl.state,
-        onChange = { AllSettings.gamepadControl.save(it) }
-    )
-    SliderSetting(
-        title = stringResource(R.string.voxelium_ui_set_dead_zone),
-        value = AllSettings.gamepadDeadZoneScale.state,
-        range = AllSettings.gamepadDeadZoneScale.min..AllSettings.gamepadDeadZoneScale.max,
-        step = 5,
-        label = { "$it%" },
-        onChange = { AllSettings.gamepadDeadZoneScale.save(it) }
-    )
-    SliderSetting(
-        title = stringResource(R.string.voxelium_ui_set_camera_speed),
-        value = AllSettings.gamepadCameraSensitivity.state,
-        range = AllSettings.gamepadCameraSensitivity.min..AllSettings.gamepadCameraSensitivity.max,
-        step = 5,
-        label = { "$it%" },
-        onChange = { AllSettings.gamepadCameraSensitivity.save(it) }
-    )
-    SliderSetting(
-        title = stringResource(R.string.voxelium_ui_set_cursor_speed),
-        value = AllSettings.gamepadCursorSensitivity.state,
-        range = AllSettings.gamepadCursorSensitivity.min..AllSettings.gamepadCursorSensitivity.max,
-        step = 5,
-        label = { "$it%" },
-        onChange = { AllSettings.gamepadCursorSensitivity.save(it) }
-    )
-}
-
-@Composable
 private fun LauncherSection() {
     ChoiceSetting(
         title = stringResource(R.string.voxelium_ui_set_dark_mode),
@@ -407,7 +378,7 @@ private fun LauncherSection() {
 }
 
 @Composable
-private fun AboutSection(openLink: (String) -> Unit, openCredits: () -> Unit) {
+private fun AboutSection(openLink: (String) -> Unit, onCheckUpdate: () -> Unit, openCredits: () -> Unit) {
     Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainer, modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(BuildKeys.LAUNCHER_NAME, style = MaterialTheme.typography.titleLarge)
@@ -419,6 +390,9 @@ private fun AboutSection(openLink: (String) -> Unit, openCredits: () -> Unit) {
                 modifier = Modifier.padding(top = 6.dp)
             )
         }
+    }
+    SettingRow(title = stringResource(R.string.voxelium_ui_set_check_update), summary = stringResource(R.string.voxelium_ui_set_version, BuildConfig.VERSION_NAME)) {
+        OutlinedButton(onClick = onCheckUpdate) { Text(stringResource(R.string.voxelium_ui_set_check)) }
     }
     SettingRow(title = stringResource(R.string.voxelium_ui_set_github), summary = URL_VOXELIUM_ANDROID.removePrefix("https://")) {
         OutlinedButton(onClick = { openLink(URL_VOXELIUM_ANDROID) }) { Text(stringResource(R.string.voxelium_ui_set_open)) }

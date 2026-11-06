@@ -21,6 +21,15 @@ package com.movtery.zalithlauncher.ui.voxelium.version
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.runtime.mutableStateOf
+import com.movtery.zalithlauncher.game.plugin.renderer_v2.RendererV2Data
+import com.movtery.zalithlauncher.game.plugin.renderer_v2.data.EnvSettingUnit
+import com.movtery.zalithlauncher.game.plugin.renderer_v2.data.VersionEnvStorage
+import com.movtery.zalithlauncher.game.version.installed.GraphicsApi
+import com.movtery.zalithlauncher.ui.screens.content.settings.RendererV2ConfigDialog
+import com.movtery.zalithlauncher.ui.voxelium.components.SettingRow
+import com.movtery.zalithlauncher.viewmodel.EventViewModel
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -56,7 +65,7 @@ import com.movtery.zalithlauncher.utils.platform.getMaxMemoryForSettings
  * FOLLOW_GLOBAL means "same as Settings".
  */
 @Composable
-fun VersionConfigSection(version: Version) {
+fun VersionConfigSection(version: Version, eventViewModel: EventViewModel) {
     val config = version.getVersionConfig()
     var tick by remember(version) { mutableIntStateOf(0) }
     fun edit(change: VersionConfig.() -> Unit) {
@@ -124,6 +133,26 @@ fun VersionConfigSection(version: Version) {
                 onClick = { edit { renderer = r.getUniqueIdentifier() } }
             )
         }
+        // A renderer plugin's own options, kept for this version only (VersionEnvStorage).
+        val v2 = remember(config.renderer) {
+            renderers.filterIsInstance<RendererV2Data>().find { it.getUniqueIdentifier() == config.renderer }
+                ?.takeIf { it.env.getConfigurableUnits().isNotEmpty() }
+        }
+        if (v2 != null) {
+            var units by remember { mutableStateOf<List<EnvSettingUnit>?>(null) }
+            SettingRow(title = stringResource(R.string.voxelium_ui_set_renderer_options), summary = stringResource(R.string.voxelium_ui_set_renderer_options_version)) {
+                OutlinedButton(onClick = { units = v2.env.createConfigurableUnits(VersionEnvStorage(config.getVersionPath())) }) {
+                    Text(stringResource(R.string.voxelium_ui_set_open))
+                }
+            }
+            units?.let {
+                RendererV2ConfigDialog(
+                    units = it,
+                    onDismissRequest = { units = null },
+                    onResetToGlobal = { VersionEnvStorage(config.getVersionPath()).delete(); units = null }
+                )
+            }
+        }
         val drivers = remember { DriverPluginManager.getDriverList() }
         if (drivers.size > 1) {
             SectionLabel(stringResource(R.string.voxelium_ui_set_driver), modifier = Modifier.padding(top = 8.dp))
@@ -131,6 +160,32 @@ fun VersionConfigSection(version: Version) {
             for (d in drivers) {
                 PickRow(title = d.name, summary = d.summary, selected = config.driver == d.id, onClick = { edit { driver = d.id } })
             }
+        }
+
+        SectionLabel(stringResource(R.string.voxelium_ui_set_advanced), modifier = Modifier.padding(top = 8.dp))
+        ChoiceSetting(
+            title = stringResource(R.string.voxelium_ui_set_graphics_api),
+            options = listOf<GraphicsApi?>(null) + GraphicsApi.entries,
+            selected = config.graphicsApi,
+            label = {
+                when (it) {
+                    null -> same
+                    GraphicsApi.DEFAULT -> stringResource(R.string.voxelium_ui_set_graphics_api_game)
+                    GraphicsApi.DEFAULT_OPENGL -> stringResource(R.string.voxelium_ui_set_graphics_api_default_opengl)
+                    else -> it.displayName
+                }
+            },
+            onPick = { api -> edit { graphicsApi = api } }
+        )
+        TextSetting(
+            title = stringResource(R.string.voxelium_ui_set_server),
+            summary = stringResource(R.string.voxelium_ui_set_server_hint),
+            value = config.serverIp,
+            placeholder = "play.example.net",
+            onChange = { text -> config.serverIp = text.trim(); config.save() }
+        )
+        SettingRow(title = stringResource(R.string.voxelium_ui_set_vulkan_check), summary = stringResource(R.string.voxelium_ui_set_vulkan_check_hint)) {
+            OutlinedButton(onClick = { eventViewModel.sendEvent(EventViewModel.Event.VulkanCheck(version)) }) { Text(stringResource(R.string.voxelium_ui_set_check)) }
         }
     }
 }

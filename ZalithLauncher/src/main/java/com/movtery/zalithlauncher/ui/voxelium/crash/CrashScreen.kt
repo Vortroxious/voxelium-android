@@ -43,6 +43,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -85,12 +86,12 @@ fun VoxeliumCrashScreen(
         modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(horizontal = 28.dp, vertical = 20.dp),
         horizontalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        Column(modifier = Modifier.width(320.dp).fillMaxHeight().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            VoxeliumMark(48)
+        Column(modifier = Modifier.width(320.dp).fillMaxHeight().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            VoxeliumMark(40)
             Text(
                 stringResource(if (gameCrash) R.string.voxelium_ui_crash_game_title else R.string.voxelium_ui_crash_launcher_title),
                 style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 4.dp)
             )
             Text(message, style = MaterialTheme.typography.bodyMedium)
             Text(
@@ -104,10 +105,12 @@ fun VoxeliumCrashScreen(
                     OutlinedButton(onClick = onUpload, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.voxelium_ui_crash_share_link)) }
                 }
             }
-            if (canRestart) {
-                OutlinedButton(onClick = onRestart, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.voxelium_ui_crash_restart)) }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                if (canRestart) {
+                    OutlinedButton(onClick = onRestart, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.voxelium_ui_crash_restart), maxLines = 1) }
+                }
+                TextButton(onClick = onClose, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.voxelium_ui_crash_close)) }
             }
-            TextButton(onClick = onClose, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.voxelium_ui_crash_close)) }
         }
         Surface(modifier = Modifier.weight(1f).fillMaxHeight(), shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainer) {
             Column(modifier = Modifier.padding(14.dp)) {
@@ -116,13 +119,16 @@ fun VoxeliumCrashScreen(
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                val logScroll = rememberScrollState()
+                // Start at the end of the log, where the error is.
+                LaunchedEffect(Unit) { snapshotFlow { logScroll.maxValue }.collect { logScroll.scrollTo(it) } }
                 SelectionContainer(modifier = Modifier.fillMaxSize().padding(top = 8.dp)) {
                     Text(
                         text.ifEmpty { stringResource(R.string.voxelium_ui_crash_no_log) },
                         fontFamily = FontFamily.Monospace,
                         fontSize = 11.sp,
                         lineHeight = 15.sp,
-                        modifier = Modifier.verticalScroll(rememberScrollState(Int.MAX_VALUE)).horizontalScroll(rememberScrollState())
+                        modifier = Modifier.verticalScroll(logScroll).horizontalScroll(rememberScrollState())
                     )
                 }
             }

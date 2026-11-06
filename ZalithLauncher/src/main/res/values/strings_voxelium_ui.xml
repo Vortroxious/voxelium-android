@@ -7,7 +7,6 @@
     <string name="voxelium_ui_controls">Controls</string>
     <string name="voxelium_ui_settings">Settings</string>
     <string name="voxelium_ui_tasks">Tasks</string>
-    <string name="voxelium_ui_more">More</string>
 
     <string name="voxelium_ui_badge_vanilla">VANILLA</string>
     <string name="voxelium_ui_badge_modpack">MODPACK</string>
@@ -49,10 +48,7 @@
 
     <string name="voxelium_ui_tab_worlds">Worlds</string>
     <string name="voxelium_ui_tab_settings">Settings</string>
-    <string name="voxelium_ui_version_settings_title">ZalithLauncher version settings</string>
     <string name="voxelium_ui_version_more">More</string>
-    <string name="voxelium_ui_version_settings_more">Rename, custom folder, renderer options and more</string>
-    <string name="voxelium_ui_version_settings_open">Open</string>
     <string name="voxelium_ui_repair_hint">Checks every file and downloads what is missing or damaged.</string>
     <string name="voxelium_ui_delete_hint">Removes this version and its game folder.</string>
     <string name="voxelium_ui_not_found">This version is no longer installed.</string>
@@ -105,7 +101,6 @@
     <string name="voxelium_ui_accounts_remove">Remove account</string>
     <string name="voxelium_ui_accounts_encrypted">Sign-in tokens stay encrypted on this phone (Android Keystore).</string>
 
-    <string name="voxelium_ui_more_classic_settings">ZalithLauncher settings</string>
     <string name="voxelium_ui_set_game">Game</string>
     <string name="voxelium_ui_set_graphics">Graphics</string>
     <string name="voxelium_ui_set_java">Java</string>
@@ -199,4 +194,60 @@
     <string name="voxelium_ui_crash_signal">Minecraft was stopped by signal %d (a native crash).</string>
     <string name="voxelium_ui_crash_launcher_message">Voxelium closed unexpectedly.</string>
     <string name="voxelium_ui_log_subtitle">Game log · %s</string>
+
+    <string name="voxelium_ui_set_motion">Motion</string>
+    <string name="voxelium_ui_set_no_gyroscope">This phone has no gyroscope.</string>
+    <string name="voxelium_ui_set_gyro">Aim by moving the phone</string>
+    <string name="voxelium_ui_set_gyro_hint">Turn the phone to look around while you play (uses the gyroscope).</string>
+    <string name="voxelium_ui_set_gyro_speed">Motion speed</string>
+    <string name="voxelium_ui_set_gyro_invert_x">Invert left and right</string>
+    <string name="voxelium_ui_set_gyro_invert_y">Invert up and down</string>
+    <string name="voxelium_ui_set_gyro_smoothing">Smooth the motion</string>
+    <string name="voxelium_ui_set_gyro_smoothing_hint">Less shaking, a little more delay.</string>
+    <string name="voxelium_ui_set_gyro_smoothing_window">Smoothing amount</string>
+    <string name="voxelium_ui_set_gyro_rate">Update interval</string>
+    <string name="voxelium_ui_set_gyro_rate_hint">Lower is more responsive and uses more battery.</string>
+    <string name="voxelium_ui_set_gamepad_mode">How the gamepad reaches the game</string>
+    <string name="voxelium_ui_set_sticks">Sticks</string>
+    <string name="voxelium_ui_set_reset_controllers">Forget controller setups</string>
+    <string name="voxelium_ui_set_reset_controllers_hint">Clears what was learned about each connected controller\'s buttons.</string>
+    <string name="voxelium_ui_set_reset_done">Done</string>
+    <string name="voxelium_ui_set_buttons">Buttons</string>
+    <string name="voxelium_ui_set_profile">Button profile</string>
+    <string name="voxelium_ui_set_profile_new">New profile</string>
+    <string name="voxelium_ui_set_profile_delete">Delete this profile</string>
+    <string name="voxelium_ui_set_profile_delete_text">Delete the button profile “%s”?</string>
+    <string name="voxelium_ui_set_profile_taken">A profile with this name already exists.</string>
+    <string name="voxelium_ui_set_in_game">In game</string>
+    <string name="voxelium_ui_set_in_menus">In menus</string>
+    <string name="voxelium_ui_set_unbound">Not set</string>
+    <string name="voxelium_ui_set_renderer_options">Renderer options</string>
+    <string name="voxelium_ui_set_renderer_options_hint">Settings this renderer offers.</string>
+    <string name="voxelium_ui_set_advanced">Advanced</string>
+    <string name="voxelium_ui_set_graphics_api">Graphics API</string>
+    <string name="voxelium_ui_set_graphics_api_hint">For Minecraft versions that can draw with OpenGL or Vulkan.</string>
+    <string name="voxelium_ui_set_graphics_api_game">As the game chooses</string>
+    <string name="voxelium_ui_set_graphics_api_default_opengl">OpenGL unless the game chose otherwise</string>
+    <string name="voxelium_ui_set_zink_system">Use the phone\'s Vulkan driver for Zink</string>
+    <string name="voxelium_ui_set_zink_system_hint">Instead of the bundled Turnip driver.</string>
+    <string name="voxelium_ui_set_zink_vsync">VSync in Zink</string>
+    <string name="voxelium_ui_set_zink_vsync_hint">Limits Zink to the screen\'s refresh rate.</string>
+    <string name="voxelium_ui_set_surface_view">Draw on a SurfaceView</string>
+    <string name="voxelium_ui_set_surface_view_hint">Try this if the game shows a black screen or stutters.</string>
+    <string name="voxelium_ui_rename">Rename</string>
+    <string name="voxelium_ui_rename_hint">Changes this version\'s name and folder. Its worlds and mods move with it.</string>
+    <string name="voxelium_ui_rename_title">Rename %s</string>
+    <string name="voxelium_ui_rename_exists">A version with this name already exists.</string>
+    <string name="voxelium_ui_rename_blocked">Can\'t rename</string>
+    <string name="voxelium_ui_rename_needed_by">%1$s is the base of %2$s, which find it by its name.</string>
+    <string name="voxelium_ui_set_renderer_options_version">This renderer\'s settings for this version only.</string>
+    <string name="voxelium_ui_set_server">Join a server on start</string>
+    <string name="voxelium_ui_set_server_hint">The game connects to this address when it starts. Leave empty to start at the title screen.</string>
+    <string name="voxelium_ui_set_vulkan_check">Check Vulkan support</string>
+    <string name="voxelium_ui_set_vulkan_check_hint">Shows whether this phone has what this version needs to draw with Vulkan.</string>
+    <string name="voxelium_ui_set_check">Check</string>
+    <string name="voxelium_ui_credits_zalith">The launcher Voxelium for Android is built on. Copyright © 2025 MovTery and contributors, GPL-3.0.</string>
+    <string name="voxelium_ui_credits_licence">Licence</string>
+    <string name="voxelium_ui_set_check_update">Check for updates</string>
+    <string name="voxelium_ui_rename_loader">Loader installs keep their name: Voxelium recognises Fabric, Quilt, Forge and NeoForge versions by it.</string>
 </resources>

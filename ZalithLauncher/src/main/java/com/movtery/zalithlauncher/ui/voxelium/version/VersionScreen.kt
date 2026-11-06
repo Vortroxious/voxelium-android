@@ -44,6 +44,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
+import com.movtery.zalithlauncher.game.version.installed.VersionsManager
+import com.movtery.zalithlauncher.ui.components.SimpleEditDialog
+import com.movtery.zalithlauncher.ui.screens.content.elements.isFilenameInvalid
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -87,8 +94,7 @@ fun VoxeliumVersionScreen(
     key: NormalNavKey.VoxeliumVersion,
     backScreenViewModel: ScreenBackStackViewModel,
     eventViewModel: EventViewModel,
-    onBack: () -> Unit,
-    onVersionSettings: (Version) -> Unit
+    onBack: () -> Unit
 ) {
     BaseScreen(screenKey = key, currentKey = backScreenViewModel.mainScreen.currentKey) { isVisible ->
         if (!isVisible) return@BaseScreen
@@ -133,7 +139,15 @@ fun VoxeliumVersionScreen(
             when (val t = tabs[tab]) {
                 is VersionTab.Content -> ContentLibraryPane(content, t.kind, modifier = pane)
                 VersionTab.Worlds -> WorldsPane(content, modifier = pane)
-                VersionTab.Settings -> SettingsPane(v, busy, pane, onVersionSettings, onDeleted = onBack)
+                VersionTab.Settings -> SettingsPane(
+                    v, busy, pane, eventViewModel, onDeleted = onBack,
+                    onRenamed = { newId ->
+                        backScreenViewModel.mainScreen.removeAndNavigateTo(
+                            removes = backScreenViewModel.clearBeforeNavKeys,
+                            screenKey = NormalNavKey.VoxeliumVersion(newId)
+                        )
+                    }
+                )
             }
         }
     }
@@ -144,21 +158,25 @@ private fun SettingsPane(
     v: VoxeliumGame.InstalledVersion,
     busy: Boolean,
     modifier: Modifier,
-    onVersionSettings: (Version) -> Unit,
-    onDeleted: () -> Unit
+    eventViewModel: EventViewModel,
+    onDeleted: () -> Unit,
+    onRenamed: (String) -> Unit
 ) {
     var deleting by remember { mutableStateOf(false) }
+    var renaming by remember { mutableStateOf(false) }
     var problem by remember { mutableStateOf<String?>(null) }
     val version = remember(v.id) { zalithVersion(v.id) }
     Column(modifier = modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        if (version != null) VersionConfigSection(version)
+        if (version != null) VersionConfigSection(version, eventViewModel)
         else Text(stringResource(R.string.voxelium_ui_set_not_supported), color = MaterialTheme.colorScheme.onSurfaceVariant)
         SectionLabel(stringResource(R.string.voxelium_ui_version_more), modifier = Modifier.padding(top = 8.dp))
+        // Voxelium tells a loader install from a modpack by its name (as on iOS), so loader installs keep theirs.
+        val canRename = !(v.isCore && v.isModded && !v.isModpack)
         SettingRow(
-            title = stringResource(R.string.voxelium_ui_version_settings_title),
-            text = stringResource(R.string.voxelium_ui_version_settings_more)
+            title = stringResource(R.string.voxelium_ui_rename),
+            text = stringResource(if (canRename) R.string.voxelium_ui_rename_hint else R.string.voxelium_ui_rename_loader)
         ) {
-            OutlinedButton(onClick = { version?.let(onVersionSettings) }, enabled = version != null) { Text(stringResource(R.string.voxelium_ui_version_settings_open)) }
+            OutlinedButton(onClick = { renaming = true }, enabled = canRename && !busy && version != null) { Text(stringResource(R.string.voxelium_ui_rename)) }
         }
         // ZalithLauncher2 checks its own versions' files when they launch.
         if (v.isCore) {
@@ -172,6 +190,16 @@ private fun SettingsPane(
             }
         }
         problem?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
+    }
+
+    if (renaming && version != null) {
+        RenameVersionDialog(
+            v = v,
+            version = version,
+            onDismiss = { renaming = false },
+            onRenamed = { renaming = false; onRenamed(it) },
+            onError = { renaming = false; problem = it }
+        )
     }
 
     if (deleting) {
@@ -212,4 +240,56 @@ private fun SettingRow(title: String, text: String, action: @Composable () -> Un
             action()
         }
     }
+}
+
+/**
+ * Renames a version's folder (its id) with the launcher's rename. A version that others are built
+ * on (a Fabric version on its vanilla parent, say) keeps its name, since they find it by name.
+ */
+@Composable
+private fun RenameVersionDialog(
+    v: VoxeliumGame.InstalledVersion,
+    version: Version,
+    onDismiss: () -> Unit,
+    onRenamed: (String) -> Unit,
+    onError: (String) -> Unit
+) {
+    val check = remember(v.id) { VoxeliumGame.deleteCheck(v.id) }
+    if (check is VoxeliumGame.DeleteCheck.NeededBy) {
+        SimpleAlertDialog(
+            title = stringResource(R.string.voxelium_ui_rename_blocked),
+            text = stringResource(R.string.voxelium_ui_rename_needed_by, v.id, check.others.joinToString(", ")),
+            onDismiss = onDismiss
+        )
+        return
+    }
+    var name by remember { mutableStateOf(v.id) }
+    val invalid = isFilenameInvalid(name)
+    val exists = remember(name) { name != v.id && VersionsManager.isVersionExists(name, true) }
+    val scope = rememberCoroutineScope()
+    SimpleEditDialog(
+        title = stringResource(R.string.voxelium_ui_rename_title, v.id),
+        value = name,
+        onValueChange = { name = it.trim() },
+        isError = name.isEmpty() || invalid != null || exists,
+        supportingText = {
+            when {
+                name.isEmpty() -> Text(stringResource(R.string.generic_cannot_empty))
+                invalid != null -> Text(invalid)
+                exists -> Text(stringResource(R.string.voxelium_ui_rename_exists))
+            }
+        },
+        singleLine = true,
+        onDismissRequest = onDismiss,
+        onConfirm = {
+            if (name.isEmpty() || invalid != null || exists) return@SimpleEditDialog
+            if (name == v.id) { onDismiss(); return@SimpleEditDialog }
+            val newName = name
+            scope.launch {
+                runCatching { withContext(Dispatchers.IO) { VersionsManager.renameVersion(version, newName) } }
+                    .onSuccess { VoxeliumGame.refreshInstalled(); onRenamed(newName) }
+                    .onFailure { onError(it.message ?: it.toString()) }
+            }
+        }
+    )
 }

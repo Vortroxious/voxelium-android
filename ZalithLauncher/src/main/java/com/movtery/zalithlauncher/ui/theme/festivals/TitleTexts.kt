@@ -34,7 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import com.movtery.zalithlauncher.ui.screens.content.versions.elements.MinecraftColorText
+import com.movtery.zalithlauncher.ui.screens.content.elements.MinecraftColorText
 import com.movtery.zalithlauncher.utils.festival.Festival
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
