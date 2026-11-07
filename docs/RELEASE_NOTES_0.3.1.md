@@ -16,7 +16,10 @@
 
 ## Tested
 On a Galaxy Note10+ (SM-N975F):
-- With a test build of this release: the colour picker, red applied at once across the side bar, Settings and Play, and kept after restarting the app.
+- **The release APK** (`Voxelium-0.3.1-arm64-v8a.apk`, versionCode 301), confirmed as the installed build: first start, blue chosen in light mode and applied at once, an offline account, Minecraft 1.21.11 installed and started to the title screen, and quit cleanly.
+
+With a test build of this release:
+- Red in dark mode, applied at once across the side bar, Settings and Play, and kept after restarting the app.
 
 Everything else is unchanged from [0.3.0](RELEASE_NOTES_0.3.0.md).
 

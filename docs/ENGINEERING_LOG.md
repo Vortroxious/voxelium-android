@@ -11,3 +11,6 @@
   - `applyAccent()` replaces the accent slots of the Material scheme and the highlight colours. Voxelium green keeps the original scheme exactly.
   - Debug build on the Note10+: red applied at once and kept after a restart. Light mode wasn't checked on the phone.
 - **0.3.1:** version 0.3.1 (301) for the accent colour release.
+  - Built from `207219c` with `tools/build_release.sh`; the first run stopped on an empty glob in zsh, fixed with `(N)` before the build.
+  - Signed by the user with the release key (same certificate as 0.3.0).
+  - Device pass on the signed arm64 APK (installed SHA-256 matches): blue in light mode, offline account, 1.21.11 to the title screen and back. Details in RELEASE_CHECKLIST.
