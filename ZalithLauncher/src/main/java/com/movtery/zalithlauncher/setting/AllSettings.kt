@@ -391,6 +391,11 @@ object AllSettings : SettingsRegistry() {
     val launcherDarkMode = enumSetting("launcherDarkMode", DarkMode.FollowSystem)
 
     /**
+     * Voxelium: the launcher's accent colour (an id from ui/voxelium/theme/Accent.kt)
+     */
+    val voxeliumAccent = stringSetting("voxeliumAccent", "voxelium")
+
+    /**
      * 启动器语言
      */
     val launcherLanguage = enumSetting("launcherLanguage", AppLanguage.FOLLOW_SYSTEM)

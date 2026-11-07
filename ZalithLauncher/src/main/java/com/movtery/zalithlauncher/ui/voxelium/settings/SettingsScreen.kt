@@ -349,6 +349,7 @@ private fun LauncherSection() {
         },
         onPick = { AllSettings.launcherDarkMode.save(it) }
     )
+    AccentSetting()
     ChoiceSetting(
         title = stringResource(R.string.voxelium_ui_set_language),
         options = AppLanguage.entries,

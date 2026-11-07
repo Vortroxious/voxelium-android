@@ -27,6 +27,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -34,10 +35,12 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.movtery.zalithlauncher.setting.AllSettings
 
 /**
  * Voxelium's own look (the design approved on 2026-11-05): deep slate surfaces with one
- * teal-green accent, rounded 16 dp cards and pill buttons. Light and dark come from the same seed.
+ * teal-green accent (or the one chosen in Settings, see Accent.kt), rounded 16 dp cards and pill
+ * buttons. Light and dark come from the same seed.
  */
 private val VoxeliumDark: ColorScheme = darkColorScheme(
     primary = Color(0xFF3DDC97),
@@ -190,9 +193,14 @@ object Voxelium {
 
 @Composable
 fun VoxeliumTheme(dark: Boolean, content: @Composable () -> Unit) {
-    androidx.compose.runtime.CompositionLocalProvider(LocalVoxeliumColors provides if (dark) DarkExtras else LightExtras) {
+    // The accent colour from Settings → Launcher; changing it recolours the launcher at once.
+    val accent = Accent.named(AllSettings.voxeliumAccent.state)
+    val (scheme, extras) = remember(accent, dark) {
+        applyAccent(if (dark) VoxeliumDark else VoxeliumLight, if (dark) DarkExtras else LightExtras, accent, dark)
+    }
+    androidx.compose.runtime.CompositionLocalProvider(LocalVoxeliumColors provides extras) {
         MaterialTheme(
-            colorScheme = if (dark) VoxeliumDark else VoxeliumLight,
+            colorScheme = scheme,
             shapes = VoxeliumShapes,
             typography = voxeliumTypography(),
             content = content
