@@ -26,7 +26,7 @@ Minecraft 26.2 and newer draw with Vulkan and need Vulkan extensions such as `VK
 | Release | What's in it | Status |
 |---|---|---|
 | Release 0.3.0 | Voxelium's own interface (Play, Install, a page per version, Accounts, Controls, Settings) and the same touch controls as Voxelium for iOS | ✅ [Published](https://github.com/Vortroxious/Voxelium-android/releases/tag/v0.3.0) 2026-11-06 |
-| Release 0.3.1 | Accent colour: 25 colours to choose from in Settings → Launcher | ⏳ Being prepared ([release notes](docs/RELEASE_NOTES_0.3.1.md)) |
+| Release 0.3.1 | New app icon, and the accent colour: 25 colours to choose from in Settings → Launcher | ⏳ Being prepared ([release notes](docs/RELEASE_NOTES_0.3.1.md)) |
 
 ## Device requirements
 - **Android 8.0 or newer.** Builds exist for arm64-v8a, armeabi-v7a, x86 and x86_64.

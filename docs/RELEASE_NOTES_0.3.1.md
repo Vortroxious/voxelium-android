@@ -1,10 +1,11 @@
 # Voxelium 0.3.1
 
-**Choose your own colour.**
+**A new icon, and choose your own colour.**
 
 > Unofficial modified version of [Zalith Launcher 2](https://github.com/ZalithLauncher/ZalithLauncher2); please report problems here, not to the Zalith Launcher team. Not affiliated with Mojang or Microsoft. Voxelium includes no Minecraft game files; you need to own Minecraft: Java Edition to play online. Android 8.0 or newer. See the [install guide](../README.md#install).
 
 ## New
+- **New app icon:** grey cubes with a grass block, instead of Zalith Launcher 2's yellow cube. Android 13 and later can also show it in your theme's colours.
 - **Accent colour.** Settings → Launcher → **Accent colour**: pick one of 25 colours for buttons, highlights and the side bar.
   - Voxelium green (the default), red, crimson, coral, orange, amber, gold, yellow, lime, green, mint, teal, cyan, sky blue, blue, navy, indigo, purple, violet, magenta, pink, brown, gray, white and black.
   - The launcher changes colour as soon as you tap one, and keeps it after a restart.
@@ -12,14 +13,11 @@
   - The same 25 colours as Voxelium for iOS.
 
 ## Fixed
-- No fixes in this release. It adds the accent colour only.
+- No fixes in this release.
 
 ## Tested
 On a Galaxy Note10+ (SM-N975F):
-- **The release APK** (`Voxelium-0.3.1-arm64-v8a.apk`, versionCode 301), confirmed as the installed build: first start, blue chosen in light mode and applied at once, an offline account, Minecraft 1.21.11 installed and started to the title screen, and quit cleanly.
-
-With a test build of this release:
-- Red in dark mode, applied at once across the side bar, Settings and Play, and kept after restarting the app.
+- With test builds of this release: the new icon in the app drawer, nothing clipped by Samsung's icon shape; the colour picker, red in dark mode and blue in light mode applied at once across the side bar, Settings and Play, kept after restarting the app; an offline account and Minecraft 1.21.11 started to the title screen.
 
 Everything else is unchanged from [0.3.0](RELEASE_NOTES_0.3.0.md).
 

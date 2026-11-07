@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.3.1
+- **New app icon:** grey cubes with a grass block, instead of Zalith Launcher 2's yellow cube.
 - **Accent colour:** Settings → Launcher → Accent colour. 25 colours (the same as Voxelium for iOS), each with a light-mode and a dark-mode shade. The launcher recolours at once and keeps the choice. Release notes: [docs/RELEASE_NOTES_0.3.1.md](docs/RELEASE_NOTES_0.3.1.md).
 
 ## 0.3.0 (2026-11-06)
