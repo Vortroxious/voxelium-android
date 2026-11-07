@@ -17,6 +17,7 @@
 
 ## Tested
 On a Galaxy Note10+ (SM-N975F):
+- **The release APK** (`Voxelium-0.3.1-arm64-v8a.apk`, versionCode 301), confirmed as the installed build: the new icon in the app drawer, the update kept the accent colour, account and installed version, and Minecraft 1.21.11 started to the title screen and quit cleanly.
 - With test builds of this release: the new icon in the app drawer, nothing clipped by Samsung's icon shape; the colour picker, red in dark mode and blue in light mode applied at once across the side bar, Settings and Play, kept after restarting the app; an offline account and Minecraft 1.21.11 started to the title screen.
 
 Everything else is unchanged from [0.3.0](RELEASE_NOTES_0.3.0.md).
