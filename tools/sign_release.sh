@@ -1,13 +1,15 @@
 #!/bin/zsh
-# Signs the release APKs in build/release-<version>/ with your own release key and puts the signed
-# files, with the release notes and their SHA-256 checksums, in ~/Desktop/Voxelium-<version>/.
+# Signs the release APKs in build/release-<version>/ (made by tools/build_release.sh) with your own
+# release key and lays out ~/Desktop/Voxelium-<version>/ the way Voxelium for iOS does its releases:
+# each signed APK with its <apk>.sha256 (sha256sum format) and <apk>.info (key=value build facts),
+# and THIRD_PARTY_NOTICES.md. The release notes are docs/RELEASE_NOTES_<version>.md.
 #
 # The key lives outside the repo (default ~/.voxelium/voxelium-release.jks; set VOXELIUM_KEYSTORE to
 # use another). If it doesn't exist yet, it is created first. The password is typed by you and never
 # saved. Keep the keystore and its password safe: every future release must be signed with it, or
 # Android won't install the update over the old version.
 #
-# Usage (from the repository root): tools/sign_release.sh 0.3.0
+# Usage (from the repository root): tools/sign_release.sh 0.3.1
 set -euo pipefail
 
 version=${1:?usage: tools/sign_release.sh <version>}
@@ -51,18 +53,30 @@ done
 unset VOXELIUM_KS_PASS
 rm -f "$out"/*.idsig
 
-cp "$src/RELEASE_NOTES.md" "$out/RELEASE_NOTES.md"
-{
-  echo
-  echo "### SHA-256"
-  echo '```'
-  (cd "$out" && shasum -a 256 Voxelium-"$version"-*.apk)
-  echo '```'
-} >> "$out/RELEASE_NOTES.md"
+aapt2=$(ls -d "$HOME"/Library/Android/sdk/build-tools/*/aapt2 | tail -1)
+cert=$("$apksigner" verify --print-certs "$out/${apks[1]:t}" | sed -n 's/.*certificate SHA-256 digest: //p' | head -1)
+for apk in "${apks[@]}"; do
+  name=${apk:t}
+  signed="$out/$name"
+  sha=$(shasum -a 256 "$signed" | cut -d' ' -f1)
+  echo "$sha  $name" > "$signed.sha256"
+  badging=$("$aapt2" dump badging "$signed")
+  {
+    echo "apk=$signed"
+    echo "size_bytes=$(stat -f%z "$signed")"
+    echo "sha256=$sha"
+    echo "package=$(echo "$badging" | sed -n "s/^package: name='\([^']*\)'.*/\1/p")"
+    echo "version=$(echo "$badging" | sed -n "s/^package: .*versionName='\([^']*\)'.*/\1/p") ($(echo "$badging" | sed -n "s/^package: .*versionCode='\([^']*\)'.*/\1/p"))"
+    echo "min_sdk=$(echo "$badging" | sed -n "s/^minSdkVersion:'\(.*\)'/\1/p")"
+    echo "abis=$(echo "$badging" | sed -n "s/^native-code: //p" | tr -d "'")"
+    echo "signing=signed, release key certificate SHA-256 $cert"
+    grep -v '^version=' "$src/build.info"
+  } > "$signed.info"
+done
+cp THIRD_PARTY_NOTICES.md "$out/THIRD_PARTY_NOTICES.md"
 
 echo
-echo "Signing certificate:"
-"$apksigner" verify --print-certs "$out/${apks[1]:t}" | grep -E "SHA-256 digest" | head -1
+echo "Signing certificate SHA-256: $cert"
 echo
-echo "Ready in $out:"
+echo "Ready in $out (paste docs/RELEASE_NOTES_$version.md into the GitHub release):"
 ls -1 "$out"

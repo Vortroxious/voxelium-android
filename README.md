@@ -7,20 +7,26 @@ An Android launcher for **Minecraft: Java Edition**, the Android sibling of [Vox
 Not affiliated with or endorsed by Mojang Studios, Microsoft or the ZalithLauncher team. Voxelium does not include any Minecraft game files. They are downloaded from Mojang's servers to your device, and you need to own Minecraft: Java Edition to play online.
 
 ## Status
-Version 0.3.0. The launcher's logic (installs, sign-in, mods, modpacks, worlds, touch controls) runs on **VoxeliumCore**, the same core as Voxelium for iOS, ported to Kotlin ([docs/CORE_PARITY.md](docs/CORE_PARITY.md)). The interface is Voxelium's own. Zalith Launcher 2 provides the engine: starting Java, the renderers, the Java runtimes and gamepad input.
+Version 0.3.1. The launcher's logic (installs, sign-in, mods, modpacks, worlds, touch controls) runs on **VoxeliumCore**, the same core as Voxelium for iOS, ported to Kotlin ([docs/CORE_PARITY.md](docs/CORE_PARITY.md)). The interface is Voxelium's own. Zalith Launcher 2 provides the engine: starting Java, the renderers, the Java runtimes and gamepad input.
 
 - **Play** (the home screen): your installed versions, the last played one first, and who you play as.
 - **Install**: Minecraft with Vanilla, Fabric, Quilt, Forge or NeoForge, with the recommended loader build preselected, and Modpacks (Modrinth search and `.mrpack` import; each pack becomes its own version). Forge and NeoForge finish setting up while installing.
 - **Each version** has its own page: mods, resource packs and shader packs (switch on/off, remove, Modrinth updates, browse Modrinth and CurseForge with required dependencies), worlds (import or share a `.zip`, delete), and settings (memory, Java, renderer, Vulkan driver, arguments, joining a server on start), plus rename, check and repair, and delete. CurseForge files whose authors only allow their website are linked there, never downloaded.
 - **Accounts**: Microsoft sign-in (tokens encrypted with the Android Keystore), offline accounts, offline play with the saved sign-in, and skins.
 - **Controls**: the same on-screen layout, gestures and `layout.json` as Voxelium for iOS, with an editor. A layout made on iOS can be imported unchanged.
-- **Settings**: memory and Java arguments, renderer and Vulkan driver, resolution, Java runtimes (8 / 17 / 21 / 25, or import your own), gamepad with button mapping, aiming with the gyroscope, appearance and language.
+- **Settings**: memory and Java arguments, renderer and Vulkan driver, resolution, Java runtimes (8 / 17 / 21 / 25, or import your own), gamepad with button mapping, aiming with the gyroscope, appearance, accent colour (25 colours) and language.
 - Renderers Krypton Wrapper (default), GL4ES, Zink, VirGL, Freedreno (Adreno) and Panfrost (Mali), plus Turnip on Adreno.
 - Update checks against this repo's GitHub releases.
 
 Voxelium's files can be browsed from Android's Files app (Voxelium appears there as a location).
 
 Minecraft 26.2 and newer draw with Vulkan and need Vulkan extensions such as `VK_KHR_dynamic_rendering` and `VK_KHR_synchronization2`. The launcher's Vulkan check shows what a phone is missing; GPUs without them (the Mali-G76, for example) run up to 26.1.x.
+
+## Releases
+| Release | What's in it | Status |
+|---|---|---|
+| Release 0.3.0 | Voxelium's own interface (Play, Install, a page per version, Accounts, Controls, Settings) and the same touch controls as Voxelium for iOS | ✅ [Published](https://github.com/Vortroxious/Voxelium-android/releases/tag/v0.3.0) 2026-11-06 |
+| Release 0.3.1 | Accent colour: 25 colours to choose from in Settings → Launcher | ⏳ Being prepared ([release notes](docs/RELEASE_NOTES_0.3.1.md)) |
 
 ## Device requirements
 - **Android 8.0 or newer.** Builds exist for arm64-v8a, armeabi-v7a, x86 and x86_64.
@@ -29,6 +35,10 @@ Minecraft 26.2 and newer draw with Vulkan and need Vulkan extensions such as `VK
 
 ## Install
 Download the APK from [Releases](https://github.com/Vortroxious/Voxelium-android/releases) and open it on your phone. You'll need to allow installs from that source.
+- **`Voxelium-0.3.1-arm64-v8a.apk`**: almost every phone from the last several years. Pick this one if unsure.
+- **`Voxelium-0.3.1-armeabi-v7a.apk`**: older 32-bit phones only.
+
+Each APK has a `.sha256` file next to it to check the download. Releases are signed with the same key, so a new one installs over the old one and keeps your versions, accounts and worlds.
 
 ## Build
 Requirements: Android Studio (its bundled JDK works), Android SDK platform 37, and **NDK 25.2.9519653**.
